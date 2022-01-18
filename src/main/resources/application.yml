@@ -1,0 +1,15 @@
+spring:
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: poc-processor-1
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+insolvency:
+  delta:
+    topic:
+      main: main-topic
+      retry: retry-topic
+      error: error-topic

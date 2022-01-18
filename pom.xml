@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>uk.gov.companieshouse</groupId>
+		<artifactId>companies-house-spring-boot-parent</artifactId>
+		<version>1.3.0</version>
+	</parent>
+
+	<artifactId>insolvency-delta-consumer</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>insolvency-delta-consumer</name>
+	<description>Insolvency Delta Consumer</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>11</java.version>
+
+		<main.class>uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication</main.class>
+
+		<assertj-core.version>3.22.0</assertj-core.version>
+		<test-containers.version>1.16.2</test-containers.version>
+		<map-struct.version>1.4.2.Final</map-struct.version>
+		<maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
+		<docker-maven-plugin.version>1.0.0</docker-maven-plugin.version>
+		<ch-kafka.version>1.4.2</ch-kafka.version>
+		<structured-logging.version>1.9.12</structured-logging.version>
+		<kafka-models.version>1.0.17</kafka-models.version>
+		<environment-reader-library.version>1.3.6</environment-reader-library.version>
+		<jib-maven-plugin.version>3.1.1</jib-maven-plugin.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${map-struct.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>uk.gov.companieshouse</groupId>
+			<artifactId>kafka-models</artifactId>
+			<version>${kafka-models.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>uk.gov.companieshouse</groupId>
+			<artifactId>ch-kafka</artifactId>
+			<version>${ch-kafka.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>uk.gov.companieshouse</groupId>
+			<artifactId>structured-logging</artifactId>
+			<version>${structured-logging.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>uk.gov.companieshouse</groupId>
+			<artifactId>environment-reader-library</artifactId>
+			<version>${environment-reader-library.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>${assertj-core.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers</artifactId>
+			<version>${test-containers.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>kafka</artifactId>
+			<version>${test-containers.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>${main.class}</mainClass>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+				<configuration>
+					<useSystemClassLoader>false</useSystemClassLoader>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<compilerArgs>
+						<arg>-Xlint</arg>
+						<arg>-Xlint:-processing</arg>
+						<arg>-Xlint:-serial</arg>
+						<arg>-Werror</arg>
+					</compilerArgs>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>${map-struct.version}</version>
+						</path>
+					</annotationProcessorPaths>
+					<showWarnings>true</showWarnings>
+					<showDeprecation>true</showDeprecation>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.17</version>
+				<dependencies>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>7.5.1</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>${jib-maven-plugin.version}</version>
+				<configuration>
+					<container>
+						<expandClasspathDependencies>true</expandClasspathDependencies>
+					</container>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
