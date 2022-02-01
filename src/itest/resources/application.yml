@@ -10,11 +10,9 @@ spring:
 insolvency:
   delta:
     topic:
-      main: insolvency-topic
+      main: {$INSOLMAIN:insolvency-topic}
       retry: insolvency-topic-retry
       error: insolvency-topic-error
 
 logger:
   namespace: insolvency-delta-consumer
-
-api:
