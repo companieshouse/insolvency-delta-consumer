@@ -23,9 +23,9 @@
 		<assertj-core.version>3.22.0</assertj-core.version>
 		<test-containers.version>1.16.2</test-containers.version>
 		<map-struct.version>1.4.2.Final</map-struct.version>
-		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-		<maven-build-helper-plugin.version>3.0.0</maven-build-helper-plugin.version>
-		<maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+		<maven-build-helper-plugin.version>3.2.0</maven-build-helper-plugin.version>
+		<maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
 		<docker-maven-plugin.version>1.0.0</docker-maven-plugin.version>
 		<ch-kafka.version>1.4.2</ch-kafka.version>
 		<structured-logging.version>1.9.12</structured-logging.version>
@@ -33,6 +33,13 @@
 		<private-api-sdk-java.version>2.0.65</private-api-sdk-java.version>
 		<api-sdk-manager-java-library.version>1.0.4</api-sdk-manager-java-library.version>
 		<jib-maven-plugin.version>3.1.1</jib-maven-plugin.version>
+		<skip.integration.tests>false</skip.integration.tests>
+		<skip.unit.tests>false</skip.unit.tests>
+
+		<!--sonar configuration-->
+		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml,
+			${project.basedir}/target/site/jacoco-it/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+		<sonar.jacoco.reports>${project.basedir}/target/site</sonar.jacoco.reports>
 	</properties>
 
 	<dependencies>
@@ -124,6 +131,66 @@
 				<configuration>
 					<mainClass>${main.class}</mainClass>
 				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>pre-unit-test</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<!-- Sets the path to the file which contains the execution model. -->
+							<destFile>${sonar.jacoco.reports}/jacoco.exec</destFile>
+							<propertyName>surefireArgLine</propertyName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>post-unit-test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<dataFile>${sonar.jacoco.reports}/jacoco.exec</dataFile>
+							<outputDirectory>${sonar.jacoco.reports}/jacoco</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>pre-integration-test</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<!-- Sets the path to the file which contains the execution model. -->
+							<destFile>${sonar.jacoco.reports}/jacoco-it.exec</destFile>
+							<propertyName>failsafeArgLine</propertyName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>post-integration-test</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<dataFile>${sonar.jacoco.reports}/jacoco-it.exec</dataFile>
+							<outputDirectory>${sonar.jacoco.reports}/jacoco-it</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 
 			<plugin>
@@ -150,8 +217,18 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.surefire</groupId>
+						<artifactId>surefire-junit47</artifactId>
+						<version>${maven-surefire-plugin.version}</version>
+					</dependency>
+				</dependencies>
 				<configuration>
-					<useSystemClassLoader>false</useSystemClassLoader>
+					<excludes>
+						<exclude>**/*ITest.java</exclude>
+					</excludes>
+					<skipTests>${skip.unit.tests}</skipTests>
 				</configuration>
 			</plugin>
 
@@ -169,7 +246,7 @@
 				</executions>
 				<configuration>
 					<classesDirectory>${project.build.outputDirectory}</classesDirectory>
-					<skipITs>false</skipITs>
+					<skipITs>${skip.integration.tests}</skipITs>
 					<includes>
 						<include>**/*ITest.java</include>
 					</includes>
@@ -209,11 +286,6 @@
 						<version>7.5.1</version>
 					</dependency>
 				</dependencies>
-			</plugin>
-
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
 			</plugin>
 
 			<plugin>

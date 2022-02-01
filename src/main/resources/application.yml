@@ -18,3 +18,4 @@ logger:
   namespace: insolvency-delta-consumer
 
 api:
+  endpoint: ${INSOLVENCY_DATA_API_URL:localhost}
