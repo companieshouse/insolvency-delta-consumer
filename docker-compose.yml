@@ -1,25 +1,36 @@
-version: "3"
+version: '3.1'
 
 services:
 
   zookeeper:
-    image: wurstmeister/zookeeper
-    ports:
-      - 2181:2181
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
 
   kafka:
-    image: wurstmeister/kafka:0.10.1.1
+    image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
     ports:
-      - 9092:9092
+      - 29092:29092
     environment:
-      KAFKA_BROKER_ID: '1'
-      KAFKA_DELETE_TOPIC_ENABLE: 'true'
-      KAFKA_ADVERTISED_HOST_NAME: 'localhost'
-      KAFKA_ADVERTISED_PORT: '9092'
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
-      KAFKA_MESSAGE_MAX_BYTES: '200000000'
-      KAFKA_LISTENERS: 'PLAINTEXT://:9092'
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://localhost:9092'
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  kafka_manager:
+    image: hlebalbau/kafka-manager:stable
+    container_name: kafka-manager
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+      - "9000:9000"
+    environment:
+      ZK_HOSTS: "zookeeper:2181"
+      APPLICATION_SECRET: "random-secret"
+      command: -Dpidfile.path = /dev/null
