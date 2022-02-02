@@ -8,6 +8,9 @@ import uk.gov.companieshouse.api.model.ApiResponse;
 @Service
 public class InsolvencyApiService {
 
+    /**
+     * Invoke Insolvency API.
+     */
     public ApiResponse<?> invokeInsolvencyApi() {
         InternalApiClient internalApiClient = getInternalApiClient();
         internalApiClient.setBasePath("apiUrl");
