@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 public class InsolvencyApiTransformer {
 
     public String transform(String input) {
-        // TODO: Use mapStruct to tranform json object to Open API generated object
+        // TODO: Use mapStruct to transform json object to Open API generated object
         return input;
     }
 }

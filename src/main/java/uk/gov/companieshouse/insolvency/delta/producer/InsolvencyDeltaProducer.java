@@ -1,19 +1,16 @@
 package uk.gov.companieshouse.insolvency.delta.producer;
 
+import java.util.concurrent.ExecutionException;
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import uk.gov.companieshouse.insolvency.delta.consumer.InsolvencyDeltaConsumer;
-import uk.gov.companieshouse.kafka.exceptions.ProducerConfigException;
 import uk.gov.companieshouse.kafka.message.Message;
 import uk.gov.companieshouse.kafka.producer.Acks;
 import uk.gov.companieshouse.kafka.producer.CHKafkaProducer;
 import uk.gov.companieshouse.kafka.producer.ProducerConfig;
-
-import javax.annotation.PostConstruct;
-import java.util.concurrent.ExecutionException;
 
 @Component
 public class InsolvencyDeltaProducer {
@@ -24,6 +21,9 @@ public class InsolvencyDeltaProducer {
 
     private CHKafkaProducer chKafkaProducer;
 
+    /**
+     * Post construct init.
+     */
     @PostConstruct
     public void init() {
         LOGGER.debug("Configuring CH Kafka producer");
@@ -35,6 +35,9 @@ public class InsolvencyDeltaProducer {
         chKafkaProducer = new CHKafkaProducer(config);
     }
 
+    /**
+     * Send Kafka message.
+     */
     public void send(Message message) {
         try {
             chKafkaProducer.send(message);

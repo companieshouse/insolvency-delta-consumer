@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.insolvency.delta.processor;
 
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +12,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
 import uk.gov.companieshouse.insolvency.delta.producer.InsolvencyDeltaProducer;
-
-import java.util.Objects;
 
 
 @Component
@@ -25,6 +25,9 @@ public class InsolvencyDeltaProcessor {
         this.deltaProducer = deltaProducer;
     }
 
+    /**
+     * Process CHS Delta message.
+     */
     public void processDelta(Message<ChsDelta> chsDelta) {
         try {
             MessageHeaders headers = chsDelta.getHeaders();

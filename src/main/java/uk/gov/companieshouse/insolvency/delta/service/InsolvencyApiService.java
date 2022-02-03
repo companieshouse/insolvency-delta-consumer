@@ -8,9 +8,13 @@ import uk.gov.companieshouse.api.model.ApiResponse;
 @Service
 public class InsolvencyApiService {
 
+    /**
+     * Invoke Insolvency API.
+     */
     public ApiResponse<?> invokeInsolvencyApi() {
-        //TODO: Change to Provider autowire to inject prototype bean?
         InternalApiClient internalApiClient = getInternalApiClient();
+        internalApiClient.setBasePath("apiUrl");
+
         return null;
     }
 

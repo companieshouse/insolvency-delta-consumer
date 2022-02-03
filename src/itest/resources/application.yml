@@ -10,7 +10,7 @@ spring:
 insolvency:
   delta:
     topic:
-      main: {$INSOLMAIN:insolvency-topic}
+      main: { $INSOLMAIN:insolvency-topic }
       retry: insolvency-topic-retry
       error: insolvency-topic-error
 

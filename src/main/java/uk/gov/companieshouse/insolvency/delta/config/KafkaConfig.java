@@ -1,30 +1,38 @@
 package uk.gov.companieshouse.insolvency.delta.config;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.deserializer.ChsDeltaDeserializer;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Configuration
+@Profile("!test")
 public class KafkaConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
+    /**
+     * Kafka Consumer Factory Message.
+     */
     @Bean
     public ConsumerFactory<String, ChsDelta> consumerFactoryMessage() {
         return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(),
                 new ChsDeltaDeserializer());
     }
 
+    /**
+     * Kafka Listener Container Factory.
+     */
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, ChsDelta> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, ChsDelta> factory = new ConcurrentKafkaListenerContainerFactory<>();
