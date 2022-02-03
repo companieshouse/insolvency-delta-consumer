@@ -9,6 +9,7 @@ spring:
 
 insolvency:
   delta:
+    group-id: insolvency-delta-consumer
     topic:
       main: insolvency-topic
       retry: insolvency-topic-retry

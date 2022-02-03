@@ -26,21 +26,24 @@ public class InsolvencyDeltaConsumer {
     /**
      * Receives Main topic messages.
      */
-    @KafkaListener(topics = "${insolvency.delta.topic.main}", groupId = "insolvency.delta.topic.main")
+    @KafkaListener(topics = "${insolvency.delta.topic.main}",
+            groupId = "${insolvency.delta.group-id}")
     @Retryable
     public void receiveMainMessages(Message<ChsDelta> chsDeltaMessage) {
-        LOGGER.info("A new message read from MAIN topic with payload: " + chsDeltaMessage.getPayload());
+        LOGGER.info("A new message read from MAIN topic with payload: "
+                + chsDeltaMessage.getPayload());
         deltaProcessor.processDelta(chsDeltaMessage);
     }
 
     /**
      * Receives Retry topic messages.
      */
-    @KafkaListener(topics = "${insolvency.delta.topic.retry}", groupId = "insolvency.delta.topic.retry")
-    public void receiveRetryMessages(Message<ChsDelta> chsDeltaMessage) {
-        LOGGER.info(String.format("A new message read from RETRY topic with payload:%s and headers:%s ",
-                chsDeltaMessage.getPayload(), chsDeltaMessage.getHeaders()));
-        deltaProcessor.processDelta(chsDeltaMessage);
+    @KafkaListener(topics = "${insolvency.delta.topic.retry}",
+            groupId = "${insolvency.delta.group-id}")
+    public void receiveRetryMessages(Message<ChsDelta> message) {
+        LOGGER.info(String.format("A new message read from RETRY topic with payload:%s "
+                + "and headers:%s ", message.getPayload(), message.getHeaders()));
+        deltaProcessor.processDelta(message);
     }
 
 }

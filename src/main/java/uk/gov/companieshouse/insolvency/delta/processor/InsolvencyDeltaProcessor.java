@@ -31,8 +31,8 @@ public class InsolvencyDeltaProcessor {
     public void processDelta(Message<ChsDelta> chsDelta) {
         try {
             MessageHeaders headers = chsDelta.getHeaders();
-            final String receivedTopic = Objects.requireNonNull(headers.get(KafkaHeaders.RECEIVED_TOPIC)).toString();
-            final boolean isRetry = headers.containsKey("INSOLVENCY_DELTA_RETRY_COUNT");
+            final String receivedTopic =
+                    Objects.requireNonNull(headers.get(KafkaHeaders.RECEIVED_TOPIC)).toString();
             final ChsDelta payload = chsDelta.getPayload();
 
         } catch (RetryableErrorException ex) {
