@@ -1,4 +1,4 @@
-package uk.gov.companieshouse.insolvency.delta.deserializer;
+package uk.gov.companieshouse.insolvency.delta.serialization;
 
 import java.util.Arrays;
 

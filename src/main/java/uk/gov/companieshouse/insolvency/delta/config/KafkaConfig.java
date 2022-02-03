@@ -13,7 +13,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import uk.gov.companieshouse.delta.ChsDelta;
-import uk.gov.companieshouse.insolvency.delta.deserializer.ChsDeltaDeserializer;
+import uk.gov.companieshouse.insolvency.delta.serialization.ChsDeltaDeserializer;
 
 @Configuration
 @Profile("!test")
@@ -35,7 +35,8 @@ public class KafkaConfig {
      */
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, ChsDelta> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, ChsDelta> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        ConcurrentKafkaListenerContainerFactory<String, ChsDelta> factory
+                = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryMessage());
         return factory;
     }
