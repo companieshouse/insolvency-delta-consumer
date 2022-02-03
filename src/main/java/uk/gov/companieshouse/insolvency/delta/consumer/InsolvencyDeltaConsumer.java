@@ -26,7 +26,8 @@ public class InsolvencyDeltaConsumer {
     /**
      * Receives Main topic messages.
      */
-    @KafkaListener(topics = "${insolvency.delta.topic.main}", groupId = "insolvency-delta-consumer")
+    @KafkaListener(topics = "${insolvency.delta.topic.main}",
+            groupId = "${insolvency.delta.group-id}")
     @Retryable
     public void receiveMainMessages(Message<ChsDelta> chsDeltaMessage) {
         LOGGER.info("A new message read from MAIN topic with payload: "
@@ -38,7 +39,7 @@ public class InsolvencyDeltaConsumer {
      * Receives Retry topic messages.
      */
     @KafkaListener(topics = "${insolvency.delta.topic.retry}",
-            groupId = "insolvency-delta-consumer")
+            groupId = "${insolvency.delta.group-id}")
     public void receiveRetryMessages(Message<ChsDelta> message) {
         LOGGER.info(String.format("A new message read from RETRY topic with payload:%s "
                 + "and headers:%s ", message.getPayload(), message.getHeaders()));
