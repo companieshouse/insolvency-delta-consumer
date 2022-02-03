@@ -80,4 +80,14 @@ docker/kafka-stop:
 	@# Help: Stop kafka within docker
 	tilt down
 
+.PHONY: lint
+lint: lint/docker-compose sonar
+	@# Help: Run all lint/* targets and sonar
+
+.PHONY: lint/docker-compose
+lint/docker-compose:
+	@# Help: Lint docker file
+	docker-compose -f docker-compose.yml config
+
+
 
