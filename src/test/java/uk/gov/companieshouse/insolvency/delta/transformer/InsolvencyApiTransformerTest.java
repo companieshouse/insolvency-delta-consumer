@@ -1,4 +1,4 @@
-package uk.gov.companieshouse.insolvency.delta.tranformer;
+package uk.gov.companieshouse.insolvency.delta.transformer;
 
 import org.junit.Test;
 
