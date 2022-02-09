@@ -19,6 +19,10 @@ all:
 clean:
 	@# Help: Reset repo to pre-build state (i.e. a clean checkout state)
 	mvn clean 
+	rm -f ./$(artifact_name).jar
+	rm -f ./$(artifact_name)-*.zip
+	rm -rf ./build-*
+	rm -rf ./build.log-*
 
 .PHONY: build
 build:
@@ -52,15 +56,16 @@ package:
 ifndef version
 	$(error No version given. Aborting)
 endif
-	$(info Packaging version: $(version))
 	mvn versions:set -DnewVersion=$(version) -DgenerateBackupPoms=false
-	mvn package -DskipTests=true
+	$(info Packaging version: $(version))
+	@test -s ./$(artifact_name).jar || { echo "ERROR: Service JAR not found"; exit 1; }
 	$(eval tmpdir:=$(shell mktemp -d build-XXXXXXXXXX))
 	cp ./start.sh $(tmpdir)
-	cp ./target/$(artifact_name)-$(version).jar $(tmpdir)/$(artifact_name).jar
+	cp ./routes.yaml $(tmpdir)
+	cp ./$(artifact_name).jar $(tmpdir)/$(artifact_name).jar
 	cd $(tmpdir); zip -r ../$(artifact_name)-$(version).zip *
 	rm -rf $(tmpdir)
-
+	
 .PHONY: dist
 dist: clean build package
 
