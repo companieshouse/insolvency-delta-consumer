@@ -27,7 +27,9 @@ clean:
 .PHONY: build
 build:
 	@# Help: Pull down any dependencies and compile code into an executable if required
+	$(info Setting version: $(version))
 	mvn versions:set -DnewVersion=$(version) -DgenerateBackupPoms=false
+	$(info Packing version: $(version))
 	mvn package -Dmaven.test.skip=true
 	cp ./target/$(artifact_name)-$(version).jar ./$(artifact_name).jar
 
