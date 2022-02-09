@@ -1,5 +1,5 @@
-app_name: ch-processor-poc
+app_name: insolvency-delta-consumer
 group: api
-weight: 991
+weight: 900
 routes:
-   1: ^/ch-processor-poc/healthcheck
+   1: ^/insolvency-delta-consumer/healthcheck

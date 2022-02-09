@@ -41,10 +41,33 @@ test-integration:
 	@# Help: Run integration tests
 	mvn integration-test -Dskip.unit.tests=true
 
+,PHONY: run-local
+run-local: 
+	@# Help: Run springboot app locally	
+	mvn spring-boot:run
+
 .PHONY: package
 package:
 	@# Help: Create a single versioned deployable package (i.e. jar, zip, tar, etc.). May be dependent on the build target being run before package
-	mvn clean install
+ifndef version
+	$(error No version given. Aborting)
+endif
+	$(info Packaging version: $(version))
+	mvn versions:set -DnewVersion=$(version) -DgenerateBackupPoms=false
+	mvn package -DskipTests=true
+	$(eval tmpdir:=$(shell mktemp -d build-XXXXXXXXXX))
+	cp ./start.sh $(tmpdir)
+	cp ./target/$(artifact_name)-$(version).jar $(tmpdir)/$(artifact_name).jar
+	cd $(tmpdir); zip -r ../$(artifact_name)-$(version).zip *
+	rm -rf $(tmpdir)
+
+.PHONY: dist
+dist: clean build package
+
+.PHONY: sonar-pr-analysis
+sonar-pr-analysis:
+	@# Help: Run sonar scan on a PR
+	mvn sonar:sonar	-P sonar-pr-analysis
 
 .PHONY: sonar
 sonar:
