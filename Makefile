@@ -1,5 +1,5 @@
 artifact_name       := insolvency-delta-consumer
-version             := unversioned
+
 
 ## Create help from comments in Makefile
 help:
