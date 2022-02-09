@@ -1,6 +1,5 @@
 artifact_name       := insolvency-delta-consumer
 
-
 ## Create help from comments in Makefile
 help:
 	@printf "%-20s %s\n" "Target" "Description"
@@ -24,8 +23,9 @@ clean:
 .PHONY: build
 build:
 	@# Help: Pull down any dependencies and compile code into an executable if required
+	mvn versions:set -DnewVersion=$(version) -DgenerateBackupPoms=false
 	mvn package -Dmaven.test.skip=true
-	cp ./target/$(artifact_name)-$(version).jar ./target/$(artifact_name).jar
+	cp ./target/$(artifact_name)-$(version).jar ./$(artifact_name).jar
 
 .PHONY: test
 test: test-integration test-unit 
