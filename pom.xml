@@ -317,6 +317,7 @@
 					<failsOnError>true</failsOnError>
 					<failOnViolation>true</failOnViolation>
 					<configLocation>companieshouse_checks.xml</configLocation>
+					<violationIgnore>LineLength,CustomImportOrder</violationIgnore>
 				</configuration>
 				<dependencies>
 					<dependency>

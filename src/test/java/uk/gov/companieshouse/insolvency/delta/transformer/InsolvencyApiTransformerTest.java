@@ -12,7 +12,7 @@ public class InsolvencyApiTransformerTest {
     @Test
     public void transformSuccessfully() {
         final InsolvencyDelta input = new InsolvencyDelta();
-        assertThat(transformer.transform(input)).isEqualTo(input);
+        assertThat(transformer.transform(input)).isEqualTo(input.toString());
     }
 
 }

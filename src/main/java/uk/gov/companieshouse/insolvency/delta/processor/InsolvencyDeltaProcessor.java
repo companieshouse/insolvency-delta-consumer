@@ -25,7 +25,8 @@ public class InsolvencyDeltaProcessor {
     private final InsolvencyApiTransformer transformer;
 
     @Autowired
-    public InsolvencyDeltaProcessor(InsolvencyDeltaProducer deltaProducer, InsolvencyApiTransformer transformer) {
+    public InsolvencyDeltaProcessor(InsolvencyDeltaProducer deltaProducer,
+                                    InsolvencyApiTransformer transformer) {
         this.deltaProducer = deltaProducer;
         this.transformer = transformer;
     }
