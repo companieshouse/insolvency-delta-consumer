@@ -1,17 +1,21 @@
+server:
+  port: 8081
+
+springfox:
+  documentation:
+    auto-startup: false
+
 spring:
   kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      group-id: insolvency-delta-consumer
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    bootstrap-servers: ${DATA_SYNC_KAFKA_BROKER_URL:localhost:9092}
 
 insolvency:
   delta:
     group-id: insolvency-delta-consumer
+    main-id: insolvency-main-consumer
+    retry-id: insolvency-retry-consumer
     topic:
-      main: insolvency-topic
+      main: insolvency-delta
       retry: insolvency-topic-retry
       error: insolvency-topic-error
 
