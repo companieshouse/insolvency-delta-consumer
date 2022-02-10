@@ -28,7 +28,7 @@ public class KafkaTestContainerConfig {
     }
 
     @Bean
-    ConcurrentKafkaListenerContainerFactory<Integer, String> kafkaListenerContainerFactory() {
+    ConcurrentKafkaListenerContainerFactory<Integer, String> listenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<Integer, String> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());

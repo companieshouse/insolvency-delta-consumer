@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.insolvency.delta.processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +15,6 @@ import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
 import uk.gov.companieshouse.insolvency.delta.producer.InsolvencyDeltaProducer;
 import uk.gov.companieshouse.insolvency.delta.transformer.InsolvencyApiTransformer;
 
-import java.util.Objects;
-
-
 @Component
 public class InsolvencyDeltaProcessor {
 
@@ -25,7 +23,8 @@ public class InsolvencyDeltaProcessor {
     private final InsolvencyApiTransformer transformer;
 
     @Autowired
-    public InsolvencyDeltaProcessor(InsolvencyDeltaProducer deltaProducer, InsolvencyApiTransformer transformer) {
+    public InsolvencyDeltaProcessor(InsolvencyDeltaProducer deltaProducer,
+                                    InsolvencyApiTransformer transformer) {
         this.deltaProducer = deltaProducer;
         this.transformer = transformer;
     }
@@ -41,7 +40,8 @@ public class InsolvencyDeltaProcessor {
             final ChsDelta payload = chsDelta.getPayload();
 
             ObjectMapper mapper = new ObjectMapper();
-            InsolvencyDelta insolvencyDelta = mapper.readValue(payload.getData(), InsolvencyDelta.class);
+            InsolvencyDelta insolvencyDelta = mapper.readValue(payload.getData(),
+                    InsolvencyDelta.class);
 
             transformer.transform(insolvencyDelta);
         } catch (RetryableErrorException ex) {
