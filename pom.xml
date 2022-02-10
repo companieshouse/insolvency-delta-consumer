@@ -30,7 +30,7 @@
 		<ch-kafka.version>1.4.2</ch-kafka.version>
 		<structured-logging.version>1.9.12</structured-logging.version>
 		<kafka-models.version>1.0.25</kafka-models.version>
-		<private-api-sdk-java.version>2.0.65</private-api-sdk-java.version>
+		<private-api-sdk-java.version>2.0.105</private-api-sdk-java.version>
 		<api-sdk-manager-java-library.version>1.0.4</api-sdk-manager-java-library.version>
 		<jib-maven-plugin.version>3.1.1</jib-maven-plugin.version>
 		<skip.integration.tests>false</skip.integration.tests>
@@ -38,7 +38,8 @@
 
 		<!--sonar configuration-->
 		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml,
-			${project.basedir}/target/site/jacoco-it/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+			${project.basedir}/target/site/jacoco-it/jacoco.xml
+		</sonar.coverage.jacoco.xmlReportPaths>
 		<sonar.jacoco.reports>${project.basedir}/target/site</sonar.jacoco.reports>
 	</properties>
 
