@@ -20,7 +20,7 @@ public class CommonApiSteps {
 
     @Given("the application running")
     public void theApplicationRunning() {
-        // TODO: Zahid: assert app running
+        assertThat(restTemplate).isNotNull();
         lastResponse = null;
     }
 
