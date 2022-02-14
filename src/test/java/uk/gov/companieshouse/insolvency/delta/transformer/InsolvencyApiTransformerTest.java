@@ -1,6 +1,6 @@
 package uk.gov.companieshouse.insolvency.delta.transformer;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.companieshouse.api.delta.InsolvencyDelta;
 
 import static org.assertj.core.api.Assertions.assertThat;
