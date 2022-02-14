@@ -3,19 +3,11 @@ package uk.gov.companieshouse.insolvency.delta.consumer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import uk.gov.companieshouse.delta.ChsDelta;
-import uk.gov.companieshouse.insolvency.delta.config.KafkaTestContainerConfig;
+import uk.gov.companieshouse.insolvency.delta.AbstractIntegrationTest;
 
-@SpringBootTest
-@DirtiesContext
-@Import(KafkaTestContainerConfig.class)
-@ActiveProfiles({"test"})
-public class InsolvencyDeltaConsumerITest {
+public class InsolvencyDeltaConsumerITest extends AbstractIntegrationTest {
 
     @Autowired
     public KafkaTemplate<String, ChsDelta> kafkaTemplate;
