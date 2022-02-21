@@ -1,7 +1,13 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.time.LocalDate;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.tomcat.jni.Local;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.FileCopyUtils;
@@ -9,14 +15,10 @@ import uk.gov.companieshouse.api.delta.Insolvency;
 import uk.gov.companieshouse.api.delta.InsolvencyDelta;
 import uk.gov.companieshouse.api.insolvency.CaseDates;
 import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
+import uk.gov.companieshouse.api.insolvency.ModelCase;
+import uk.gov.companieshouse.api.insolvency.Practitioners;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.time.LocalDate;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
-public class InsolvencyMapperTest {
+class InsolvencyMapperTest {
     private ObjectMapper mapper;
     private Insolvency insolvency;
 
@@ -32,7 +34,7 @@ public class InsolvencyMapperTest {
     }
 
     @Test
-    public void shouldMapInsolvencyToCompanyInsolvency() {
+    void shouldMapInsolvencyToCompanyInsolvency() {
 //        Insolvency insolvency = new Insolvency();
 //        insolvency.setDeltaAt("20211008152823383176");
 //
@@ -64,14 +66,24 @@ public class InsolvencyMapperTest {
         assertThat(insolvency).isNotNull();
         assertThat(insolvencyTarget).isNotNull();
         assertThat(insolvencyTarget.getDeltaAt()).isEqualTo("20211008152823383176");
-        assertThat(insolvencyTarget.getCases().get(0).getNumber()).isEqualTo(1);
-        assertThat(insolvencyTarget.getCases().get(0).getPractitioners().get(0).getName()).isEqualTo("Bernard Hoffman");
-        assertThat(insolvencyTarget.getCases().get(0).getPractitioners().get(0).getAppointedOn()).isEqualTo(LocalDate.of(2020, 05, 06));
-        assertThat(insolvencyTarget.getCases().get(0).getDates().size()).isEqualTo(2);
-        assertThat(insolvencyTarget.getCases().get(0).getDates().get(0).getDate()).isEqualTo(LocalDate.of(2020,05,06));
-        assertThat(insolvencyTarget.getCases().get(0).getDates().get(0).getType()).isEqualTo(CaseDates.TypeEnum.WOUND_UP_ON);
-        assertThat(insolvencyTarget.getCases().get(0).getDates().get(1).getDate()).isEqualTo(LocalDate.of(2020,04,29));
-        assertThat(insolvencyTarget.getCases().get(0).getDates().get(1).getType()).isEqualTo(CaseDates.TypeEnum.DECLARATION_SOLVENT_ON);
+
+        assertThat(insolvencyTarget.getCases().size()).isEqualTo(1);
+        ModelCase firstCase = insolvencyTarget.getCases().get(0);
+
+        assertThat(firstCase.getNumber()).isEqualTo(1);
+        assertThat(firstCase.getPractitioners().size()).isEqualTo(1);
+
+        Practitioners firstPractitioner = firstCase.getPractitioners().get(0);
+        assertThat(firstPractitioner.getName()).isEqualTo("Bernard Hoffman");
+        assertThat(firstPractitioner.getAppointedOn()).isEqualTo(LocalDate.of(2020, 05, 06));
+
+        assertThat(firstCase.getDates().size()).isEqualTo(2);
+        List<CaseDates> caseDates = firstCase.getDates();
+
+        assertThat(caseDates.get(0).getType()).isEqualTo(CaseDates.TypeEnum.WOUND_UP_ON);
+        assertThat(caseDates.get(0).getDate()).isEqualTo(LocalDate.of(2020,05,06));
+        assertThat(caseDates.get(1).getType()).isEqualTo(CaseDates.TypeEnum.DECLARATION_SOLVENT_ON);
+        assertThat(caseDates.get(1).getDate()).isEqualTo(LocalDate.of(2020,04,29));
 
     }
 }
