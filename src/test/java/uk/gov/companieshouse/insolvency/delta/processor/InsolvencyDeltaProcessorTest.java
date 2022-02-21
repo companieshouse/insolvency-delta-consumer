@@ -92,6 +92,7 @@ public class InsolvencyDeltaProcessorTest {
         caseNumber.setCaseTypeId(CaseNumber.CaseTypeIdEnum.NUMBER_1);
         caseNumber.setSwornDate("20200429");
         caseNumber.windUpDate("20200506");
+        caseNumber.setMortgageId(Long.valueOf("3001368176"));
         caseNumber.addAppointmentsItem(appointment);
 
         Insolvency insolvency = new Insolvency();
