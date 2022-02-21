@@ -1,9 +1,11 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
+import static uk.gov.companieshouse.api.delta.CaseNumber.CaseTypeEnum.ADMINISTRATION;
+import static uk.gov.companieshouse.api.delta.CaseNumber.CaseTypeEnum.FOREIGN_INSOLVENCY;
+import static uk.gov.companieshouse.api.delta.CaseNumber.CaseTypeEnum.IN_ADMINISTRATION;
 import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.ADMINISTRATION_DISCHARGED_ON;
 import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.ADMINISTRATION_ENDED_ON;
 import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.ADMINISTRATION_STARTED_ON;
-import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.CASE_END_ON;
 import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.CONCLUDED_WINDING_UP_ON;
 import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.DECLARATION_SOLVENT_ON;
 import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.DISSOLVED_ON;
@@ -28,30 +30,44 @@ import uk.gov.companieshouse.api.insolvency.CaseDates;
 public final class Utils {
 
     // make the class noninstantiable
-    private Utils() {}
+    private Utils() {
+    }
 
+    /**
+     * NB: Source does not have a corresponding date to map to the following target enum members:
+     * MORATORIUM_ENDED_ON, CASE_END_ON, ORDERED_TO_WIND_UP_ON.
+     *
+     * @param sourceCase the source case containing all dates as non-nested properties
+     * @return a map of target enum values and the corresponding source case dates
+     */
     private static EnumMap<CaseDates.TypeEnum, String> createMapping(CaseNumber sourceCase) {
         EnumMap<CaseDates.TypeEnum, String> datesWithTargetEnums =
                 new EnumMap<>(CaseDates.TypeEnum.class);
 
-        // TODO check mappings; could be more than one mapped to the same enum or even missing
         datesWithTargetEnums.put(INSTRUMENTED_ON, sourceCase.getInstrumentDate());
-        datesWithTargetEnums.put(ADMINISTRATION_STARTED_ON, sourceCase.getAdminOrderDate());
         datesWithTargetEnums.put(ADMINISTRATION_DISCHARGED_ON,
-                sourceCase.getDischargeAdminOrderDate()); // ?
+                sourceCase.getDischargeAdminOrderDate());
         datesWithTargetEnums.put(ADMINISTRATION_ENDED_ON, sourceCase.getAdminEndDate());
         datesWithTargetEnums.put(CONCLUDED_WINDING_UP_ON, sourceCase.getWindUpConclusionDate());
         datesWithTargetEnums.put(PETITIONED_ON, sourceCase.getPetitionDate());
-        // datesWithTargetEnums.put(ORDERED_TO_WIND_UP_ON, sourceCase); // ?
         datesWithTargetEnums.put(DUE_TO_BE_DISSOLVED_ON, sourceCase.getDissolvedDueDate());
-        datesWithTargetEnums.put(CASE_END_ON, sourceCase.getCompletionDate());
         datesWithTargetEnums.put(WOUND_UP_ON, sourceCase.getWindUpDate());
         datesWithTargetEnums.put(VOLUNTARY_ARRANGEMENT_STARTED_ON, sourceCase.getReportDate());
         datesWithTargetEnums.put(VOLUNTARY_ARRANGEMENT_ENDED_ON, sourceCase.getCompletionDate());
         datesWithTargetEnums.put(MORATORIUM_STARTED_ON, sourceCase.getAppointmentDate());
-        // datesWithTargetEnums.put(MORATORIUM_ENDED_ON, sourceCase); // ?
         datesWithTargetEnums.put(DECLARATION_SOLVENT_ON, sourceCase.getSwornDate());
         datesWithTargetEnums.put(DISSOLVED_ON, sourceCase.getDissolvedDate());
+
+        // Special mapping cases
+        if (sourceCase.getCaseType() == FOREIGN_INSOLVENCY) {
+            datesWithTargetEnums.replace(MORATORIUM_STARTED_ON, null);
+        }
+        if (sourceCase.getCaseType() == ADMINISTRATION) {
+            datesWithTargetEnums.put(ADMINISTRATION_STARTED_ON, sourceCase.getAdminOrderDate());
+        }
+        if (sourceCase.getCaseType() == IN_ADMINISTRATION) {
+            datesWithTargetEnums.put(ADMINISTRATION_STARTED_ON, sourceCase.getAdminStartDate());
+        }
 
         return datesWithTargetEnums;
     }
@@ -67,6 +83,7 @@ public final class Utils {
      * Converts the dates in the source case to the target model comprised of an Enum matching the
      * name of the date property and the LocalDate parsed from its string representation in the
      * source. Returns a list of CaseDates objects to be used in the target ModelCase.
+     *
      * @param sourceCase the source case containing all dates as non-nested properties
      * @return list of all non-empty CaseDates mapped from the source.
      */

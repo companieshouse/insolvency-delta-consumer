@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.FileCopyUtils;
+import uk.gov.companieshouse.api.delta.CaseNumber;
 import uk.gov.companieshouse.api.delta.Insolvency;
 import uk.gov.companieshouse.api.delta.InsolvencyDelta;
 import uk.gov.companieshouse.api.insolvency.CaseDates;
@@ -27,7 +28,8 @@ class InsolvencyMapperTest {
         mapper = new ObjectMapper();
 
         String path = "insolvency-delta-example.json";
-        String input = FileCopyUtils.copyToString(new InputStreamReader(ClassLoader.getSystemClassLoader().getResourceAsStream(path)));
+        String input =
+                FileCopyUtils.copyToString(new InputStreamReader(ClassLoader.getSystemClassLoader().getResourceAsStream(path)));
 
         final InsolvencyDelta insolvencyDelta = mapper.readValue(input, InsolvencyDelta.class);
         insolvency = insolvencyDelta.getInsolvency().get(0);
@@ -61,7 +63,8 @@ class InsolvencyMapperTest {
 //        sourceCase.addAppointmentsItem(sourcePractitioner);
 //        insolvency.addCaseNumbersItem(sourceCase);
 //
-        InternalCompanyInsolvency insolvencyTarget = InsolvencyMapper.INSTANCE.insolvencyDeltaToApi(insolvency);
+        InternalCompanyInsolvency insolvencyTarget =
+                InsolvencyMapper.INSTANCE.insolvencyDeltaToApi(insolvency);
 
         assertThat(insolvency).isNotNull();
         assertThat(insolvencyTarget).isNotNull();
@@ -71,6 +74,10 @@ class InsolvencyMapperTest {
         ModelCase firstCase = insolvencyTarget.getCases().get(0);
 
         assertThat(firstCase.getNumber()).isEqualTo(1);
+        assertThat(firstCase.getType().getValue()
+                .replace("-", " ").toUpperCase())
+                .isEqualTo(CaseNumber.CaseTypeEnum.MEMBERS_VOLUNTARY_LIQUIDATION
+                        .getValue().toUpperCase());
         assertThat(firstCase.getPractitioners().size()).isEqualTo(1);
 
         Practitioners firstPractitioner = firstCase.getPractitioners().get(0);
@@ -81,9 +88,9 @@ class InsolvencyMapperTest {
         List<CaseDates> caseDates = firstCase.getDates();
 
         assertThat(caseDates.get(0).getType()).isEqualTo(CaseDates.TypeEnum.WOUND_UP_ON);
-        assertThat(caseDates.get(0).getDate()).isEqualTo(LocalDate.of(2020,05,06));
+        assertThat(caseDates.get(0).getDate()).isEqualTo(LocalDate.of(2020, 05, 06));
         assertThat(caseDates.get(1).getType()).isEqualTo(CaseDates.TypeEnum.DECLARATION_SOLVENT_ON);
-        assertThat(caseDates.get(1).getDate()).isEqualTo(LocalDate.of(2020,04,29));
+        assertThat(caseDates.get(1).getDate()).isEqualTo(LocalDate.of(2020, 04, 29));
 
     }
 }

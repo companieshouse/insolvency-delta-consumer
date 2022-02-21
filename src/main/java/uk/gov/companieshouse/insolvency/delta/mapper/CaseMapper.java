@@ -5,6 +5,7 @@ import java.util.List;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ValueMapping;
 import org.mapstruct.ValueMappings;
@@ -40,8 +41,8 @@ public interface CaseMapper {
             @ValueMapping(target = "CORPORATE_VOLUNTARY_ARRANGEMENT_MORATORIUM", source =
                     "CVA_MORATORIA"),
             @ValueMapping(target = "FOREIGN_INSOLVENCY", source = "FOREIGN_INSOLVENCY"),
-            // TODO: Wrong mapping
-            @ValueMapping(target = "RECEIVERSHIP", source = "MORATORIUM")})
+            // Currently missing a target enum for Moratorium - see mapping spreadsheet
+            @ValueMapping(target = MappingConstants.NULL, source = "MORATORIUM")})
     ModelCase map(CaseNumber sourceCase);
 
     /**
