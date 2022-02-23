@@ -1,13 +1,24 @@
 package uk.gov.companieshouse.insolvency.delta.transformer;
 
 import org.springframework.stereotype.Component;
-import uk.gov.companieshouse.api.delta.InsolvencyDelta;
+import uk.gov.companieshouse.api.delta.Insolvency;
+import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
+import uk.gov.companieshouse.insolvency.delta.mapper.InsolvencyMapper;
 
 @Component
 public class InsolvencyApiTransformer {
 
-    public String transform(InsolvencyDelta insolvencyDelta) {
-        // TODO: Use mapStruct to transform json object to Open API generated object
-        return insolvencyDelta.toString();
+    /**
+     * Transforms an Insolvency object from an InsolvencyDelta object
+     * into an InternalCompanyInsolvency using mapstruct.
+     * @param insolvency source object
+     * @return source object mapped to InternalCompanyInsolvency
+     */
+    public InternalCompanyInsolvency transform(Insolvency insolvency) {
+        String companyNumber = insolvency.getCompanyNumber();
+        InternalCompanyInsolvency transformedInsolvency =
+                InsolvencyMapper.INSTANCE.insolvencyDeltaToApi(insolvency, companyNumber);
+
+        return transformedInsolvency;
     }
 }

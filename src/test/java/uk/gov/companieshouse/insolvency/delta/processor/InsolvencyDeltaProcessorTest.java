@@ -46,11 +46,12 @@ public class InsolvencyDeltaProcessorTest {
     void When_ValidChsDeltaMessage_Expect_ValidInsolvencyDeltaMapping() throws IOException {
         Message<ChsDelta> mockChsDeltaMessage = createChsDeltaMessage();
         InsolvencyDelta expectedInsolvencyDelta = createInsolvencyDelta();
-        when(transformer.transform(expectedInsolvencyDelta)).thenCallRealMethod();
+        Insolvency expectedInsolvency = expectedInsolvencyDelta.getInsolvency().get(0);
+        when(transformer.transform(expectedInsolvency)).thenCallRealMethod();
 
         deltaProcessor.processDelta(mockChsDeltaMessage);
 
-        verify(transformer).transform(expectedInsolvencyDelta);
+        verify(transformer).transform(expectedInsolvency);
     }
 
     private Message<ChsDelta> createChsDeltaMessage() throws IOException {
@@ -78,6 +79,7 @@ public class InsolvencyDeltaProcessorTest {
         address.setLocality("Whetstone");
         address.setRegion("London");
         address.setPostalCode("N20 0LH");
+        address.setCountry("");
 
         Appointment appointment = new Appointment();
         appointment.setForename("Bernard");

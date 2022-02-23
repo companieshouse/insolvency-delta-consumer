@@ -7,6 +7,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
+import uk.gov.companieshouse.api.delta.Insolvency;
 import uk.gov.companieshouse.api.delta.InsolvencyDelta;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
@@ -47,7 +48,12 @@ public class InsolvencyDeltaProcessor {
             InsolvencyDelta insolvencyDelta = mapper.readValue(payload.getData(),
                     InsolvencyDelta.class);
 
-            transformer.transform(insolvencyDelta);
+            /** We always receive only one insolvency/charge per delta in a list,
+             * so we only take the first element
+             * CHIPS is not able to send more than one insolvency per delta.
+             **/
+            Insolvency insolvency = insolvencyDelta.getInsolvency().get(0);
+            transformer.transform(insolvency);
         } catch (RetryableErrorException ex) {
             retryDeltaMessage(chsDelta);
         } catch (Exception ex) {
