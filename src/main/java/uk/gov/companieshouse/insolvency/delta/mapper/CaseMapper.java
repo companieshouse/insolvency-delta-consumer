@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
@@ -64,12 +65,14 @@ public interface CaseMapper {
         List<CaseDates> mappedCaseDates = Utils.mapAndAggregateCaseDates(sourceCase);
         modelCase.setDates(mappedCaseDates);
 
-        String mortgageId = sourceCase.getMortgageId().toString();
-        String link = String.format("/company/%s/charges/%s", companyNumber, mortgageId);
+        Optional<Long> optionalMortgageId = Optional.ofNullable(sourceCase.getMortgageId());
+        optionalMortgageId.ifPresent(mortgageId -> {
+            String link = String.format("/company/%s/charges/%s", companyNumber, mortgageId);
 
-        Links links = new Links();
-        links.setCharge(link);
-        modelCase.setLinks(links);
+            Links links = new Links();
+            links.setCharge(link);
+            modelCase.setLinks(links);
+        });
     }
 
 }

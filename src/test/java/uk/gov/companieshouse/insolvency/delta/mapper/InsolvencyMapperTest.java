@@ -37,14 +37,8 @@ class InsolvencyMapperTest {
 
     @Test
     void shouldMapInsolvencyToCompanyInsolvency() {
-//        Insolvency insolvency = new Insolvency();
-//        insolvency.setDeltaAt("20211008152823383176");
 //
-//        CaseNumber sourceCase = new CaseNumber();
-//        sourceCase.setCaseNumber(1);
-//        sourceCase.setCaseType(CaseNumber.CaseTypeEnum.RECEIVER_MANAGER);
-//        sourceCase.setCaseTypeId(CaseNumber.CaseTypeIdEnum.NUMBER_5);
-//        sourceCase.mortgageId(Long.valueOf("3001368176"));
+
 //
 //        Appointment sourcePractitioner = new Appointment();
 //        sourcePractitioner.setForename("Gilbert");
