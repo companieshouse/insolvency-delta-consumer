@@ -24,31 +24,31 @@ public interface PractitionersMapper {
     @Mapping(target = "ceasedToActOn", source = "ceasedToActAppt", dateFormat = "yyyyMMdd")
     @Mapping(target = "role", source = "apptType")
     @ValueMappings({
-            @ValueMapping(source = "NUMBER_1", target = "PRACTITIONER"),
-            @ValueMapping(source = "NUMBER_2", target = "PROVISIONAL_LIQUIDATOR"),
-            @ValueMapping(source = "NUMBER_3", target = "INTERIM_LIQUIDATOR"),
-            @ValueMapping(source = "NUMBER_4", target = "FINAL_LIQUIDATOR"),
-            @ValueMapping(source = "NUMBER_5", target = "RECEIVER"),
-            @ValueMapping(source = "NUMBER_6", target = "ADMINISTRATIVE_RECEIVER"),
-            @ValueMapping(source = "NUMBER_7", target = "RECEIVER_MANAGER"),
-            @ValueMapping(source = "NUMBER_8", target = "PROPOSED_LIQUIDATOR")})
+            @ValueMapping(target = "PRACTITIONER", source = "NUMBER_1"),
+            @ValueMapping(target = "PROVISIONAL_LIQUIDATOR", source = "NUMBER_2"),
+            @ValueMapping(target = "INTERIM_LIQUIDATOR", source = "NUMBER_3"),
+            @ValueMapping(target = "FINAL_LIQUIDATOR", source = "NUMBER_4"),
+            @ValueMapping(target = "RECEIVER", source = "NUMBER_5"),
+            @ValueMapping(target = "ADMINISTRATIVE_RECEIVER", source = "NUMBER_6"),
+            @ValueMapping(target = "RECEIVER_MANAGER", source = "NUMBER_7"),
+            @ValueMapping(target = "PROPOSED_LIQUIDATOR", source = "NUMBER_8")})
     Practitioners map(Appointment sourcePractitioner);
 
     /**
-     * Concatenates practitioner name to one string.
-     * @param practitioners target practitioner.
+     * Concatenates practitioner names to a string.
+     *
+     * @param practitioners      target practitioner.
      * @param sourcePractitioner source practitioner.
      */
     @AfterMapping
-    default void setPractitionerName(
-            @MappingTarget Practitioners practitioners, Appointment sourcePractitioner) {
-        String joined =
-                Stream.of(sourcePractitioner.getForename(),
-                            sourcePractitioner.getMiddleName(),
-                            sourcePractitioner.getSurname())
-                    .filter(s -> s != null && !s.isEmpty())
-                    .collect(Collectors.joining(" "));
+    default void setPractitionerName(@MappingTarget Practitioners practitioners,
+                                     Appointment sourcePractitioner) {
+        String joinedPractitionerNames = Stream.of(sourcePractitioner.getForename(),
+                        sourcePractitioner.getMiddleName(),
+                        sourcePractitioner.getSurname())
+                .filter(s -> s != null && !s.isEmpty())
+                .collect(Collectors.joining(" "));
 
-        practitioners.setName(joined);
+        practitioners.setName(joinedPractitionerNames);
     }
 }

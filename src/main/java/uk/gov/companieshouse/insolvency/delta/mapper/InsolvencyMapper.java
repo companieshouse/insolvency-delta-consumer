@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -11,10 +12,9 @@ public interface InsolvencyMapper {
     InsolvencyMapper INSTANCE = Mappers.getMapper(InsolvencyMapper.class);
 
     @Mapping(target = "etag", ignore = true) // doesn't exist on source
-    @Mapping(target = "status", ignore = true) // TODO doesn't seem to exist on source - confirm
+    @Mapping(target = "status", ignore = true) // doesn't exist on source
+    @Mapping(target = "deltaAt", source = "deltaAt")
     @Mapping(target = "cases", source = "caseNumbers")
-    InternalCompanyInsolvency insolvencyDeltaToApi(Insolvency insolvency);
-    // each InsolvencyDelta contains a List<Insolvency>, and each of these in turn contains:
-    // companyNumber, deltaAt, List<CaseNumber>
-
+    InternalCompanyInsolvency insolvencyDeltaToApi(Insolvency insolvency,
+                                                   @Context String companyNumber);
 }
