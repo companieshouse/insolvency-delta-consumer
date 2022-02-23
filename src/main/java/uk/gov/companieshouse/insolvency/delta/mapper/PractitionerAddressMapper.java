@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import uk.gov.companieshouse.api.delta.PractitionerAddress;
 
@@ -8,6 +9,24 @@ import uk.gov.companieshouse.api.delta.PractitionerAddress;
 public interface PractitionerAddressMapper {
     PractitionerAddressMapper INSTANCE = Mappers.getMapper(PractitionerAddressMapper.class);
 
+    @Mapping(target = "addressLine2",
+            expression = "java(emptyStringToNull(sourcePractitionerAddress.getAddressLine2()))")
+    @Mapping(target = "locality",
+            expression = "java(emptyStringToNull(sourcePractitionerAddress.getLocality()))")
+    @Mapping(target = "region",
+            expression = "java(emptyStringToNull(sourcePractitionerAddress.getRegion()))")
+    @Mapping(target = "country",
+            expression = "java(emptyStringToNull(sourcePractitionerAddress.getCountry()))")
     uk.gov.companieshouse.api.insolvency.PractitionerAddress map(
             PractitionerAddress sourcePractitionerAddress);
+
+    /**
+     * By default we always get the optional properties on the source address as "" (empty string).
+     * This method excludes them from being added to the target object.
+     * @param property practitioner address property
+     * @return the property itself if not an empty string, null otherwise
+     */
+    default String emptyStringToNull(String property) {
+        return property.isEmpty() ? null : property;
+    }
 }

@@ -37,26 +37,6 @@ class InsolvencyMapperTest {
 
     @Test
     void shouldMapInsolvencyToCompanyInsolvency() {
-//
-
-//
-//        Appointment sourcePractitioner = new Appointment();
-//        sourcePractitioner.setForename("Gilbert");
-//        sourcePractitioner.setMiddleName("J");
-//        sourcePractitioner.setSurname("Lemon");
-//        sourcePractitioner.setApptType(Appointment.ApptTypeEnum.NUMBER_7);
-//        sourcePractitioner.setApptDate("20200430");
-//        sourcePractitioner.setCeasedToActAppt("20200401");
-//
-//        PractitionerAddress sourcePractitionerAddress = new PractitionerAddress();
-//        sourcePractitionerAddress.setAddressLine1("3rd Floor 9 Colmore Row");
-//        sourcePractitionerAddress.setLocality("Birmingham");
-//        sourcePractitionerAddress.setPostalCode("B3 2BJ");
-//
-//        sourcePractitioner.setPractitionerAddress(sourcePractitionerAddress);
-//        sourceCase.addAppointmentsItem(sourcePractitioner);
-//        insolvency.addCaseNumbersItem(sourceCase);
-//
         String companyNumber = insolvency.getCompanyNumber();
         InternalCompanyInsolvency insolvencyTarget =
                 InsolvencyMapper.INSTANCE.insolvencyDeltaToApi(insolvency, companyNumber);
@@ -82,6 +62,7 @@ class InsolvencyMapperTest {
         assertThat(address.getAddressLine2()).isEqualTo("1238 High Road");
         assertThat(address.getLocality()).isEqualTo("Whetstone");
         assertThat(address.getRegion()).isEqualTo("London");
+        assertThat(address.getCountry()).isNull();
         assertThat(address.getPostalCode()).isEqualTo("N20 0LH");
 
         assertThat(firstCase.getDates().size()).isEqualTo(2);
