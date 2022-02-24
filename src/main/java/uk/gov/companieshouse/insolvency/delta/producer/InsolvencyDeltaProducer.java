@@ -1,38 +1,25 @@
 package uk.gov.companieshouse.insolvency.delta.producer;
 
 import java.util.concurrent.ExecutionException;
-import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.kafka.message.Message;
-import uk.gov.companieshouse.kafka.producer.Acks;
 import uk.gov.companieshouse.kafka.producer.CHKafkaProducer;
-import uk.gov.companieshouse.kafka.producer.ProducerConfig;
+import uk.gov.companieshouse.logging.Logger;
 
 @Component
 public class InsolvencyDeltaProducer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(InsolvencyDeltaProducer.class);
 
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootstrapServers;
+    private final Logger logger;
 
-    private CHKafkaProducer chKafkaProducer;
+    private final CHKafkaProducer chKafkaProducer;
 
-    /**
-     * Post construct init.
-     */
-    @PostConstruct
-    public void init() {
-        LOGGER.debug("Configuring CH Kafka producer");
-        final ProducerConfig config = createProducerConfig();
-        config.setRoundRobinPartitioner(true);
-        config.setAcks(Acks.WAIT_FOR_ALL);
-        config.setRetries(10);
-        config.setRequestTimeoutMilliseconds(3000);
-        chKafkaProducer = new CHKafkaProducer(config);
+    @Autowired
+    public InsolvencyDeltaProducer(Logger logger,
+                                   CHKafkaProducer chKafkaProducer) {
+        this.logger = logger;
+        this.chKafkaProducer = chKafkaProducer;
     }
 
     /**
@@ -42,13 +29,8 @@ public class InsolvencyDeltaProducer {
         try {
             chKafkaProducer.send(message);
         } catch (ExecutionException | InterruptedException ex) {
-            LOGGER.error("Error while sending the message", ex);
+            logger.error("Error while sending the message", ex);
         }
     }
 
-    protected ProducerConfig createProducerConfig() {
-        final ProducerConfig config = new ProducerConfig();
-        config.setBrokerAddresses(bootstrapServers.split(","));
-        return config;
-    }
 }

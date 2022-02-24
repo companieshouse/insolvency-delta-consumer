@@ -14,20 +14,31 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.serialization.ChsDeltaDeserializer;
+import uk.gov.companieshouse.kafka.producer.Acks;
+import uk.gov.companieshouse.kafka.producer.CHKafkaProducer;
+import uk.gov.companieshouse.kafka.producer.ProducerConfig;
 
 @Configuration
 @Profile("!test")
 public class KafkaConfig {
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootstrapServers;
+
+    private final ChsDeltaDeserializer chsDeltaDeserializer;
+
+    private final String bootstrapServers;
+
+    public KafkaConfig(ChsDeltaDeserializer chsDeltaDeserializer, @Value("${spring.kafka"
+            + ".bootstrap-servers}") String bootstrapServers) {
+        this.chsDeltaDeserializer = chsDeltaDeserializer;
+        this.bootstrapServers = bootstrapServers;
+    }
 
     /**
-     * Kafka Consumer Factory Message.
+     * Kafka Consumer Factory.
      */
     @Bean
-    public ConsumerFactory<String, ChsDelta> consumerFactoryMessage() {
+    public ConsumerFactory<String, ChsDelta> kafkaConsumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(),
-                new ChsDeltaDeserializer());
+                chsDeltaDeserializer);
     }
 
     /**
@@ -37,8 +48,21 @@ public class KafkaConfig {
     public ConcurrentKafkaListenerContainerFactory<String, ChsDelta> listenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, ChsDelta> factory
                 = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactoryMessage());
+        factory.setConsumerFactory(kafkaConsumerFactory());
         return factory;
+    }
+
+    /**
+     * CH Kafka Producer.
+     */
+    @Bean
+    public CHKafkaProducer chKafkaProducer() {
+        final ProducerConfig config = createProducerConfig();
+        config.setRoundRobinPartitioner(true);
+        config.setAcks(Acks.WAIT_FOR_ALL);
+        config.setRetries(10);
+        config.setRequestTimeoutMilliseconds(3000);
+        return new CHKafkaProducer(config);
     }
 
     private Map<String, Object> consumerConfigs() {
@@ -51,6 +75,11 @@ public class KafkaConfig {
         return props;
     }
 
+    private ProducerConfig createProducerConfig() {
+        final ProducerConfig config = new ProducerConfig();
+        config.setBrokerAddresses(bootstrapServers.split(","));
+        return config;
+    }
 }
 
 
