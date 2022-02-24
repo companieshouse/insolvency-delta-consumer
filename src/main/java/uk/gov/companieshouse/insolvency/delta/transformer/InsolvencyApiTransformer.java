@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.insolvency.delta.transformer;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.delta.Insolvency;
 import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
@@ -7,6 +8,13 @@ import uk.gov.companieshouse.insolvency.delta.mapper.InsolvencyMapper;
 
 @Component
 public class InsolvencyApiTransformer {
+
+    private final InsolvencyMapper mapper;
+
+    @Autowired
+    public InsolvencyApiTransformer(InsolvencyMapper mapper) {
+        this.mapper = mapper;
+    }
 
     /**
      * Transforms an Insolvency object from an InsolvencyDelta object
@@ -17,7 +25,7 @@ public class InsolvencyApiTransformer {
     public InternalCompanyInsolvency transform(Insolvency insolvency) {
         String companyNumber = insolvency.getCompanyNumber();
         InternalCompanyInsolvency transformedInsolvency =
-                InsolvencyMapper.INSTANCE.insolvencyDeltaToApi(insolvency, companyNumber);
+                mapper.insolvencyDeltaToApi(insolvency, companyNumber);
 
         return transformedInsolvency;
     }
