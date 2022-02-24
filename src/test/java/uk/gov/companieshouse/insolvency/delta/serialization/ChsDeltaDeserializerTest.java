@@ -1,16 +1,26 @@
 package uk.gov.companieshouse.insolvency.delta.serialization;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.delta.ChsDelta;
+import uk.gov.companieshouse.logging.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 public class ChsDeltaDeserializerTest {
 
-    private ChsDeltaDeserializer deserializer = new ChsDeltaDeserializer();
+    @Mock
+    private Logger logger;
+    private ChsDeltaDeserializer deserializer;
+
+    @BeforeEach
+    public void init() {
+        deserializer = new ChsDeltaDeserializer(logger);
+    }
 
     @Test
     void When_deserialize_Expect_ValidChsDeltaObject() {
@@ -22,7 +32,7 @@ public class ChsDeltaDeserializerTest {
         assertThat(deserializedObject).isEqualTo(chsDelta);
     }
 
-    private byte[] encodedData(ChsDelta chsDelta){
+    private byte[] encodedData(ChsDelta chsDelta) {
         ChsDeltaSerializer serializer = new ChsDeltaSerializer();
         return serializer.serialize("", chsDelta);
     }

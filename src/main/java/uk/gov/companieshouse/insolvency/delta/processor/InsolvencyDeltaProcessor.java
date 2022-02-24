@@ -2,8 +2,6 @@ package uk.gov.companieshouse.insolvency.delta.processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
@@ -14,19 +12,25 @@ import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
 import uk.gov.companieshouse.insolvency.delta.producer.InsolvencyDeltaProducer;
 import uk.gov.companieshouse.insolvency.delta.transformer.InsolvencyApiTransformer;
+import uk.gov.companieshouse.logging.Logger;
 
 @Component
 public class InsolvencyDeltaProcessor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InsolvencyDeltaProcessor.class);
     private final InsolvencyDeltaProducer deltaProducer;
     private final InsolvencyApiTransformer transformer;
+    private final Logger logger;
 
+    /**
+     * The constructor.
+     */
     @Autowired
     public InsolvencyDeltaProcessor(InsolvencyDeltaProducer deltaProducer,
-                                    InsolvencyApiTransformer transformer) {
+                                    InsolvencyApiTransformer transformer,
+                                    Logger logger) {
         this.deltaProducer = deltaProducer;
         this.transformer = transformer;
+        this.logger = logger;
     }
 
     /**

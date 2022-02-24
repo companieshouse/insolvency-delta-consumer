@@ -16,7 +16,7 @@ public class LoggingConfig {
     private String loggerNamespace;
 
     /**
-     * Creates a logger with specified namespace.
+     * Main application logger with component specific namespace.
      *
      * @return the {@link LoggerFactory} for the specified namespace
      */

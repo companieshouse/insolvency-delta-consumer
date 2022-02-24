@@ -14,6 +14,7 @@ import uk.gov.companieshouse.api.delta.*;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.producer.InsolvencyDeltaProducer;
 import uk.gov.companieshouse.insolvency.delta.transformer.InsolvencyApiTransformer;
+import uk.gov.companieshouse.logging.Logger;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,9 +33,12 @@ public class InsolvencyDeltaProcessorTest {
     @Mock
     private InsolvencyApiTransformer transformer;
 
+    @Mock
+    private Logger logger;
+
     @BeforeEach
     void setUp() {
-        deltaProcessor = new InsolvencyDeltaProcessor(insolvencyDeltaProducer, transformer);
+        deltaProcessor = new InsolvencyDeltaProcessor(insolvencyDeltaProducer, transformer, logger);
     }
 
     @Test
