@@ -1,11 +1,21 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.companieshouse.api.delta.PractitionerAddress;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-public class PractitionerAddressMapperTest {
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = { PractitionerAddressMapperImpl.class })
+class PractitionerAddressMapperTest {
+
+    @Autowired
+    PractitionerAddressMapper mapper;
 
     @Test
     void shouldMapFullPractitionerAddress() {
@@ -18,7 +28,7 @@ public class PractitionerAddressMapperTest {
         sourcePractitionerAddress.setPostalCode("N20 0LH");
 
         uk.gov.companieshouse.api.insolvency.PractitionerAddress targetAddress =
-                PractitionerAddressMapper.INSTANCE.map(sourcePractitionerAddress);
+                mapper.map(sourcePractitionerAddress);
 
         assertThat(targetAddress).isNotNull();
         assertThat(targetAddress.getAddressLine1()).isEqualTo("Yerrill Murphy Edelman House");
@@ -40,7 +50,7 @@ public class PractitionerAddressMapperTest {
         sourcePractitionerAddress.setPostalCode("N20 0LH");
 
         uk.gov.companieshouse.api.insolvency.PractitionerAddress targetAddress =
-                PractitionerAddressMapper.INSTANCE.map(sourcePractitionerAddress);
+                mapper.map(sourcePractitionerAddress);
 
         assertThat(targetAddress).isNotNull();
         assertThat(targetAddress.getAddressLine1()).isEqualTo("Yerrill Murphy Edelman House");
@@ -62,7 +72,7 @@ public class PractitionerAddressMapperTest {
         sourcePractitionerAddress.setPostalCode("N20 0LH");
 
         uk.gov.companieshouse.api.insolvency.PractitionerAddress targetAddress =
-                PractitionerAddressMapper.INSTANCE.map(sourcePractitionerAddress);
+                mapper.map(sourcePractitionerAddress);
 
         assertThat(targetAddress).isNotNull();
         assertThat(targetAddress.getAddressLine1()).isEqualTo("Yerrill Murphy Edelman House");

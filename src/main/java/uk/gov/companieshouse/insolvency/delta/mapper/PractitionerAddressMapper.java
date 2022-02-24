@@ -2,12 +2,10 @@ package uk.gov.companieshouse.insolvency.delta.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 import uk.gov.companieshouse.api.delta.PractitionerAddress;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface PractitionerAddressMapper {
-    PractitionerAddressMapper INSTANCE = Mappers.getMapper(PractitionerAddressMapper.class);
 
     @Mapping(target = "addressLine2",
             expression = "java(emptyStringToNull(sourcePractitionerAddress.getAddressLine2()))")

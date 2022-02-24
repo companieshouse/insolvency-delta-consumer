@@ -11,15 +11,13 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ValueMapping;
 import org.mapstruct.ValueMappings;
-import org.mapstruct.factory.Mappers;
 import uk.gov.companieshouse.api.delta.CaseNumber;
 import uk.gov.companieshouse.api.insolvency.CaseDates;
 import uk.gov.companieshouse.api.insolvency.Links;
 import uk.gov.companieshouse.api.insolvency.ModelCase;
 
-@Mapper(uses = {PractitionersMapper.class})
+@Mapper(componentModel = "spring", uses = {PractitionersMapper.class})
 public interface CaseMapper {
-    CaseMapper INSTANCE = Mappers.getMapper(CaseMapper.class);
 
     @Mapping(target = "dates", ignore = true) // mapped in AfterMapping
     @Mapping(target = "links", ignore = true) // mapped in AfterMapping

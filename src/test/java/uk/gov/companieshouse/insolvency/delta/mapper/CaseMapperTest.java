@@ -10,14 +10,26 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.companieshouse.api.delta.CaseNumber;
 import uk.gov.companieshouse.api.insolvency.CaseDates;
 import uk.gov.companieshouse.api.insolvency.ModelCase;
 
-public class CaseMapperTest {
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {
+        CaseMapperImpl.class,
+        PractitionersMapperImpl.class,
+        PractitionerAddressMapperImpl.class})
+class CaseMapperTest {
 
-    String companyNumber = "1232466";
-    String mortgageId = "1232466";
+    private static final String companyNumber = "1232466";
+    private static final String mortgageId = "1232466";
+
+    @Autowired
+    CaseMapper mapper;
 
     @Test
     void shouldMapFullCaseWithDatesAndMortgageId() {
@@ -29,7 +41,7 @@ public class CaseMapperTest {
         sourceCase.setAdminOrderDate("20010705");
         sourceCase.setDischargeAdminOrderDate("20210823");
 
-        ModelCase targetCase = CaseMapper.INSTANCE.map(sourceCase, companyNumber);
+        ModelCase targetCase = mapper.map(sourceCase, companyNumber);
 
         assertThat(targetCase.getType()).isEqualTo(ADMINISTRATION_ORDER);
         assertThat(targetCase.getNumber()).isEqualTo(1);
@@ -53,11 +65,11 @@ public class CaseMapperTest {
         sourceCase.setCaseType(RECEIVER_MANAGER);
         sourceCase.setCaseTypeId(CaseNumber.CaseTypeIdEnum.NUMBER_5);
 
-        ModelCase targetCase = CaseMapper.INSTANCE.map(sourceCase, companyNumber);
+        ModelCase targetCase = mapper.map(sourceCase, companyNumber);
 
         assertThat(targetCase.getType()).isEqualTo(ModelCase.TypeEnum.RECEIVER_MANAGER);
         assertThat(targetCase.getNumber()).isEqualTo(1);
-        assertThat(targetCase.getDates().size()).isEqualTo(0);
+        assertThat(targetCase.getDates().size()).isZero();
         assertThat(targetCase.getPractitioners()).isNull();
         assertThat(targetCase.getLinks()).isNull();
     }

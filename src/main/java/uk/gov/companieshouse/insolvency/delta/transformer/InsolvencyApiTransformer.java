@@ -24,9 +24,6 @@ public class InsolvencyApiTransformer {
      */
     public InternalCompanyInsolvency transform(Insolvency insolvency) {
         String companyNumber = insolvency.getCompanyNumber();
-        InternalCompanyInsolvency transformedInsolvency =
-                mapper.insolvencyDeltaToApi(insolvency, companyNumber);
-
-        return transformedInsolvency;
+        return mapper.insolvencyDeltaToApi(insolvency, companyNumber);
     }
 }

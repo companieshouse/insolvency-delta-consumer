@@ -9,7 +9,6 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.delta.Insolvency;
 import uk.gov.companieshouse.api.delta.InsolvencyDelta;
-import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
 import uk.gov.companieshouse.insolvency.delta.producer.InsolvencyDeltaProducer;

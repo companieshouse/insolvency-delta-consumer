@@ -9,14 +9,12 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ValueMapping;
 import org.mapstruct.ValueMappings;
-import org.mapstruct.factory.Mappers;
 import uk.gov.companieshouse.api.delta.Appointment;
 import uk.gov.companieshouse.api.insolvency.Practitioners;
 
 
-@Mapper(uses = {PractitionerAddressMapper.class})
+@Mapper(componentModel = "spring", uses = {PractitionerAddressMapper.class})
 public interface PractitionersMapper {
-    PractitionersMapper INSTANCE = Mappers.getMapper(PractitionersMapper.class);
 
     @Mapping(target = "name", ignore = true)
     @Mapping(target = "address", source = "practitionerAddress")

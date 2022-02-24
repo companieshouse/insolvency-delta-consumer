@@ -3,14 +3,24 @@ package uk.gov.companieshouse.insolvency.delta.mapper;
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.companieshouse.api.delta.Appointment;
 
 import uk.gov.companieshouse.api.insolvency.Practitioners;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {
+        PractitionersMapperImpl.class,
+        PractitionerAddressMapperImpl.class})
+class PractitionersMapperTest {
 
-public class PractitionersMapperTest {
+    @Autowired
+    PractitionersMapper mapper;
 
     @Test
     void shouldMapPractitionerWithAllNames() {
@@ -22,7 +32,7 @@ public class PractitionersMapperTest {
         sourcePractitioner.setApptDate("20200430");
         sourcePractitioner.setCeasedToActAppt("20210205");
 
-        Practitioners targetPractitioner = PractitionersMapper.INSTANCE.map(sourcePractitioner);
+        Practitioners targetPractitioner = mapper.map(sourcePractitioner);
 
         assertThat(targetPractitioner.getName()).isEqualTo("Diane Elizabeth Hill");
         assertThat(targetPractitioner.getAppointedOn()).isEqualTo(LocalDate.of(2020, 4, 30));
@@ -40,7 +50,7 @@ public class PractitionersMapperTest {
         sourcePractitioner.setApptType(Appointment.ApptTypeEnum.NUMBER_1);
         sourcePractitioner.setApptDate("20200506");
 
-        Practitioners targetPractitioner = PractitionersMapper.INSTANCE.map(sourcePractitioner);
+        Practitioners targetPractitioner = mapper.map(sourcePractitioner);
 
         assertThat(targetPractitioner.getName()).isEqualTo("Hildegard Strudel");
         assertThat(targetPractitioner.getAppointedOn()).isEqualTo(LocalDate.of(2020, 5, 6));

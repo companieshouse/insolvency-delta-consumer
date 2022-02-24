@@ -8,6 +8,10 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.FileCopyUtils;
 import uk.gov.companieshouse.api.delta.Insolvency;
 import uk.gov.companieshouse.api.delta.InsolvencyDelta;
@@ -19,9 +23,19 @@ import uk.gov.companieshouse.api.insolvency.Practitioners;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {
+        InsolvencyMapperImpl.class,
+        CaseMapperImpl.class,
+        PractitionersMapperImpl.class,
+        PractitionerAddressMapperImpl.class})
 class InsolvencyMapperTest {
+
     private ObjectMapper mapper;
     private Insolvency insolvency;
+
+    @Autowired
+    InsolvencyMapper insolvencyMapper;
 
     @BeforeEach
     public void setUp() throws IOException {
@@ -39,7 +53,7 @@ class InsolvencyMapperTest {
     void shouldMapInsolvencyToCompanyInsolvency() {
         String companyNumber = insolvency.getCompanyNumber();
         InternalCompanyInsolvency insolvencyTarget =
-                InsolvencyMapper.INSTANCE.insolvencyDeltaToApi(insolvency, companyNumber);
+                insolvencyMapper.insolvencyDeltaToApi(insolvency, companyNumber);
 
         assertThat(insolvency).isNotNull();
         assertThat(insolvencyTarget).isNotNull();
