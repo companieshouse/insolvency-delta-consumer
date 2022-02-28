@@ -6,23 +6,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.FileCopyUtils;
-import uk.gov.companieshouse.api.delta.Appointment;
-import uk.gov.companieshouse.api.delta.CaseNumber;
-import uk.gov.companieshouse.api.delta.Insolvency;
-import uk.gov.companieshouse.api.delta.InsolvencyDelta;
-import uk.gov.companieshouse.api.delta.PractitionerAddress;
+import uk.gov.companieshouse.api.delta.*;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.producer.InsolvencyDeltaProducer;
+import uk.gov.companieshouse.insolvency.delta.service.api.ApiClientService;
 import uk.gov.companieshouse.insolvency.delta.transformer.InsolvencyApiTransformer;
 import uk.gov.companieshouse.logging.Logger;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,11 +37,14 @@ public class InsolvencyDeltaProcessorTest {
     private InsolvencyApiTransformer transformer;
 
     @Mock
+    private ApiClientService apiClientService;
+
+    @Mock
     private Logger logger;
 
     @BeforeEach
     void setUp() {
-        deltaProcessor = new InsolvencyDeltaProcessor(insolvencyDeltaProducer, transformer, logger);
+        deltaProcessor = new InsolvencyDeltaProcessor(insolvencyDeltaProducer, apiClientService, transformer, logger);
     }
 
     @Test
@@ -50,12 +52,24 @@ public class InsolvencyDeltaProcessorTest {
     void When_ValidChsDeltaMessage_Expect_ValidInsolvencyDeltaMapping() throws IOException {
         Message<ChsDelta> mockChsDeltaMessage = createChsDeltaMessage();
         InsolvencyDelta expectedInsolvencyDelta = createInsolvencyDelta();
-        Insolvency expectedInsolvency = expectedInsolvencyDelta.getInsolvency().get(0);
-        when(transformer.transform(expectedInsolvency)).thenCallRealMethod();
+        when(transformer.transform(expectedInsolvencyDelta)).thenCallRealMethod();
 
         deltaProcessor.processDelta(mockChsDeltaMessage);
 
+        verify(transformer).transform(expectedInsolvencyDelta);
+        Insolvency expectedInsolvency = expectedInsolvencyDelta.getInsolvency().get(0);
+        final ApiResponse<Void> response = new ApiResponse<>(HttpStatus.OK.value(), null, null);
+        when(transformer.transform(expectedInsolvency)).thenReturn(internalCompanyInsolvencyMock());
+        when(apiClientService.putInsolvency(eq("context_id"),eq("02588581"), eq(internalCompanyInsolvencyMock()))).thenReturn(response);
+        deltaProcessor.processDelta(mockChsDeltaMessage);
+        verify(apiClientService).putInsolvency("context_id", "02588581", internalCompanyInsolvencyMock());
         verify(transformer).transform(expectedInsolvency);
+    }
+
+    private InternalCompanyInsolvency internalCompanyInsolvencyMock() {
+        InternalCompanyInsolvency internalCompanyInsolvency = new InternalCompanyInsolvency();
+        internalCompanyInsolvency.deltaAt("Example Delta At");
+        return internalCompanyInsolvency;
     }
 
     private Message<ChsDelta> createChsDeltaMessage() throws IOException {
