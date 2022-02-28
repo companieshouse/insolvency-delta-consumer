@@ -60,7 +60,7 @@ public interface CaseMapper {
     @AfterMapping
     default void mapDatesAndLinks(@MappingTarget ModelCase modelCase,
                                   CaseNumber sourceCase, @Context String companyNumber) {
-        List<CaseDates> mappedCaseDates = Utils.mapAndAggregateCaseDates(sourceCase);
+        List<CaseDates> mappedCaseDates = MapperUtils.mapAndAggregateCaseDates(sourceCase);
         modelCase.setDates(mappedCaseDates);
 
         Optional<Long> optionalMortgageId = Optional.ofNullable(sourceCase.getMortgageId());

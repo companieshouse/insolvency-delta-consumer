@@ -27,10 +27,10 @@ import java.util.stream.Collectors;
 import uk.gov.companieshouse.api.delta.CaseNumber;
 import uk.gov.companieshouse.api.insolvency.CaseDates;
 
-public final class Utils {
+public final class MapperUtils {
 
     // make the class noninstantiable
-    private Utils() {
+    private MapperUtils() {
     }
 
     /**

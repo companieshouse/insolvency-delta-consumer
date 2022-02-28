@@ -307,6 +307,7 @@
 						<arg>-Xlint</arg>
 						<arg>-Xlint:-processing</arg>
 						<arg>-Xlint:-serial</arg>
+						<!-- TODO to be re-enable <arg>-Werror</arg> once private-api-sdk version issue is resolved -->
 					</compilerArgs>
 					<annotationProcessorPaths>
 						<path>
