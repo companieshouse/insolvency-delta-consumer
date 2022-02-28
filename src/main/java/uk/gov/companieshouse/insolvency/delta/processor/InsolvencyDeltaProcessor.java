@@ -11,9 +11,12 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
+import uk.gov.companieshouse.api.delta.InsolvencyDelta;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.companieshouse.api.delta.Insolvency;
 import uk.gov.companieshouse.api.delta.InsolvencyDelta;
 import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
+import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
@@ -63,7 +66,30 @@ public class InsolvencyDeltaProcessor {
             InternalCompanyInsolvency internalCompanyInsolvency = transformer.transform(insolvency);
             final String companyNumber = insolvencyDelta.getInsolvency().get(0).getCompanyNumber();
 
-            transformer.transform(insolvencyDelta);
+
+            logger.trace(String.format("DSND-362: InsolvencyDelta extracted "
+                    + "from a Kafka message: %s", insolvencyDelta));
+
+            /** We always receive only one insolvency/charge per delta in a list,
+             * so we only take the first element
+             * CHIPS is not able to send more than one insolvency per delta.
+             **/
+
+            logger.trace(String.format("DSND-362: InsolvencyDelta transformed into "
+                    + "InternalCompanyInsolvency: %s", internalCompanyInsolvency));
+            logMap.put("company_number", companyNumber);
+            logger.infoContext(
+                    logContext,
+                    String.format("Process insolvency for company number [%s]", companyNumber),
+                    logMap);
+
+            final ApiResponse<Void> response =
+                    apiClientService.putInsolvency(logContext,
+                            companyNumber,
+                            internalCompanyInsolvency);
+
+            handleResponse(null, HttpStatus.valueOf(response.getStatusCode()), logContext,
+                    "Response from sending insolvency data", logMap);
         } catch (RetryableErrorException ex) {
             retryDeltaMessage(chsDelta);
         } catch (Exception ex) {

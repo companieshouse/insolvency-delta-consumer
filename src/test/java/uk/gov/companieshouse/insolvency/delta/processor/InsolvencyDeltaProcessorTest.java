@@ -11,7 +11,17 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.FileCopyUtils;
+<<<<<<< Updated upstream
 import uk.gov.companieshouse.api.delta.*;
+=======
+import uk.gov.companieshouse.api.delta.Appointment;
+import uk.gov.companieshouse.api.delta.CaseNumber;
+import uk.gov.companieshouse.api.delta.Insolvency;
+import uk.gov.companieshouse.api.delta.InsolvencyDelta;
+import uk.gov.companieshouse.api.delta.PractitionerAddress;
+import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
+import uk.gov.companieshouse.api.model.ApiResponse;
+>>>>>>> Stashed changes
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.producer.InsolvencyDeltaProducer;
 import uk.gov.companieshouse.insolvency.delta.service.api.ApiClientService;
@@ -52,11 +62,6 @@ public class InsolvencyDeltaProcessorTest {
     void When_ValidChsDeltaMessage_Expect_ValidInsolvencyDeltaMapping() throws IOException {
         Message<ChsDelta> mockChsDeltaMessage = createChsDeltaMessage();
         InsolvencyDelta expectedInsolvencyDelta = createInsolvencyDelta();
-        when(transformer.transform(expectedInsolvencyDelta)).thenCallRealMethod();
-
-        deltaProcessor.processDelta(mockChsDeltaMessage);
-
-        verify(transformer).transform(expectedInsolvencyDelta);
         Insolvency expectedInsolvency = expectedInsolvencyDelta.getInsolvency().get(0);
         final ApiResponse<Void> response = new ApiResponse<>(HttpStatus.OK.value(), null, null);
         when(transformer.transform(expectedInsolvency)).thenReturn(internalCompanyInsolvencyMock());
