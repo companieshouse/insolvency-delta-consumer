@@ -10,7 +10,11 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.FileCopyUtils;
-import uk.gov.companieshouse.api.delta.*;
+import uk.gov.companieshouse.api.delta.Appointment;
+import uk.gov.companieshouse.api.delta.CaseNumber;
+import uk.gov.companieshouse.api.delta.Insolvency;
+import uk.gov.companieshouse.api.delta.InsolvencyDelta;
+import uk.gov.companieshouse.api.delta.PractitionerAddress;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.producer.InsolvencyDeltaProducer;
 import uk.gov.companieshouse.insolvency.delta.transformer.InsolvencyApiTransformer;
@@ -46,11 +50,12 @@ public class InsolvencyDeltaProcessorTest {
     void When_ValidChsDeltaMessage_Expect_ValidInsolvencyDeltaMapping() throws IOException {
         Message<ChsDelta> mockChsDeltaMessage = createChsDeltaMessage();
         InsolvencyDelta expectedInsolvencyDelta = createInsolvencyDelta();
-        when(transformer.transform(expectedInsolvencyDelta)).thenCallRealMethod();
+        Insolvency expectedInsolvency = expectedInsolvencyDelta.getInsolvency().get(0);
+        when(transformer.transform(expectedInsolvency)).thenCallRealMethod();
 
         deltaProcessor.processDelta(mockChsDeltaMessage);
 
-        verify(transformer).transform(expectedInsolvencyDelta);
+        verify(transformer).transform(expectedInsolvency);
     }
 
     private Message<ChsDelta> createChsDeltaMessage() throws IOException {
@@ -78,6 +83,7 @@ public class InsolvencyDeltaProcessorTest {
         address.setLocality("Whetstone");
         address.setRegion("London");
         address.setPostalCode("N20 0LH");
+        address.setCountry("");
 
         Appointment appointment = new Appointment();
         appointment.setForename("Bernard");
@@ -92,6 +98,7 @@ public class InsolvencyDeltaProcessorTest {
         caseNumber.setCaseTypeId(CaseNumber.CaseTypeIdEnum.NUMBER_1);
         caseNumber.setSwornDate("20200429");
         caseNumber.windUpDate("20200506");
+        caseNumber.setMortgageId(Long.valueOf("3001368176"));
         caseNumber.addAppointmentsItem(appointment);
 
         Insolvency insolvency = new Insolvency();
