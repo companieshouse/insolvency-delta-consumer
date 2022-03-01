@@ -30,7 +30,7 @@ public class InsolvencyDeltaProcessor {
     private final InsolvencyDeltaProducer deltaProducer;
     private final InsolvencyApiTransformer transformer;
     private final ApiClientService apiClientService;
-    private final uk.gov.companieshouse.logging.Logger logger;
+    private final Logger logger;
 
     /**
      * The constructor.
@@ -52,26 +52,28 @@ public class InsolvencyDeltaProcessor {
     public void processDelta(Message<ChsDelta> chsDelta) {
         try {
             MessageHeaders headers = chsDelta.getHeaders();
-            final String logContext = chsDelta.getPayload().getContextId();
+            final ChsDelta payload = chsDelta.getPayload();
+            final String logContext = payload.getContextId();
             final Map<String, Object> logMap = new HashMap<>();
             final String receivedTopic =
                     Objects.requireNonNull(headers.get(KafkaHeaders.RECEIVED_TOPIC)).toString();
-            final ChsDelta payload = chsDelta.getPayload();
+
 
             ObjectMapper mapper = new ObjectMapper();
             InsolvencyDelta insolvencyDelta = mapper.readValue(payload.getData(),
                     InsolvencyDelta.class);
+
+            /** We always receive only one insolvency/charge per delta in a list,
+             * so we only take the first element
+             * CHIPS is not able to send more than one insolvency per delta.
+             **/
+
             Insolvency insolvency = insolvencyDelta.getInsolvency().get(0);
             InternalCompanyInsolvency internalCompanyInsolvency = transformer.transform(insolvency);
             final String companyNumber = insolvency.getCompanyNumber();
 
             logger.trace(String.format("DSND-362: InsolvencyDelta extracted "
                     + "from a Kafka message: %s", insolvencyDelta));
-
-            /** We always receive only one insolvency/charge per delta in a list,
-             * so we only take the first element
-             * CHIPS is not able to send more than one insolvency per delta.
-             **/
 
             logger.trace(String.format("DSND-362: InsolvencyDelta transformed into "
                     + "InternalCompanyInsolvency: %s", internalCompanyInsolvency));

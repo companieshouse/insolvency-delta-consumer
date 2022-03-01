@@ -26,9 +26,6 @@ public class ApiClientServiceImpl extends BaseApiClientServiceImpl implements Ap
     @Value("${api.api-url}")
     private String apiUrl;
 
-    @Value("${api.payments-url}")
-    private String paymentsApiUrl;
-
     @Value("${api.internal-api-url}")
     private String internalApiUrl;
 
@@ -46,7 +43,6 @@ public class ApiClientServiceImpl extends BaseApiClientServiceImpl implements Ap
     public InternalApiClient getApiClient(String contextId) {
         InternalApiClient internalApiClient = new InternalApiClient(getHttpClient(contextId));
         internalApiClient.setBasePath(apiUrl);
-        internalApiClient.setBasePaymentsPath(paymentsApiUrl);
         internalApiClient.setInternalBasePath(internalApiUrl);
 
         return internalApiClient;
