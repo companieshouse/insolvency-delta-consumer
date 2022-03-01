@@ -11,7 +11,11 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.FileCopyUtils;
-import uk.gov.companieshouse.api.delta.*;
+import uk.gov.companieshouse.api.delta.Insolvency;
+import uk.gov.companieshouse.api.delta.InsolvencyDelta;
+import uk.gov.companieshouse.api.delta.PractitionerAddress;
+import uk.gov.companieshouse.api.delta.Appointment;
+import uk.gov.companieshouse.api.delta.CaseNumber;
 import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
 import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.delta.ChsDelta;
@@ -56,9 +60,11 @@ public class InsolvencyDeltaProcessorTest {
         InsolvencyDelta expectedInsolvencyDelta = createInsolvencyDelta();
         Insolvency expectedInsolvency = expectedInsolvencyDelta.getInsolvency().get(0);
         final ApiResponse<Void> response = new ApiResponse<>(HttpStatus.OK.value(), null, null);
+
         when(transformer.transform(expectedInsolvency)).thenReturn(internalCompanyInsolvencyMock());
         when(apiClientService.putInsolvency(eq("context_id"),eq("02588581"), eq(internalCompanyInsolvencyMock()))).thenReturn(response);
         deltaProcessor.processDelta(mockChsDeltaMessage);
+
         verify(apiClientService).putInsolvency("context_id", "02588581", internalCompanyInsolvencyMock());
         verify(transformer).transform(expectedInsolvency);
     }
