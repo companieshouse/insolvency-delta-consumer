@@ -69,12 +69,11 @@ public class InsolvencyDeltaProcessor {
              **/
 
             Insolvency insolvency = insolvencyDelta.getInsolvency().get(0);
-            InternalCompanyInsolvency internalCompanyInsolvency = transformer.transform(insolvency);
-            final String companyNumber = insolvency.getCompanyNumber();
-
             logger.trace(String.format("DSND-362: InsolvencyDelta extracted "
                     + "from a Kafka message: %s", insolvencyDelta));
+            InternalCompanyInsolvency internalCompanyInsolvency = transformer.transform(insolvency);
 
+            final String companyNumber = insolvency.getCompanyNumber();
             logger.trace(String.format("DSND-362: InsolvencyDelta transformed into "
                     + "InternalCompanyInsolvency: %s", internalCompanyInsolvency));
             logMap.put("company_number", companyNumber);
