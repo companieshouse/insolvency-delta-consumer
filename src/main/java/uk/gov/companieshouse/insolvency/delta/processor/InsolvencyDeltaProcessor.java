@@ -62,6 +62,8 @@ public class InsolvencyDeltaProcessor {
             ObjectMapper mapper = new ObjectMapper();
             InsolvencyDelta insolvencyDelta = mapper.readValue(payload.getData(),
                     InsolvencyDelta.class);
+            logger.trace(String.format("DSND-362: InsolvencyDelta extracted "
+                    + "from a Kafka message: %s", insolvencyDelta));
 
             /** We always receive only one insolvency/charge per delta in a list,
              * so we only take the first element
@@ -69,8 +71,6 @@ public class InsolvencyDeltaProcessor {
              **/
 
             Insolvency insolvency = insolvencyDelta.getInsolvency().get(0);
-            logger.trace(String.format("DSND-362: InsolvencyDelta extracted "
-                    + "from a Kafka message: %s", insolvencyDelta));
             InternalCompanyInsolvency internalCompanyInsolvency = transformer.transform(insolvency);
 
             final String companyNumber = insolvency.getCompanyNumber();
