@@ -1,6 +1,10 @@
 server:
   port: 8081
 
+springfox:
+  documentation:
+    auto-startup: false
+
 spring:
   kafka:
     bootstrap-servers: ${DATA_SYNC_KAFKA_BROKER_URL:localhost:9092}
