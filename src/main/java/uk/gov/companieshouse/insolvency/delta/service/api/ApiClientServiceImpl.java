@@ -20,7 +20,7 @@ import uk.gov.companieshouse.logging.Logger;
 @Service
 public class ApiClientServiceImpl extends BaseApiClientServiceImpl implements ApiClientService {
 
-    @Value("${api.internal-api-key}")
+    @Value("${api.insolvency-data-api-key}")
     private String chsApiKey;
 
     @Value("${api.api-url}")
