@@ -16,7 +16,9 @@ import uk.gov.companieshouse.api.delta.InsolvencyDelta;
 import uk.gov.companieshouse.api.delta.PractitionerAddress;
 import uk.gov.companieshouse.api.delta.Appointment;
 import uk.gov.companieshouse.api.delta.CaseNumber;
+import uk.gov.companieshouse.api.insolvency.CompanyInsolvency;
 import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
+import uk.gov.companieshouse.api.insolvency.InternalData;
 import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.producer.InsolvencyDeltaProducer;
@@ -26,6 +28,7 @@ import uk.gov.companieshouse.logging.Logger;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.OffsetDateTime;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
@@ -71,7 +74,10 @@ public class InsolvencyDeltaProcessorTest {
 
     private InternalCompanyInsolvency internalCompanyInsolvencyMock() {
         InternalCompanyInsolvency internalCompanyInsolvency = new InternalCompanyInsolvency();
-        internalCompanyInsolvency.deltaAt("Example Delta At");
+        InternalData internalData = new InternalData();
+        internalData.setUpdatedBy("topic-partition-offset");
+        internalCompanyInsolvency.setInternalData(internalData);
+        internalCompanyInsolvency.setExternalData(new CompanyInsolvency());
         return internalCompanyInsolvency;
     }
 
@@ -88,8 +94,10 @@ public class InsolvencyDeltaProcessorTest {
 
         return MessageBuilder
                 .withPayload(mockChsDelta)
-                .setHeader(KafkaHeaders.RECEIVED_TOPIC, "test")
+                .setHeader(KafkaHeaders.RECEIVED_TOPIC, "topic")
                 .setHeader("INSOLVENCY_DELTA_RETRY_COUNT", 1)
+                .setHeader(KafkaHeaders.RECEIVED_PARTITION_ID, "partition")
+                .setHeader(KafkaHeaders.OFFSET, "offset")
                 .build();
     }
 

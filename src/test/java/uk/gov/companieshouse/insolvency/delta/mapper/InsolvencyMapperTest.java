@@ -3,6 +3,8 @@ package uk.gov.companieshouse.insolvency.delta.mapper;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +18,9 @@ import org.springframework.util.FileCopyUtils;
 import uk.gov.companieshouse.api.delta.Insolvency;
 import uk.gov.companieshouse.api.delta.InsolvencyDelta;
 import uk.gov.companieshouse.api.insolvency.CaseDates;
+import uk.gov.companieshouse.api.insolvency.CompanyInsolvency;
 import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
+import uk.gov.companieshouse.api.insolvency.InternalData;
 import uk.gov.companieshouse.api.insolvency.ModelCase;
 import uk.gov.companieshouse.api.insolvency.PractitionerAddress;
 import uk.gov.companieshouse.api.insolvency.Practitioners;
@@ -55,13 +59,19 @@ class InsolvencyMapperTest {
         InternalCompanyInsolvency insolvencyTarget =
                 insolvencyMapper.insolvencyDeltaToApi(insolvency, companyNumber);
 
+        InternalData internalInsolvencyTarget = insolvencyTarget.getInternalData();
+        CompanyInsolvency externalInsolvencyTarget = insolvencyTarget.getExternalData();
+
+        // Nanosecond must be 9 digits and therefore padded with 000 at the end
+        OffsetDateTime expectedDeltaAt = OffsetDateTime.of(2021, 10, 8, 15, 28, 23, 383176000, ZoneOffset.of("Z"));
+
         assertThat(insolvency).isNotNull();
         assertThat(insolvencyTarget).isNotNull();
-        assertThat(insolvencyTarget.getDeltaAt()).isEqualTo("20211008152823383176");
-        assertThat(insolvencyTarget.getCases().size()).isEqualTo(2);
+        assertThat(internalInsolvencyTarget.getDeltaAt()).isEqualTo(expectedDeltaAt);
+        assertThat(externalInsolvencyTarget.getCases().size()).isEqualTo(2);
 
         // FIRST CASE
-        ModelCase firstCase = insolvencyTarget.getCases().get(0);
+        ModelCase firstCase = externalInsolvencyTarget.getCases().get(0);
         assertThat(firstCase.getNumber()).isEqualTo(1);
         assertThat(firstCase.getType()).isEqualTo(ModelCase.TypeEnum.ADMINISTRATIVE_RECEIVER);
         assertThat(firstCase.getPractitioners().size()).isEqualTo(2);
@@ -107,7 +117,7 @@ class InsolvencyMapperTest {
         assertThat(firstCase.getLinks().getCharge()).isEqualTo(expectedChargeLink);
 
         // SECOND CASE
-        ModelCase secondCase = insolvencyTarget.getCases().get(1);
+        ModelCase secondCase = externalInsolvencyTarget.getCases().get(1);
         assertThat(secondCase.getNumber()).isEqualTo(2);
         assertThat(secondCase.getType()).isEqualTo(ModelCase.TypeEnum.CREDITORS_VOLUNTARY_LIQUIDATION);
         assertThat(secondCase.getPractitioners().size()).isEqualTo(1);

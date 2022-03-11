@@ -57,7 +57,12 @@ public class InsolvencyDeltaProcessor {
             final Map<String, Object> logMap = new HashMap<>();
             final String receivedTopic =
                     Objects.requireNonNull(headers.get(KafkaHeaders.RECEIVED_TOPIC)).toString();
-
+            final String partition =
+                    Objects.requireNonNull(
+                            headers.get(KafkaHeaders.RECEIVED_PARTITION_ID)
+                    ).toString();
+            final String offset =
+                    Objects.requireNonNull(headers.get(KafkaHeaders.OFFSET)).toString();
 
             ObjectMapper mapper = new ObjectMapper();
             InsolvencyDelta insolvencyDelta = mapper.readValue(payload.getData(),
@@ -72,6 +77,10 @@ public class InsolvencyDeltaProcessor {
 
             Insolvency insolvency = insolvencyDelta.getInsolvency().get(0);
             InternalCompanyInsolvency internalCompanyInsolvency = transformer.transform(insolvency);
+
+            final String updatedBy = String.format("%s-%s-%s", receivedTopic, partition, offset);
+
+            internalCompanyInsolvency.getInternalData().setUpdatedBy(updatedBy);
 
             final String companyNumber = insolvency.getCompanyNumber();
             logger.trace(String.format("DSND-362: InsolvencyDelta transformed into "
