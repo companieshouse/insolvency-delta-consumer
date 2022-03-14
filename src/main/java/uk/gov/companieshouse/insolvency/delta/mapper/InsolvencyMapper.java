@@ -25,7 +25,7 @@ public interface InsolvencyMapper {
 
     /**
      * Invoked at the end of the auto-generated mapping methods and parses deltaAt from
-     * String to OffsetDateTime with UTC zone offset
+     * String to OffsetDateTime with UTC zone offset.
      *
      * @param internalData     the target InternalData object
      * @param insolvency    the source Insolvency object
