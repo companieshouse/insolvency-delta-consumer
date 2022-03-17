@@ -32,7 +32,6 @@
 		<private-api-sdk-java.version>2.0.125</private-api-sdk-java.version>
 		<api-sdk-manager-java-library.version>1.0.4</api-sdk-manager-java-library.version>
 		<jib-maven-plugin.version>3.1.1</jib-maven-plugin.version>
-		
 		<springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
 
 
@@ -258,18 +257,14 @@
 							<goal>report</goal>
 						</goals>
 						<configuration>
+							<!-- Sets the path to the file which contains the execution data. -->
 							<dataFile>${sonar.jacoco.reports}/jacoco-it.exec</dataFile>
+							<!-- Sets the output directory for the code coverage report. -->
 							<outputDirectory>${sonar.jacoco.reports}/jacoco-it</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-
-			<plugin>
-                <groupId>org.sonarsource.scanner.maven</groupId>
-                <artifactId>sonar-maven-plugin</artifactId>
-                <version>${sonar-maven-plugin.version}</version>
-            </plugin>  
 
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -297,6 +292,7 @@
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
 					<argLine>-Dfile.encoding=UTF-8</argLine>
+					<argLine>${surefireArgLine}</argLine>
 					<excludes>
 						<exclude>**/*ITest.java</exclude>
 					</excludes>
@@ -318,6 +314,7 @@
 				</executions>
 				<configuration>
 					<argLine>-Dfile.encoding=UTF-8</argLine>
+					<argLine>${failsafeArgLine}</argLine>
 					<classesDirectory>${project.build.outputDirectory}</classesDirectory>
 					<skipITs>${skip.integration.tests}</skipITs>
 					<includes>
