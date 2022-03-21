@@ -1,10 +1,10 @@
 package uk.gov.companieshouse.insolvency.delta.processor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -19,7 +19,6 @@ import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
-import uk.gov.companieshouse.insolvency.delta.producer.InsolvencyDeltaProducer;
 import uk.gov.companieshouse.insolvency.delta.service.api.ApiClientService;
 import uk.gov.companieshouse.insolvency.delta.transformer.InsolvencyApiTransformer;
 import uk.gov.companieshouse.logging.Logger;
@@ -27,7 +26,6 @@ import uk.gov.companieshouse.logging.Logger;
 @Component
 public class InsolvencyDeltaProcessor {
 
-    private final InsolvencyDeltaProducer deltaProducer;
     private final InsolvencyApiTransformer transformer;
     private final ApiClientService apiClientService;
     private final Logger logger;
@@ -36,11 +34,9 @@ public class InsolvencyDeltaProcessor {
      * The constructor.
      */
     @Autowired
-    public InsolvencyDeltaProcessor(InsolvencyDeltaProducer deltaProducer,
-                                    ApiClientService apiClientService,
+    public InsolvencyDeltaProcessor(ApiClientService apiClientService,
                                     InsolvencyApiTransformer transformer,
                                     Logger logger) {
-        this.deltaProducer = deltaProducer;
         this.transformer = transformer;
         this.apiClientService = apiClientService;
         this.logger = logger;
