@@ -7,6 +7,8 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.header.Header;
 
+import static org.springframework.kafka.support.KafkaHeaders.EXCEPTION_CAUSE_FQCN;
+
 public class RetryableTopicErrorInterceptor implements ProducerInterceptor<String, Object> {
 
     @Override
@@ -20,9 +22,9 @@ public class RetryableTopicErrorInterceptor implements ProducerInterceptor<Strin
     }
 
     private String getNextErrorTopic(ProducerRecord<String, Object> record) {
-        Header header = record.headers().lastHeader("kafka_exception-fqcn");
+        Header header = record.headers().lastHeader(EXCEPTION_CAUSE_FQCN);
         return header != null &&
-                new String(header.value()).contains("delta.exception.NonRetryableErrorException") ?
+                new String(header.value()).contains(NonRetryableErrorException.class.getName()) ?
                 record.topic().replace("-error", "-invalid") : record.topic();
     }
 
