@@ -27,6 +27,8 @@ public class ChsDeltaDeserializer implements Deserializer<ChsDelta> {
         try {
             logger.trace(String.format("DSND-123: Message picked up from topic with data: %s",
                     new String(data)));
+            /*data = (" {\"key\": " +
+                    "\"value\"}\u0002\u0014context_id").getBytes();*/
             Decoder decoder = DecoderFactory.get().binaryDecoder(data, null);
             DatumReader<ChsDelta> reader = new ReflectDatumReader<>(ChsDelta.class);
             ChsDelta chsDelta = reader.read(null, decoder);
