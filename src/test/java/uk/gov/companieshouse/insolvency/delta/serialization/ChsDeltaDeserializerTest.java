@@ -33,7 +33,7 @@ public class ChsDeltaDeserializerTest {
     }
 
     private byte[] encodedData(ChsDelta chsDelta) {
-        ChsDeltaSerializer serializer = new ChsDeltaSerializer();
+        ChsDeltaSerializer serializer = new ChsDeltaSerializer(null);
         return serializer.serialize("", chsDelta);
     }
 }

@@ -12,7 +12,7 @@ public class InsolvencyDeltaConsumerITest extends AbstractIntegrationTest {
     @Autowired
     public KafkaTemplate<String, ChsDelta> kafkaTemplate;
 
-    @Value("${insolvency.delta.topic.main}")
+    @Value("${insolvency.delta.topic}")
     private String mainTopic;
 
     @Test

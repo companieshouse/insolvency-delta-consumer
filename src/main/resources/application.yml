@@ -7,23 +7,18 @@ springfox:
 
 spring:
   kafka:
-    bootstrap-servers: ${DATA_SYNC_KAFKA_BROKER_URL:localhost:9092}
+    bootstrap-servers: ${DATA_SYNC_KAFKA_BROKER_URL:localhost:29092}
 
 insolvency:
   delta:
     group-id: insolvency-delta-consumer
-    main-id: insolvency-main-consumer
-    retry-id: insolvency-retry-consumer
-    topic:
-      main: insolvency-delta
-      retry: insolvency-topic-retry
-      error: insolvency-topic-error
+    topic: insolvency-delta
 
 logger:
   namespace: insolvency-delta-consumer
 
 api:
   endpoint: ${INSOLVENCY_DATA_API_URL:localhost}
-  insolvency-data-api-key: ${INSOLVENCY_DATA_API_KEY:localhost}
+  internal-api-key: ${CHS_INTERNAL_API_KEY:localhost}
   api-url: ${API_URL:localhost}
   internal-api-url: ${INTERNAL_API_URL:localhost}

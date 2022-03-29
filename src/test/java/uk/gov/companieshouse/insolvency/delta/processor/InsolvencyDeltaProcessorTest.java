@@ -1,5 +1,8 @@
 package uk.gov.companieshouse.insolvency.delta.processor;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,26 +14,15 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.FileCopyUtils;
-import uk.gov.companieshouse.api.delta.Insolvency;
-import uk.gov.companieshouse.api.delta.InsolvencyDelta;
-import uk.gov.companieshouse.api.delta.PractitionerAddress;
-import uk.gov.companieshouse.api.delta.Appointment;
-import uk.gov.companieshouse.api.delta.CaseNumber;
-import uk.gov.companieshouse.api.insolvency.CompanyInsolvency;
+import uk.gov.companieshouse.api.delta.*;
 import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
-import uk.gov.companieshouse.api.insolvency.InternalData;
 import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.delta.ChsDelta;
-import uk.gov.companieshouse.insolvency.delta.producer.InsolvencyDeltaProducer;
 import uk.gov.companieshouse.insolvency.delta.service.api.ApiClientService;
 import uk.gov.companieshouse.insolvency.delta.transformer.InsolvencyApiTransformer;
 import uk.gov.companieshouse.logging.Logger;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.time.OffsetDateTime;
-
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,9 +30,6 @@ import static org.mockito.Mockito.when;
 public class InsolvencyDeltaProcessorTest {
 
     private InsolvencyDeltaProcessor deltaProcessor;
-
-    @Mock
-    private InsolvencyDeltaProducer insolvencyDeltaProducer;
 
     @Mock
     private InsolvencyApiTransformer transformer;
@@ -53,7 +42,7 @@ public class InsolvencyDeltaProcessorTest {
 
     @BeforeEach
     void setUp() {
-        deltaProcessor = new InsolvencyDeltaProcessor(insolvencyDeltaProducer, apiClientService, transformer, logger);
+        deltaProcessor = new InsolvencyDeltaProcessor(apiClientService, transformer, logger);
     }
 
     @Test
@@ -74,10 +63,7 @@ public class InsolvencyDeltaProcessorTest {
 
     private InternalCompanyInsolvency internalCompanyInsolvencyMock() {
         InternalCompanyInsolvency internalCompanyInsolvency = new InternalCompanyInsolvency();
-        InternalData internalData = new InternalData();
-        internalData.setUpdatedBy("topic-partition-offset");
-        internalCompanyInsolvency.setInternalData(internalData);
-        internalCompanyInsolvency.setExternalData(new CompanyInsolvency());
+        internalCompanyInsolvency.deltaAt("Example Delta At");
         return internalCompanyInsolvency;
     }
 
@@ -94,10 +80,8 @@ public class InsolvencyDeltaProcessorTest {
 
         return MessageBuilder
                 .withPayload(mockChsDelta)
-                .setHeader(KafkaHeaders.RECEIVED_TOPIC, "topic")
+                .setHeader(KafkaHeaders.RECEIVED_TOPIC, "test")
                 .setHeader("INSOLVENCY_DELTA_RETRY_COUNT", 1)
-                .setHeader(KafkaHeaders.RECEIVED_PARTITION_ID, "partition")
-                .setHeader(KafkaHeaders.OFFSET, "offset")
                 .build();
     }
 

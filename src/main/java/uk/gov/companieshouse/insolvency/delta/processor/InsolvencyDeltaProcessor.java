@@ -1,10 +1,10 @@
 package uk.gov.companieshouse.insolvency.delta.processor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -19,7 +19,6 @@ import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
-import uk.gov.companieshouse.insolvency.delta.producer.InsolvencyDeltaProducer;
 import uk.gov.companieshouse.insolvency.delta.service.api.ApiClientService;
 import uk.gov.companieshouse.insolvency.delta.transformer.InsolvencyApiTransformer;
 import uk.gov.companieshouse.logging.Logger;
@@ -27,7 +26,6 @@ import uk.gov.companieshouse.logging.Logger;
 @Component
 public class InsolvencyDeltaProcessor {
 
-    private final InsolvencyDeltaProducer deltaProducer;
     private final InsolvencyApiTransformer transformer;
     private final ApiClientService apiClientService;
     private final Logger logger;
@@ -36,11 +34,9 @@ public class InsolvencyDeltaProcessor {
      * The constructor.
      */
     @Autowired
-    public InsolvencyDeltaProcessor(InsolvencyDeltaProducer deltaProducer,
-                                    ApiClientService apiClientService,
+    public InsolvencyDeltaProcessor(ApiClientService apiClientService,
                                     InsolvencyApiTransformer transformer,
                                     Logger logger) {
-        this.deltaProducer = deltaProducer;
         this.transformer = transformer;
         this.apiClientService = apiClientService;
         this.logger = logger;
@@ -57,12 +53,7 @@ public class InsolvencyDeltaProcessor {
             final Map<String, Object> logMap = new HashMap<>();
             final String receivedTopic =
                     Objects.requireNonNull(headers.get(KafkaHeaders.RECEIVED_TOPIC)).toString();
-            final String partition =
-                    Objects.requireNonNull(
-                            headers.get(KafkaHeaders.RECEIVED_PARTITION_ID)
-                    ).toString();
-            final String offset =
-                    Objects.requireNonNull(headers.get(KafkaHeaders.OFFSET)).toString();
+
 
             ObjectMapper mapper = new ObjectMapper();
             InsolvencyDelta insolvencyDelta = mapper.readValue(payload.getData(),
@@ -77,10 +68,6 @@ public class InsolvencyDeltaProcessor {
 
             Insolvency insolvency = insolvencyDelta.getInsolvency().get(0);
             InternalCompanyInsolvency internalCompanyInsolvency = transformer.transform(insolvency);
-
-            final String updatedBy = String.format("%s-%s-%s", receivedTopic, partition, offset);
-
-            internalCompanyInsolvency.getInternalData().setUpdatedBy(updatedBy);
 
             final String companyNumber = insolvency.getCompanyNumber();
             logger.trace(String.format("DSND-362: InsolvencyDelta transformed into "
