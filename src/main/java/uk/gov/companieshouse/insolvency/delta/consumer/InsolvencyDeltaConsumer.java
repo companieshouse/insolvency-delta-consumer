@@ -25,6 +25,9 @@ public class InsolvencyDeltaConsumer {
     private final Logger logger;
     public final KafkaTemplate<String, Object> kafkaTemplate;
 
+    /**
+     * Default constructor.
+     */
     @Autowired
     public InsolvencyDeltaConsumer(InsolvencyDeltaProcessor deltaProcessor, Logger logger,
                                    KafkaTemplate<String, Object> kafkaTemplate) {
@@ -40,11 +43,10 @@ public class InsolvencyDeltaConsumer {
             backoff = @Backoff(delay = 100),
             fixedDelayTopicStrategy = FixedDelayStrategy.SINGLE_TOPIC,
             retryTopicSuffix = "-${insolvency.delta.group-id}-retry",
-            dltTopicSuffix ="-${insolvency.delta.group-id}-error",
+            dltTopicSuffix = "-${insolvency.delta.group-id}-error",
             dltStrategy = DltStrategy.FAIL_ON_ERROR,
             autoCreateTopics = "false",
-            exclude = NonRetryableErrorException.class
-    )
+            exclude = NonRetryableErrorException.class)
     @KafkaListener(topics = "${insolvency.delta.topic}",
             groupId = "${insolvency.delta.group-id}",
             containerFactory = "listenerContainerFactory")

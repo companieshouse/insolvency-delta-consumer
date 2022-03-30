@@ -29,18 +29,21 @@ public class ChsDeltaSerializer implements Serializer<Object> {
         logger.trace("Payload serialised: " + payload);
 
         try {
-            if (payload == null)
+            if (payload == null) {
                 return null;
+            }
 
-            if (payload instanceof byte[])
+            if (payload instanceof byte[]) {
                 return (byte[]) payload;
+            }
 
             if (payload instanceof ChsDelta) {
                 ChsDelta chsDelta = (ChsDelta) payload;
                 DatumWriter<ChsDelta> writer = new SpecificDatumWriter<>();
                 EncoderFactory encoderFactory = EncoderFactory.get();
 
-                AvroSerializer<ChsDelta> avroSerializer = new AvroSerializer<>(writer, encoderFactory);
+                AvroSerializer<ChsDelta> avroSerializer =
+                        new AvroSerializer<>(writer, encoderFactory);
 
                 return avroSerializer.toBinary(chsDelta);
             }

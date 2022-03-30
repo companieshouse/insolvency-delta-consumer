@@ -14,7 +14,8 @@ public class RetryableTopicErrorInterceptor implements ProducerInterceptor<Strin
 
     @Override
     public ProducerRecord<String, Object> onSend(ProducerRecord<String, Object> record) {
-        String nextTopic = record.topic().contains("-error") ? getNextErrorTopic(record) : record.topic();
+        String nextTopic = record.topic().contains("-error") ? getNextErrorTopic(record)
+                : record.topic();
         if (nextTopic.contains("-invalid")) {
             return new ProducerRecord<>(nextTopic, record.key(), record.value());
         }
@@ -23,7 +24,7 @@ public class RetryableTopicErrorInterceptor implements ProducerInterceptor<Strin
     }
 
     @Override
-    public void onAcknowledgement(RecordMetadata recordMetadata, Exception e) {
+    public void onAcknowledgement(RecordMetadata recordMetadata, Exception ex) {
     }
 
     @Override
@@ -37,10 +38,11 @@ public class RetryableTopicErrorInterceptor implements ProducerInterceptor<Strin
     private String getNextErrorTopic(ProducerRecord<String, Object> record) {
         Header header1 = record.headers().lastHeader(EXCEPTION_CAUSE_FQCN);
         Header header2 = record.headers().lastHeader(EXCEPTION_STACKTRACE);
-        return ((header1 != null &&
-                new String(header1.value()).contains(NonRetryableErrorException.class.getName()))
-                || (header2 != null &&
-                new String(header2.value()).contains(NonRetryableErrorException.class.getName()))) ?
-                record.topic().replace("-error", "-invalid") : record.topic();
+        return ((header1 != null
+                && new String(header1.value()).contains(NonRetryableErrorException.class.getName()))
+                || (header2 != null
+                && new String(header2.value()).contains(
+                        NonRetryableErrorException.class.getName())))
+                ? record.topic().replace("-error", "-invalid") : record.topic();
     }
 }
