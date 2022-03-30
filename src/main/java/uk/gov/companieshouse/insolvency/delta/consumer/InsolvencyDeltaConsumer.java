@@ -54,11 +54,9 @@ public class InsolvencyDeltaConsumer {
                                     @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) String partition,
                                     @Header(KafkaHeaders.OFFSET) String offset) {
-        logger.info(String.format("A new message from %s topic with payload:%s "
+        logger.trace(String.format("A new message from %s topic with payload:%s "
                 + "and headers:%s ", topic, message.getPayload(), message.getHeaders()));
-        // process the message
-        throw new RetryableErrorException("Move the message to retry topic");
-        //throw new NonRetryableErrorException("Move the message to invalid or error topic");
+        deltaProcessor.processDelta(message);
     }
 
 }
