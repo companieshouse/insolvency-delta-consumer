@@ -14,10 +14,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import uk.gov.companieshouse.delta.ChsDelta;
@@ -35,6 +35,9 @@ public class KafkaConfig {
 
     private final String bootstrapServers;
 
+    /**
+     * Constructor.
+     */
     public KafkaConfig(ChsDeltaDeserializer chsDeltaDeserializer,
                        ChsDeltaSerializer chsDeltaSerializer,
                        @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers) {
@@ -52,16 +55,20 @@ public class KafkaConfig {
                 new ErrorHandlingDeserializer<>(chsDeltaDeserializer));
     }
 
+    /**
+     * Kafka Producer Factory.
+     */
     @Bean
     public ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ChsDeltaSerializer.class);
-        props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, RetryableTopicErrorInterceptor.class.getName());
+        props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG,
+                RetryableTopicErrorInterceptor.class.getName());
         //props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
-        DefaultKafkaProducerFactory<String, Object> factory =
-                new DefaultKafkaProducerFactory<>(props, new StringSerializer(), chsDeltaSerializer);
+        DefaultKafkaProducerFactory<String, Object> factory = new DefaultKafkaProducerFactory<>(
+                props, new StringSerializer(), chsDeltaSerializer);
         //factory.setTransactionIdPrefix("tx-");
 
         return factory;
