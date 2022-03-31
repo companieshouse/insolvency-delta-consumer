@@ -83,10 +83,8 @@ public class KafkaTestContainerConfig {
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ChsDeltaSerializer.class);
         props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG,
                 RetryableTopicErrorInterceptor.class.getName());
-        //props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
         DefaultKafkaProducerFactory<String, Object> factory = new DefaultKafkaProducerFactory<>(
                 props, new StringSerializer(), chsDeltaSerializer);
-        //factory.setTransactionIdPrefix("tx-");
 
         return factory;
     }
