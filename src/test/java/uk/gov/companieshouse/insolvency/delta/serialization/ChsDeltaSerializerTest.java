@@ -39,6 +39,13 @@ public class ChsDeltaSerializerTest {
         assertThat(serialize).isEqualTo(null);
     }
 
+    @Test
+    void When_serialize_receivesBytes_returnsBytes() {
+        byte[] byteExample = "Example bytes".getBytes();
+        byte[] serialize = serializer.serialize("", byteExample);
+        assertThat(serialize).isEqualTo(byteExample);
+    }
+
     private ChsDelta decodedData(byte[] chsDelta) {
         ChsDeltaDeserializer serializer = new ChsDeltaDeserializer(this.logger);
         return serializer.deserialize("", chsDelta);

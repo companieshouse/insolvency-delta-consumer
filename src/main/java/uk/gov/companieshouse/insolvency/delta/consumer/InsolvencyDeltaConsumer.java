@@ -13,7 +13,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.exception.NonRetryableErrorException;
-import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
 import uk.gov.companieshouse.insolvency.delta.processor.InsolvencyDeltaProcessor;
 import uk.gov.companieshouse.logging.Logger;
 
@@ -34,13 +33,14 @@ public class InsolvencyDeltaConsumer {
         this.deltaProcessor = deltaProcessor;
         this.logger = logger;
         this.kafkaTemplate = kafkaTemplate;
+
     }
 
     /**
      * Receives Main topic messages.
      */
-    @RetryableTopic(attempts = "4",
-            backoff = @Backoff(delay = 100),
+    @RetryableTopic(attempts = "${insolvency.delta.attempts}",
+            backoff = @Backoff(delayExpression = "${insolvency.delta.backoff-delay}"),
             fixedDelayTopicStrategy = FixedDelayStrategy.SINGLE_TOPIC,
             retryTopicSuffix = "-${insolvency.delta.group-id}-retry",
             dltTopicSuffix = "-${insolvency.delta.group-id}-error",

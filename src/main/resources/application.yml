@@ -13,6 +13,8 @@ insolvency:
   delta:
     group-id: insolvency-delta-consumer
     topic: insolvency-delta
+    attempts: 4
+    backoff-delay: 100
 
 logger:
   namespace: insolvency-delta-consumer
