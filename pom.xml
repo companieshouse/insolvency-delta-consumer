@@ -331,6 +331,7 @@
 					</execution>
 				</executions>
 				<configuration>
+					<encoding>UTF-8</encoding>
 					<argLine>-Dfile.encoding=UTF-8</argLine>
 					<argLine>${failsafeArgLine}</argLine>
 					<classesDirectory>${project.build.outputDirectory}</classesDirectory>
@@ -371,9 +372,9 @@
 				<executions>
 					<execution>
 						<phase>process-sources</phase>
-						<goals>
-							<goal>check</goal>
-						</goals>
+<!--						<goals>-->
+<!--							<goal>check</goal>-->
+<!--						</goals>-->
 					</execution>
 				</executions>
 				<configuration>
