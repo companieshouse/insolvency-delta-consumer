@@ -6,9 +6,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.delta.ChsDelta;
+import uk.gov.companieshouse.insolvency.delta.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.logging.Logger;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 public class ChsDeltaDeserializerTest {
@@ -32,8 +36,14 @@ public class ChsDeltaDeserializerTest {
         assertThat(deserializedObject).isEqualTo(chsDelta);
     }
 
+    @Test
+    void When_deserializeFails_throwsNonRetryableError() {
+        byte[] data = "Invalid message".getBytes();
+        assertThrows(NonRetryableErrorException.class, () -> deserializer.deserialize("", data));
+    }
+
     private byte[] encodedData(ChsDelta chsDelta) {
-        ChsDeltaSerializer serializer = new ChsDeltaSerializer();
+        ChsDeltaSerializer serializer = new ChsDeltaSerializer(this.logger);
         return serializer.serialize("", chsDelta);
     }
 }

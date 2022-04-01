@@ -21,14 +21,12 @@ import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
 import uk.gov.companieshouse.api.insolvency.InternalData;
 import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.delta.ChsDelta;
-import uk.gov.companieshouse.insolvency.delta.producer.InsolvencyDeltaProducer;
 import uk.gov.companieshouse.insolvency.delta.service.api.ApiClientService;
 import uk.gov.companieshouse.insolvency.delta.transformer.InsolvencyApiTransformer;
 import uk.gov.companieshouse.logging.Logger;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.time.OffsetDateTime;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
@@ -38,9 +36,6 @@ import static org.mockito.Mockito.when;
 public class InsolvencyDeltaProcessorTest {
 
     private InsolvencyDeltaProcessor deltaProcessor;
-
-    @Mock
-    private InsolvencyDeltaProducer insolvencyDeltaProducer;
 
     @Mock
     private InsolvencyApiTransformer transformer;
@@ -53,7 +48,7 @@ public class InsolvencyDeltaProcessorTest {
 
     @BeforeEach
     void setUp() {
-        deltaProcessor = new InsolvencyDeltaProcessor(insolvencyDeltaProducer, apiClientService, transformer, logger);
+        deltaProcessor = new InsolvencyDeltaProcessor(apiClientService, transformer, logger);
     }
 
     @Test
