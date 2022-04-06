@@ -61,14 +61,9 @@ public class InsolvencyDeltaProcessor {
         final String offset =
                 Objects.requireNonNull(headers.get(KafkaHeaders.OFFSET)).toString();
 
-        ObjectMapper mapper = new ObjectMapper();
-        InsolvencyDelta insolvencyDelta = null;
-        try {
-            insolvencyDelta = mapper.readValue(payload.getData(),
-                    InsolvencyDelta.class);
-        } catch (JsonProcessingException exception) {
-            throw new RetryableErrorException("Error when mapping to insolvency delta");
-        }
+
+        InsolvencyDelta insolvencyDelta = mapToInsolvencyDelta(payload);
+
         logger.trace(String.format("DSND-362: InsolvencyDelta extracted "
                     + "from a Kafka message: %s", insolvencyDelta));
 
@@ -104,6 +99,18 @@ public class InsolvencyDeltaProcessor {
 
     }
 
+    private InsolvencyDelta mapToInsolvencyDelta(ChsDelta payload)
+            throws NonRetryableErrorException {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(payload.getData(),
+                    InsolvencyDelta.class);
+        } catch (JsonProcessingException exception) {
+            throw new NonRetryableErrorException("Error when mapping to insolvency delta",
+                    exception);
+        }
+    }
+
     private void handleResponse(
             final ResponseStatusException ex,
             final HttpStatus httpStatus,
@@ -116,12 +123,12 @@ public class InsolvencyDeltaProcessor {
             // 400 BAD REQUEST status is not retryable
             logger.errorContext(logContext, msg, null, logMap);
             throw new NonRetryableErrorException(msg);
-        } else if (httpStatus.is4xxClientError() || httpStatus.is5xxServerError()) {
+        } else if (!httpStatus.is2xxSuccessful()) {
             // any other client or server status is retryable
             logger.errorContext(logContext, msg + ", retry", null, logMap);
             throw new RetryableErrorException(msg);
         } else {
-            logger.debugContext(logContext, msg, logMap);
+            logger.trace("Got success response from PUT insolvency");
         }
     }
 

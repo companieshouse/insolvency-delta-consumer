@@ -56,7 +56,12 @@ public class InsolvencyDeltaConsumer {
                                     @Header(KafkaHeaders.OFFSET) String offset) {
         logger.trace(String.format("A new message from %s topic with payload:%s "
                 + "and headers:%s ", topic, message.getPayload(), message.getHeaders()));
-        deltaProcessor.processDelta(message);
+        try {
+            deltaProcessor.processDelta(message);
+        } catch (Exception exception) {
+            logger.error(exception);
+            throw exception;
+        }
     }
 
 }

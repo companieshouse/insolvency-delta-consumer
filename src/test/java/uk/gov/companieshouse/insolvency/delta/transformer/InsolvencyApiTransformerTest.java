@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.api.delta.Insolvency;
 import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
+import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
 import uk.gov.companieshouse.insolvency.delta.mapper.InsolvencyMapper;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,6 +54,6 @@ class InsolvencyApiTransformerTest {
         when(mapper.insolvencyDeltaToApi(insolvency, COMPANY_NUMBER))
                 .thenThrow(NullPointerException.class);
 
-        assertThrows(NullPointerException.class, () -> transformer.transform(insolvency));
+        assertThrows(RetryableErrorException.class, () -> transformer.transform(insolvency));
     }
 }

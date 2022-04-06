@@ -119,7 +119,7 @@ public class InsolvencyDeltaProcessorTest {
     @DisplayName("When can't transform into insolvency delta API, throws retryable error")
     void When_CantTransformIntoInsolvencyDeltaApi_RetryableError() throws IOException {
         Message<ChsDelta> invalidChsDeltaMessage = invalidChsDeltaMessage();
-        Assertions.assertThrows(RetryableErrorException.class, () -> deltaProcessor.processDelta(invalidChsDeltaMessage));
+        Assertions.assertThrows(NonRetryableErrorException.class, () -> deltaProcessor.processDelta(invalidChsDeltaMessage));
     }
 
     private InternalCompanyInsolvency internalCompanyInsolvencyMock() {
