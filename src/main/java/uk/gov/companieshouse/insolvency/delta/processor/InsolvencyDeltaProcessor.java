@@ -105,7 +105,7 @@ public class InsolvencyDeltaProcessor {
         try {
             return mapper.readValue(payload.getData(),
                     InsolvencyDelta.class);
-        } catch (JsonProcessingException exception) {
+        } catch (Exception exception) {
             throw new NonRetryableErrorException("Error when mapping to insolvency delta",
                     exception);
         }
