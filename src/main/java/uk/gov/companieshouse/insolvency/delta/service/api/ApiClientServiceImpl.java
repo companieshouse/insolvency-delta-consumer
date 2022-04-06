@@ -60,7 +60,7 @@ public class ApiClientServiceImpl extends BaseApiClientServiceImpl implements Ap
             String companyNumber,
             InternalCompanyInsolvency insolvency) {
         final String uri =
-                String.format("/beta/company/%s/insolvency", companyNumber);
+                String.format("/company/%s/insolvency", companyNumber);
 
         Map<String,Object> logMap = createLogMap(companyNumber,"PUT", uri);
         logger.infoContext(log, String.format("PUT %s", uri), logMap);
