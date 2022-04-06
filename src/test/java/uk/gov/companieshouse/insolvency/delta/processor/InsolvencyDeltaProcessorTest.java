@@ -101,7 +101,7 @@ public class InsolvencyDeltaProcessorTest {
     }
 
     @Test
-    @DisplayName("Getting another 4xx when calling put insolvency, throws retryable error")
+    @DisplayName("Getting internal server error when calling put insolvency, throws retryable error")
     void When_PutInsolvencyInternalServerError_RetryableError() throws IOException {
         Message<ChsDelta> mockChsDeltaMessage = createChsDeltaMessage();
         InsolvencyDelta expectedInsolvencyDelta = createInsolvencyDelta();
