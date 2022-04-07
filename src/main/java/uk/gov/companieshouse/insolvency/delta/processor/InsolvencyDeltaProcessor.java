@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.insolvency.delta.processor;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
@@ -46,60 +47,61 @@ public class InsolvencyDeltaProcessor {
     /**
      * Process CHS Delta message.
      */
-    public void processDelta(Message<ChsDelta> chsDelta) {
-        try {
-            MessageHeaders headers = chsDelta.getHeaders();
-            final ChsDelta payload = chsDelta.getPayload();
-            final String logContext = payload.getContextId();
-            final Map<String, Object> logMap = new HashMap<>();
-            final String receivedTopic =
-                    Objects.requireNonNull(headers.get(KafkaHeaders.RECEIVED_TOPIC)).toString();
-            final String partition =
-                    Objects.requireNonNull(
-                            headers.get(KafkaHeaders.RECEIVED_PARTITION_ID)
-                    ).toString();
-            final String offset =
-                    Objects.requireNonNull(headers.get(KafkaHeaders.OFFSET)).toString();
+    public void processDelta(Message<ChsDelta> chsDelta,
+                             String topic,
+                             String partition,
+                             String offset) {
+        MessageHeaders headers = chsDelta.getHeaders();
+        final ChsDelta payload = chsDelta.getPayload();
+        final String logContext = payload.getContextId();
+        final Map<String, Object> logMap = new HashMap<>();
 
-            ObjectMapper mapper = new ObjectMapper();
-            InsolvencyDelta insolvencyDelta = mapper.readValue(payload.getData(),
-                    InsolvencyDelta.class);
-            logger.trace(String.format("DSND-362: InsolvencyDelta extracted "
+        InsolvencyDelta insolvencyDelta = mapToInsolvencyDelta(payload);
+
+        logger.trace(String.format("DSND-362: InsolvencyDelta extracted "
                     + "from a Kafka message: %s", insolvencyDelta));
 
-            /** We always receive only one insolvency/charge per delta in a list,
-             * so we only take the first element
-             * CHIPS is not able to send more than one insolvency per delta.
-             **/
+        /** We always receive only one insolvency/charge per delta in a list,
+         * so we only take the first element
+         * CHIPS is not able to send more than one insolvency per delta.
+         **/
 
-            Insolvency insolvency = insolvencyDelta.getInsolvency().get(0);
-            InternalCompanyInsolvency internalCompanyInsolvency = transformer.transform(insolvency);
+        Insolvency insolvency = insolvencyDelta.getInsolvency().get(0);
 
-            final String updatedBy = String.format("%s-%s-%s", receivedTopic, partition, offset);
+        InternalCompanyInsolvency internalCompanyInsolvency = transformer.transform(insolvency);
 
-            internalCompanyInsolvency.getInternalData().setUpdatedBy(updatedBy);
+        final String updatedBy = String.format("%s-%s-%s", topic, partition, offset);
 
-            final String companyNumber = insolvency.getCompanyNumber();
-            logger.trace(String.format("DSND-362: InsolvencyDelta transformed into "
-                    + "InternalCompanyInsolvency: %s", internalCompanyInsolvency));
-            logMap.put("company_number", companyNumber);
-            logger.infoContext(
-                    logContext,
-                    String.format("Process insolvency for company number [%s]", companyNumber),
-                    logMap);
+        internalCompanyInsolvency.getInternalData().setUpdatedBy(updatedBy);
 
-            final ApiResponse<Void> response =
-                    apiClientService.putInsolvency(logContext,
-                            companyNumber,
-                            internalCompanyInsolvency);
+        final String companyNumber = insolvency.getCompanyNumber();
+        logger.trace(String.format("DSND-362: InsolvencyDelta transformed into "
+                + "InternalCompanyInsolvency: %s", internalCompanyInsolvency));
+        logMap.put("company_number", companyNumber);
+        logger.infoContext(
+                logContext,
+                String.format("Process insolvency for company number [%s]", companyNumber),
+                logMap);
 
-            handleResponse(null, HttpStatus.valueOf(response.getStatusCode()), logContext,
-                    "Response from sending insolvency data", logMap);
-        } catch (RetryableErrorException ex) {
-            retryDeltaMessage(chsDelta);
-        } catch (Exception ex) {
-            handleErrorMessage(chsDelta);
-            // send to error topic
+        final ApiResponse<Void> response =
+                apiClientService.putInsolvency(logContext,
+                        companyNumber,
+                        internalCompanyInsolvency);
+
+        handleResponse(null, HttpStatus.valueOf(response.getStatusCode()), logContext,
+                "Response from sending insolvency data", logMap);
+
+    }
+
+    private InsolvencyDelta mapToInsolvencyDelta(ChsDelta payload)
+            throws NonRetryableErrorException {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(payload.getData(),
+                    InsolvencyDelta.class);
+        } catch (Exception exception) {
+            throw new NonRetryableErrorException("Error when mapping to insolvency delta",
+                    exception);
         }
     }
 
@@ -115,21 +117,13 @@ public class InsolvencyDeltaProcessor {
             // 400 BAD REQUEST status is not retryable
             logger.errorContext(logContext, msg, null, logMap);
             throw new NonRetryableErrorException(msg);
-        } else if (httpStatus.is4xxClientError() || httpStatus.is5xxServerError()) {
+        } else if (!httpStatus.is2xxSuccessful()) {
             // any other client or server status is retryable
             logger.errorContext(logContext, msg + ", retry", null, logMap);
             throw new RetryableErrorException(msg);
         } else {
-            logger.debugContext(logContext, msg, logMap);
+            logger.trace("Got success response from PUT insolvency");
         }
-    }
-
-    public void retryDeltaMessage(Message<ChsDelta> chsDelta) {
-
-    }
-
-    private void handleErrorMessage(Message<ChsDelta> chsDelta) {
-
     }
 
 }

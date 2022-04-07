@@ -5,6 +5,10 @@ public class RetryableErrorException extends RuntimeException {
         super(message);
     }
 
+    public RetryableErrorException(String message, Exception exception) {
+        super(message, exception);
+    }
+
     public RetryableErrorException(Exception exception) {
         super(exception);
     }

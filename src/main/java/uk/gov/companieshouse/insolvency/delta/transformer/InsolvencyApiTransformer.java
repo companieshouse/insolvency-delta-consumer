@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.delta.Insolvency;
 import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
+import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
 import uk.gov.companieshouse.insolvency.delta.mapper.InsolvencyMapper;
 
 @Component
@@ -22,8 +23,16 @@ public class InsolvencyApiTransformer {
      * @param insolvency source object
      * @return source object mapped to InternalCompanyInsolvency
      */
-    public InternalCompanyInsolvency transform(Insolvency insolvency) {
-        String companyNumber = insolvency.getCompanyNumber();
-        return mapper.insolvencyDeltaToApi(insolvency, companyNumber);
+    public InternalCompanyInsolvency transform(Insolvency insolvency)
+            throws RetryableErrorException {
+        try {
+            String companyNumber =
+                    insolvency.getCompanyNumber();
+            return mapper.insolvencyDeltaToApi(insolvency,
+                    companyNumber);
+        } catch (Exception exception) {
+            throw new RetryableErrorException("Unable to map to Insolvency API object",
+                    exception);
+        }
     }
 }
