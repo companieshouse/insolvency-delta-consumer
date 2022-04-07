@@ -72,7 +72,7 @@ class InsolvencyMapperTest {
 
         // FIRST CASE
         ModelCase firstCase = externalInsolvencyTarget.getCases().get(0);
-        assertThat(firstCase.getNumber()).isEqualTo(1);
+        assertThat(firstCase.getNumber()).isEqualTo("1");
         assertThat(firstCase.getType()).isEqualTo(ModelCase.TypeEnum.ADMINISTRATIVE_RECEIVER);
         assertThat(firstCase.getPractitioners().size()).isEqualTo(2);
 
@@ -118,7 +118,7 @@ class InsolvencyMapperTest {
 
         // SECOND CASE
         ModelCase secondCase = externalInsolvencyTarget.getCases().get(1);
-        assertThat(secondCase.getNumber()).isEqualTo(2);
+        assertThat(secondCase.getNumber()).isEqualTo("2");
         assertThat(secondCase.getType()).isEqualTo(ModelCase.TypeEnum.CREDITORS_VOLUNTARY_LIQUIDATION);
         assertThat(secondCase.getPractitioners().size()).isEqualTo(1);
 
