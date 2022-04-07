@@ -47,20 +47,14 @@ public class InsolvencyDeltaProcessor {
     /**
      * Process CHS Delta message.
      */
-    public void processDelta(Message<ChsDelta> chsDelta) {
+    public void processDelta(Message<ChsDelta> chsDelta,
+                             String topic,
+                             String partition,
+                             String offset) {
         MessageHeaders headers = chsDelta.getHeaders();
         final ChsDelta payload = chsDelta.getPayload();
         final String logContext = payload.getContextId();
         final Map<String, Object> logMap = new HashMap<>();
-        final String receivedTopic =
-                Objects.requireNonNull(headers.get(KafkaHeaders.RECEIVED_TOPIC)).toString();
-        final String partition =
-                Objects.requireNonNull(
-                        headers.get(KafkaHeaders.RECEIVED_PARTITION_ID)
-                ).toString();
-        final String offset =
-                Objects.requireNonNull(headers.get(KafkaHeaders.OFFSET)).toString();
-
 
         InsolvencyDelta insolvencyDelta = mapToInsolvencyDelta(payload);
 
@@ -76,7 +70,7 @@ public class InsolvencyDeltaProcessor {
 
         InternalCompanyInsolvency internalCompanyInsolvency = transformer.transform(insolvency);
 
-        final String updatedBy = String.format("%s-%s-%s", receivedTopic, partition, offset);
+        final String updatedBy = String.format("%s-%s-%s", topic, partition, offset);
 
         internalCompanyInsolvency.getInternalData().setUpdatedBy(updatedBy);
 

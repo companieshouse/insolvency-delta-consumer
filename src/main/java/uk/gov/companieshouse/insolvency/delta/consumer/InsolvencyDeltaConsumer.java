@@ -57,9 +57,10 @@ public class InsolvencyDeltaConsumer {
         logger.trace(String.format("A new message from %s topic with payload:%s "
                 + "and headers:%s ", topic, message.getPayload(), message.getHeaders()));
         try {
-            deltaProcessor.processDelta(message);
+            deltaProcessor.processDelta(message, topic, partition, offset);
         } catch (Exception exception) {
-            logger.error(exception);
+            logger.error(String.format("Exception occurred while processing the topic %s "
+                    + "with message %s, exception thrown is %s", topic, message, exception));
             throw exception;
         }
     }
