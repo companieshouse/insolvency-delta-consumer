@@ -44,7 +44,7 @@ class CaseMapperTest {
         ModelCase targetCase = mapper.map(sourceCase, companyNumber);
 
         assertThat(targetCase.getType()).isEqualTo(ADMINISTRATION_ORDER);
-        assertThat(targetCase.getNumber()).isEqualTo(1);
+        assertThat(targetCase.getNumber()).isEqualTo("1");
         assertThat(targetCase.getNotes()).isNull();
 
         List<CaseDates> caseDates = targetCase.getDates();
@@ -68,7 +68,7 @@ class CaseMapperTest {
         ModelCase targetCase = mapper.map(sourceCase, companyNumber);
 
         assertThat(targetCase.getType()).isEqualTo(ModelCase.TypeEnum.RECEIVER_MANAGER);
-        assertThat(targetCase.getNumber()).isEqualTo(1);
+        assertThat(targetCase.getNumber()).isEqualTo("1");
         assertThat(targetCase.getDates().size()).isZero();
         assertThat(targetCase.getPractitioners()).isNull();
         assertThat(targetCase.getLinks()).isNull();
