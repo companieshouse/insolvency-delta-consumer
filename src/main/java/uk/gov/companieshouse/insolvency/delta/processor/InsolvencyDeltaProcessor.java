@@ -115,12 +115,13 @@ public class InsolvencyDeltaProcessor {
         logMap.put("status", httpStatus.toString());
         if (HttpStatus.BAD_REQUEST == httpStatus) {
             // 400 BAD REQUEST status is not retryable
-            logger.errorContext(logContext, msg, null, logMap);
-            throw new NonRetryableErrorException(msg);
+            throw new NonRetryableErrorException(String
+                    .format("Bad request PUT Api Response %s", msg));
         } else if (!httpStatus.is2xxSuccessful()) {
             // any other client or server status is retryable
             logger.errorContext(logContext, msg + ", retry", null, logMap);
-            throw new RetryableErrorException(msg);
+            throw new RetryableErrorException(String
+                    .format("Unsuccessful PUT API response, %s", msg));
         } else {
             logger.trace("Got success response from PUT insolvency");
         }
