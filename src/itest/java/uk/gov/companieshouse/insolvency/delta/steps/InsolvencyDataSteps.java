@@ -45,24 +45,33 @@ public class InsolvencyDataSteps {
         stubInsolvencyDataApiServiceCalls();
     }
 
-    @When("a message is published to the topic {string}")
-    public void a_message_is_published_to_the_topic(String topicName) throws InterruptedException {
+    @When("a message is published to the topic {string} and consumed")
+    public void a_message_is_published_to_the_topic_and_consumed(String topicName) throws InterruptedException {
         kafkaTemplate.send(topicName, createMessage());
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
         countDownLatch.await(5, TimeUnit.SECONDS);
     }
 
-    @Then("the insolvency delta consumer should consume and process the message")
+    @Then("verify PUT method is called on insolvency-data-api service with response status code as 200")
     public void the_insolvency_delta_consumer_should_consume_and_process_the_message() {
         verify(1, putRequestedFor(urlPathEqualTo("/company/01876743/insolvency")));
 
         wireMockServer.stop();
     }
 
+    @Then("verify PUT method is called on insolvency-data-api service")
+    public void verify_put_method_with_request_is_called_on_insolvency_data_api_service() {
+        verify(1, putRequestedFor(urlEqualTo("/company/01876743/insolvency"))
+                .withRequestBody(matchingJsonPath("$.external_data"))
+                .withRequestBody(matchingJsonPath("$.internal_data")));
+
+        wireMockServer.stop();
+    }
+
     private void stubInsolvencyDataApiServiceCalls() {
         stubFor(
-                put(urlPathEqualTo("/beta/company/01876743/insolvency"))
+                put(urlPathEqualTo("/company/01876743/insolvency"))
                         .withRequestBody(containing("01876743"))
                         .willReturn(aResponse()
                                 .withStatus(200)));
