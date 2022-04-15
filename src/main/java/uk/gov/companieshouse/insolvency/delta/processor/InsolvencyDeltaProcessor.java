@@ -1,20 +1,18 @@
 package uk.gov.companieshouse.insolvency.delta.processor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.companieshouse.api.delta.Insolvency;
+import uk.gov.companieshouse.api.delta.InsolvencyDeleteDelta;
 import uk.gov.companieshouse.api.delta.InsolvencyDelta;
 import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
 import uk.gov.companieshouse.api.model.ApiResponse;
@@ -55,11 +53,35 @@ public class InsolvencyDeltaProcessor {
         final ChsDelta payload = chsDelta.getPayload();
         final String logContext = payload.getContextId();
         final Map<String, Object> logMap = new HashMap<>();
+        final String companyNumber;
 
-        InsolvencyDelta insolvencyDelta = mapToInsolvencyDelta(payload);
+        if (Boolean.TRUE.equals(payload.getIsDelete())) {
+            var insolvencyDeleteDelta =
+                    mapToInsolvencyDelta(payload, InsolvencyDeleteDelta.class);
+            logger.trace(String.format("InsolvencyDeleteDelta extracted from Kafka message: %s",
+                    insolvencyDeleteDelta));
+
+            companyNumber = insolvencyDeleteDelta.getCompanyNumber();
+            logMap.put("company_number", companyNumber);
+
+            logger.infoContext(
+                    logContext,
+                    String.format(
+                            "Process DELETE insolvency for company number %s", companyNumber),
+                    logMap);
+
+            final ApiResponse<Void> response =
+                    apiClientService.deleteInsolvency(logContext, companyNumber);
+
+            handleResponse(null, HttpStatus.valueOf(response.getStatusCode()), logContext,
+                    "Response from DELETE insolvency request", logMap);
+            return;
+        }
+
+        InsolvencyDelta insolvencyDelta = mapToInsolvencyDelta(payload, InsolvencyDelta.class);
 
         logger.trace(String.format("DSND-362: InsolvencyDelta extracted "
-                    + "from a Kafka message: %s", insolvencyDelta));
+                + "from a Kafka message: %s", insolvencyDelta));
 
         /** We always receive only one insolvency/charge per delta in a list,
          * so we only take the first element
@@ -74,7 +96,7 @@ public class InsolvencyDeltaProcessor {
 
         internalCompanyInsolvency.getInternalData().setUpdatedBy(updatedBy);
 
-        final String companyNumber = insolvency.getCompanyNumber();
+        companyNumber = insolvency.getCompanyNumber();
         logger.trace(String.format("DSND-362: InsolvencyDelta transformed into "
                 + "InternalCompanyInsolvency: %s", internalCompanyInsolvency));
         logMap.put("company_number", companyNumber);
@@ -93,14 +115,14 @@ public class InsolvencyDeltaProcessor {
 
     }
 
-    private InsolvencyDelta mapToInsolvencyDelta(ChsDelta payload)
+    private <T> T mapToInsolvencyDelta(ChsDelta payload, Class<T> deltaClass)
             throws NonRetryableErrorException {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.readValue(payload.getData(),
-                    InsolvencyDelta.class);
+            return mapper.readValue(payload.getData(), deltaClass);
         } catch (Exception exception) {
-            throw new NonRetryableErrorException("Error when mapping to insolvency delta",
+            throw new NonRetryableErrorException(
+                    "Error when mapping to insolvency delta class" + deltaClass.getName(),
                     exception);
         }
     }

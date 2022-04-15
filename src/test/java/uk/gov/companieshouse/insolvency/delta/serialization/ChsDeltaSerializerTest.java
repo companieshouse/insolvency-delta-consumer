@@ -1,19 +1,19 @@
 package uk.gov.companieshouse.insolvency.delta.serialization;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.delta.ChsDelta;
-import uk.gov.companieshouse.insolvency.delta.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.logging.Logger;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 @ExtendWith(MockitoExtension.class)
-public class ChsDeltaSerializerTest {
+class ChsDeltaSerializerTest {
 
     @Mock
     private Logger logger;
@@ -24,9 +24,10 @@ public class ChsDeltaSerializerTest {
         serializer = new ChsDeltaSerializer(logger);
     }
 
-    @Test
-    void When_serialize_Expect_chsDeltaBytes() {
-        ChsDelta chsDelta = new ChsDelta("{\"key\": \"value\"}", 1, "context_id");
+    @ParameterizedTest
+    @ValueSource(booleans =  {true, false})
+    void When_serialize_Expect_chsDeltaBytes(boolean isDelete) {
+        ChsDelta chsDelta = new ChsDelta("{\"key\": \"value\"}", 1, "context_id", isDelete);
 
         byte[] result = serializer.serialize("", chsDelta);
 
@@ -36,7 +37,7 @@ public class ChsDeltaSerializerTest {
     @Test
     void When_serialize_null_returns_null() {
         byte[] serialize = serializer.serialize("", null);
-        assertThat(serialize).isEqualTo(null);
+        assertThat(serialize).isNull();
     }
 
     @Test
