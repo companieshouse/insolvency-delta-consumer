@@ -55,29 +55,6 @@ public class InsolvencyDeltaProcessor {
         final Map<String, Object> logMap = new HashMap<>();
         final String companyNumber;
 
-        if (Boolean.TRUE.equals(payload.getIsDelete())) {
-            var insolvencyDeleteDelta =
-                    mapToInsolvencyDelta(payload, InsolvencyDeleteDelta.class);
-            logger.trace(String.format("InsolvencyDeleteDelta extracted from Kafka message: %s",
-                    insolvencyDeleteDelta));
-
-            companyNumber = insolvencyDeleteDelta.getCompanyNumber();
-            logMap.put("company_number", companyNumber);
-
-            logger.infoContext(
-                    logContext,
-                    String.format(
-                            "Process DELETE insolvency for company number %s", companyNumber),
-                    logMap);
-
-            final ApiResponse<Void> response =
-                    apiClientService.deleteInsolvency(logContext, companyNumber);
-
-            handleResponse(null, HttpStatus.valueOf(response.getStatusCode()), logContext,
-                    "Response from DELETE insolvency request", logMap);
-            return;
-        }
-
         InsolvencyDelta insolvencyDelta = mapToInsolvencyDelta(payload, InsolvencyDelta.class);
 
         logger.trace(String.format("DSND-362: InsolvencyDelta extracted "
@@ -113,6 +90,36 @@ public class InsolvencyDeltaProcessor {
         handleResponse(null, HttpStatus.valueOf(response.getStatusCode()), logContext,
                 "Response from sending insolvency data", logMap);
 
+    }
+
+    /**
+     * Process Insolvency Delete messages.
+     */
+    public void processDelete(Message<ChsDelta> chsDelta) {
+        final var payload = chsDelta.getPayload();
+        final String logContext = payload.getContextId();
+        final Map<String, Object> logMap = new HashMap<>();
+        final String companyNumber;
+
+        var insolvencyDeleteDelta =
+                mapToInsolvencyDelta(payload, InsolvencyDeleteDelta.class);
+        logger.trace(String.format("InsolvencyDeleteDelta extracted from Kafka message: %s",
+                insolvencyDeleteDelta));
+
+        companyNumber = insolvencyDeleteDelta.getCompanyNumber();
+        logMap.put("company_number", companyNumber);
+
+        logger.infoContext(
+                logContext,
+                String.format(
+                        "Process DELETE insolvency for company number %s", companyNumber),
+                logMap);
+
+        final ApiResponse<Void> response =
+                apiClientService.deleteInsolvency(logContext, companyNumber);
+
+        handleResponse(null, HttpStatus.valueOf(response.getStatusCode()), logContext,
+                "Response from DELETE insolvency request", logMap);
     }
 
     private <T> T mapToInsolvencyDelta(ChsDelta payload, Class<T> deltaClass)
