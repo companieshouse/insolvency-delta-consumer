@@ -57,10 +57,15 @@ public class InsolvencyDeltaConsumer {
         logger.trace(String.format("A new message from %s topic with payload:%s "
                 + "and headers:%s ", topic, message.getPayload(), message.getHeaders()));
         try {
-            deltaProcessor.processDelta(message, topic, partition, offset);
+            if (Boolean.TRUE.equals(message.getPayload().getIsDelete())) {
+                deltaProcessor.processDelete(message);
+            } else {
+                deltaProcessor.processDelta(message, topic, partition, offset);
+            }
         } catch (Exception exception) {
             logger.error(String.format("Exception occurred while processing the topic %s "
-                    + "with message %s, exception thrown is %s", topic, message, exception));
+                    + "with context id %s, exception thrown is %s",
+                    topic, message.getPayload().getContextId(), exception));
             throw exception;
         }
     }

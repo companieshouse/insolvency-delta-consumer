@@ -21,4 +21,11 @@ public interface ApiClientService {
             final String log,
             final String companyNumber,
             final InternalCompanyInsolvency internalCompanyInsolvency);
+
+    /**
+     * Delete insolvency.
+     */
+    ApiResponse<Void> deleteInsolvency(
+            final String log,
+            final String companyNumber);
 }
