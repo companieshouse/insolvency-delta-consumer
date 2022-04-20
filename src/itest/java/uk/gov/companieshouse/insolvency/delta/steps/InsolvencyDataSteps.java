@@ -26,6 +26,8 @@ public class InsolvencyDataSteps {
 
     private static WireMockServer wireMockServer;
 
+    private String companyNumber;
+
     @Autowired
     public KafkaTemplate<String, Object> kafkaTemplate;
 
@@ -37,42 +39,37 @@ public class InsolvencyDataSteps {
         ResponseEntity<String> response = restTemplate.getForEntity("/healthcheck", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.valueOf(200));
         assertThat(response.getBody()).isEqualTo("I am healthy");
-
-        wireMockServer = new WireMockServer(8888);
-        wireMockServer.start();
-        configureFor("localhost", 8888);
-
-        stubInsolvencyDataApiServiceCalls();
     }
 
-    @When("a message is published to the topic {string} and consumed")
-    public void a_message_is_published_to_the_topic_and_consumed(String topicName) throws InterruptedException {
-        kafkaTemplate.send(topicName, createMessage());
+    @When("a {string} with {string} is published to the topic {string} and consumed")
+    public void a_with_is_published_to_the_topic_and_consumed(String message, String companyNumber, String topicName)
+            throws InterruptedException {
+        this.companyNumber = companyNumber;
+
+        stubInsolvencyDataApiServiceCalls(companyNumber);
+        kafkaTemplate.send(topicName, createMessage(message));
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
         countDownLatch.await(5, TimeUnit.SECONDS);
     }
 
-    @Then("verify PUT method is called on insolvency-data-api service with response status code as 200")
-    public void the_insolvency_delta_consumer_should_consume_and_process_the_message() {
-        verify(1, putRequestedFor(urlPathEqualTo("/company/01876743/insolvency")));
-
-        wireMockServer.stop();
-    }
-
     @Then("verify PUT method is called on insolvency-data-api service")
     public void verify_put_method_with_request_is_called_on_insolvency_data_api_service() {
-        verify(1, putRequestedFor(urlEqualTo("/company/01876743/insolvency"))
+        verify(1, putRequestedFor(urlEqualTo("/company/"+this.companyNumber+"/insolvency"))
                 .withRequestBody(matchingJsonPath("$.external_data"))
                 .withRequestBody(matchingJsonPath("$.internal_data")));
 
         wireMockServer.stop();
     }
 
-    private void stubInsolvencyDataApiServiceCalls() {
+    private void stubInsolvencyDataApiServiceCalls(String chNumber) {
+        wireMockServer = new WireMockServer(8888);
+        wireMockServer.start();
+        configureFor("localhost", 8888);
+
         stubFor(
-                put(urlPathEqualTo("/company/01876743/insolvency"))
-                        .withRequestBody(containing("01876743"))
+                put(urlPathEqualTo("/company/"+chNumber+"/insolvency"))
+                        .withRequestBody(containing(chNumber))
                         .willReturn(aResponse()
                                 .withStatus(200)));
     }
@@ -85,8 +82,8 @@ public class InsolvencyDataSteps {
         }
     }
 
-    private ChsDelta createMessage() {
-        String insolvencyData = loadFile("classpath:data/insolvency-delta-complex.json");
+    private ChsDelta createMessage(String message) {
+        String insolvencyData = loadFile("classpath:data/"+message+".json");
         return ChsDelta.newBuilder()
                 .setData(insolvencyData)
                 .setContextId("context_id")

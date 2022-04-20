@@ -1,0 +1,31 @@
+{
+  "insolvency":[
+    {"delta_at": "20211008152823383176",
+      "company_number":"02877511",
+      "case_numbers":[
+        {
+          "case_number":2,
+          "case_type_id":2,
+          "case_type":"Creditors Voluntary Liquidation",
+          "wind_up_date":"20210524"
+        ,"appointments":[
+          {
+            "forename":"Happy path 4",
+            "middle_name":"",
+            "surname":"Dumville",
+            "appt_type":1,
+            "appt_date":"20210524",
+            "practitioner_address":{"address_line_1":"72 London Road","address_line_2":"","locality":"St Albans","region":"Hertfordshire","country":"", "postal_code":"AL1 1NS"}},
+          {
+            "forename":"Henry",
+            "middle_name":"Nicholas",
+            "surname":"Page",
+            "appt_type":1,
+            "appt_date":"20210524",
+            "practitioner_address":{"address_line_1":"72 London Road","address_line_2":"","locality":"St Albans","region":"Hertfordshire","country":"", "postal_code":"AL1 1NS"}}
+        ]
+        }
+      ]
+    }
+  ]
+}
