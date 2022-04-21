@@ -1,0 +1,19 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+
+logger:
+  namespace: company-delta-consumer
+
+insolvency:
+  delta:
+    group-id: insolvency-delta-consumer
+    topic: insolvency-delta
+    attempts: 1
+    backoff-delay: 100
+
+api:
+  endpoint: ${INSOLVENCY_DATA_API_URL:http://localhost:8888}
+  insolvency-data-api-key: ${INSOLVENCY_DATA_API_KEY:localhost}
+  api-url: ${API_URL:http://localhost:8888}
+  internal-api-url: ${INTERNAL_API_URL:http://localhost:8888}

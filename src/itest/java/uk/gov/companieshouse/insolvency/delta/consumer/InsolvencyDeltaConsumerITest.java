@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import uk.gov.companieshouse.delta.ChsDelta;
-import uk.gov.companieshouse.insolvency.delta.AbstractIntegrationTest;
+import uk.gov.companieshouse.insolvency.delta.config.AbstractIntegrationTest;
 
 public class InsolvencyDeltaConsumerITest extends AbstractIntegrationTest {
 

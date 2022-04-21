@@ -1,10 +1,9 @@
-package uk.gov.companieshouse.insolvency.delta;
+package uk.gov.companieshouse.insolvency.delta.config;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.companieshouse.insolvency.delta.config.KafkaTestContainerConfig;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext

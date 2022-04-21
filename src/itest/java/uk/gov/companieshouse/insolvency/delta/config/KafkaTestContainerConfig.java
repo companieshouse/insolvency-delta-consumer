@@ -2,14 +2,12 @@ package uk.gov.companieshouse.insolvency.delta.config;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
@@ -21,13 +19,9 @@ import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.exception.RetryableTopicErrorInterceptor;
 import uk.gov.companieshouse.insolvency.delta.serialization.ChsDeltaDeserializer;
 import uk.gov.companieshouse.insolvency.delta.serialization.ChsDeltaSerializer;
-import uk.gov.companieshouse.kafka.producer.CHKafkaProducer;
 
 @TestConfiguration
 public class KafkaTestContainerConfig {
-
-    @MockBean
-    private CHKafkaProducer chKafkaProducer;
 
     private final ChsDeltaDeserializer chsDeltaDeserializer;
     private final ChsDeltaSerializer chsDeltaSerializer;

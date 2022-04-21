@@ -41,6 +41,7 @@
 		<skip.integration.tests>false</skip.integration.tests>
 		<skip.unit.tests>false</skip.unit.tests>
 		<assertj-core.version>3.22.0</assertj-core.version>
+		<wiremock.standalone.version>2.32.0</wiremock.standalone.version>
 		<test-containers.version>1.16.3</test-containers.version>
 
 		<!--sonar configuration-->
@@ -59,6 +60,7 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
 	</properties>
 
 	<dependencyManagement>
@@ -169,6 +171,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${test-containers.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-core</artifactId>
 			<version>${io-cucumber.version}</version>
@@ -191,6 +199,30 @@
 			<artifactId>cucumber-spring</artifactId>
 			<version>${io-cucumber.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.tomakehurst</groupId>
+			<artifactId>wiremock-jre8</artifactId>
+			<version>${wiremock.standalone.version}</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.conscrypt</groupId>
+					<artifactId>conscrypt-openjdk-uber</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.javacrumbs.json-unit</groupId>
+					<artifactId>json-unit-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.github.jknack</groupId>
+					<artifactId>handlebars</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.github.jknack</groupId>
+					<artifactId>handlebars-helpers</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 
@@ -402,6 +434,32 @@
 						<expandClasspathDependencies>true</expandClasspathDependencies>
 					</container>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>${maven-resources-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/test-classes</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/itest/resources</directory>
+									<includes>
+										<include>**/*.*</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
