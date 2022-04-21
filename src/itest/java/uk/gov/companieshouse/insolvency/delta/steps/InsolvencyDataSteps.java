@@ -2,10 +2,11 @@ package uk.gov.companieshouse.insolvency.delta.steps;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.matching.ContentPattern;
+import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -19,7 +20,6 @@ import org.springframework.util.ResourceUtils;
 import uk.gov.companieshouse.delta.ChsDelta;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class InsolvencyDataSteps {
@@ -53,11 +53,17 @@ public class InsolvencyDataSteps {
         countDownLatch.await(5, TimeUnit.SECONDS);
     }
 
-    @Then("verify PUT method is called on insolvency-data-api service")
-    public void verify_put_method_with_request_is_called_on_insolvency_data_api_service() {
-        verify(1, putRequestedFor(urlEqualTo("/company/"+this.companyNumber+"/insolvency"))
-                .withRequestBody(matchingJsonPath("$.external_data"))
-                .withRequestBody(matchingJsonPath("$.internal_data")));
+    @Then("verify PUT method is called on insolvency-data-api service with body {string}")
+    public void verify_put_method_is_called_on_insolvency_data_api_service_with_body(String output) {
+        String expectedBody = loadFile("classpath:output/"+output+".json");
+        verify(1, putRequestedFor(urlMatching("/company/"+this.companyNumber+"/insolvency")));
+
+        List<ServeEvent> allServeEvents = getAllServeEvents();
+        ServeEvent serveEvent = allServeEvents.get(0);
+        String actualBody = serveEvent.getRequest().getBodyAsString();
+
+        assertThat(serveEvent.getResponse().getStatus()).isEqualTo(200);
+        assertThat(actualBody).isEqualTo(expectedBody);
 
         wireMockServer.stop();
     }
@@ -66,7 +72,6 @@ public class InsolvencyDataSteps {
         wireMockServer = new WireMockServer(8888);
         wireMockServer.start();
         configureFor("localhost", 8888);
-
         stubFor(
                 put(urlPathEqualTo("/company/"+chNumber+"/insolvency"))
                         .withRequestBody(containing(chNumber))
@@ -83,7 +88,7 @@ public class InsolvencyDataSteps {
     }
 
     private ChsDelta createMessage(String message) {
-        String insolvencyData = loadFile("classpath:data/"+message+".json");
+        String insolvencyData = loadFile("classpath:input/"+message+".json");
         return ChsDelta.newBuilder()
                 .setData(insolvencyData)
                 .setContextId("context_id")
