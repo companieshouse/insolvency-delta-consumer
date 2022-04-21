@@ -1,11 +1,17 @@
 package uk.gov.companieshouse.insolvency.delta.processor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -13,11 +19,11 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.FileCopyUtils;
+import uk.gov.companieshouse.api.delta.Appointment;
+import uk.gov.companieshouse.api.delta.CaseNumber;
 import uk.gov.companieshouse.api.delta.Insolvency;
 import uk.gov.companieshouse.api.delta.InsolvencyDelta;
 import uk.gov.companieshouse.api.delta.PractitionerAddress;
-import uk.gov.companieshouse.api.delta.Appointment;
-import uk.gov.companieshouse.api.delta.CaseNumber;
 import uk.gov.companieshouse.api.insolvency.CompanyInsolvency;
 import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
 import uk.gov.companieshouse.api.insolvency.InternalData;
@@ -31,13 +37,10 @@ import uk.gov.companieshouse.logging.Logger;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
-public class InsolvencyDeltaProcessorTest {
+class InsolvencyDeltaProcessorTest {
 
     private InsolvencyDeltaProcessor deltaProcessor;
 
@@ -58,7 +61,7 @@ public class InsolvencyDeltaProcessorTest {
     @Test
     @DisplayName("Transforms a kafka message containing a ChsDelta payload into an InsolvencyDelta")
     void When_ValidChsDeltaMessage_Expect_ValidInsolvencyDeltaMapping() throws IOException {
-        Message<ChsDelta> mockChsDeltaMessage = createChsDeltaMessage();
+        Message<ChsDelta> mockChsDeltaMessage = createChsDeltaMessage(false);
         InsolvencyDelta expectedInsolvencyDelta = createInsolvencyDelta();
         Insolvency expectedInsolvency = expectedInsolvencyDelta.getInsolvency().get(0);
         final ApiResponse<Void> response = new ApiResponse<>(HttpStatus.OK.value(), null, null);
@@ -73,7 +76,7 @@ public class InsolvencyDeltaProcessorTest {
     @Test
     @DisplayName("Bad request when calling put insolvency, throws non retryable error")
     void When_PutInsolvencyBadRequest_NonRetryableError() throws IOException {
-        Message<ChsDelta> mockChsDeltaMessage = createChsDeltaMessage();
+        Message<ChsDelta> mockChsDeltaMessage = createChsDeltaMessage(false);
         InsolvencyDelta expectedInsolvencyDelta = createInsolvencyDelta();
         Insolvency expectedInsolvency = expectedInsolvencyDelta.getInsolvency().get(0);
         final ApiResponse<Void> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), null, null);
@@ -88,7 +91,7 @@ public class InsolvencyDeltaProcessorTest {
     @Test
     @DisplayName("Getting another 4xx when calling put insolvency, throws retryable error")
     void When_PutInsolvencyUnauthorized_RetryableError() throws IOException {
-        Message<ChsDelta> mockChsDeltaMessage = createChsDeltaMessage();
+        Message<ChsDelta> mockChsDeltaMessage = createChsDeltaMessage(false);
         InsolvencyDelta expectedInsolvencyDelta = createInsolvencyDelta();
         Insolvency expectedInsolvency = expectedInsolvencyDelta.getInsolvency().get(0);
         final ApiResponse<Void> response = new ApiResponse<>(HttpStatus.UNAUTHORIZED.value(), null, null);
@@ -103,7 +106,7 @@ public class InsolvencyDeltaProcessorTest {
     @Test
     @DisplayName("Getting internal server error when calling put insolvency, throws retryable error")
     void When_PutInsolvencyInternalServerError_RetryableError() throws IOException {
-        Message<ChsDelta> mockChsDeltaMessage = createChsDeltaMessage();
+        Message<ChsDelta> mockChsDeltaMessage = createChsDeltaMessage(false);
         InsolvencyDelta expectedInsolvencyDelta = createInsolvencyDelta();
         Insolvency expectedInsolvency = expectedInsolvencyDelta.getInsolvency().get(0);
         final ApiResponse<Void> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), null, null);
@@ -116,10 +119,53 @@ public class InsolvencyDeltaProcessorTest {
     }
 
     @Test
-    @DisplayName("When can't transform into insolvency delta API, throws retryable error")
-    void When_CantTransformIntoInsolvencyDeltaApi_RetryableError() throws IOException {
-        Message<ChsDelta> invalidChsDeltaMessage = invalidChsDeltaMessage();
+    @DisplayName("When mapping an invalid ChsDelta message into Insolvency Delta then throws a non-retryable exception")
+    void When_CantTransformIntoInsolvencyDelta_nonRetryableError() throws IOException {
+        Message<ChsDelta> invalidChsDeltaMessage = invalidChsDeltaMessage(false);
         Assertions.assertThrows(NonRetryableErrorException.class, () -> deltaProcessor.processDelta(invalidChsDeltaMessage, "topic", "partition", "offset"));
+    }
+
+    @Test
+    @DisplayName("Transforms a kafka message containing a ChsDelta payload into an InsolvencyDeleteDelta")
+    void When_ValidChsDeltaMessage_Expect_ValidInsolvencyDeleteDeltaMapping() throws IOException {
+        Message<ChsDelta> mockChsDeltaMessage = createChsDeltaMessage(true);
+        final ApiResponse<Void> response = new ApiResponse<>(HttpStatus.OK.value(), null, null);
+
+        when(apiClientService.deleteInsolvency("context_id", "12345678")).thenReturn(response);
+
+        deltaProcessor.processDelete(mockChsDeltaMessage);
+
+        verify(apiClientService).deleteInsolvency("context_id", "12345678");
+    }
+
+    @Test
+    @DisplayName("When mapping an invalid ChsDelta message into Insolvency Delete Delta then throws a non-retryable exception")
+    void When_CantTransformIntoInsolvencyDeltaApi_nonRetryableError() throws IOException {
+        Message<ChsDelta> invalidChsDeltaMessage = invalidChsDeltaMessage(true);
+        Assertions.assertThrows(NonRetryableErrorException.class, () -> deltaProcessor.processDelete(invalidChsDeltaMessage));
+    }
+
+
+    @ParameterizedTest
+    @MethodSource("provideExceptionParameters")
+    @DisplayName("When calling DELETE insolvency and an error occurs then throw the appropriate exception based on the error type")
+    void When_DeleteInsolvencyException_throw_appropriate_exception(HttpStatus httpStatus, Class<Throwable> exception) throws IOException {
+        Message<ChsDelta> mockChsDeltaMessage = createChsDeltaMessage(true);
+        final ApiResponse<Void> errorResponse = new ApiResponse<>(httpStatus.value(), null, null);
+
+        when(apiClientService.deleteInsolvency("context_id", "12345678")).thenReturn(errorResponse);
+
+        Assertions.assertThrows(exception, () -> deltaProcessor.processDelete(mockChsDeltaMessage));
+
+        verify(apiClientService).deleteInsolvency("context_id", "12345678");
+    }
+
+    private static Stream<Arguments> provideExceptionParameters() {
+        return Stream.of(
+                Arguments.of(HttpStatus.BAD_REQUEST, NonRetryableErrorException.class),
+                Arguments.of(HttpStatus.UNAUTHORIZED, RetryableErrorException.class),
+                Arguments.of(HttpStatus.INTERNAL_SERVER_ERROR, RetryableErrorException.class)
+        );
     }
 
     private InternalCompanyInsolvency internalCompanyInsolvencyMock() {
@@ -131,15 +177,19 @@ public class InsolvencyDeltaProcessorTest {
         return internalCompanyInsolvency;
     }
 
-    private Message<ChsDelta> createChsDeltaMessage() throws IOException {
+    private Message<ChsDelta> createChsDeltaMessage(boolean isDelete) throws IOException {
+        var payloadFilename = (isDelete)
+                ? "insolvency-delete-delta.json"
+                : "insolvency-delta-example.json";
         InputStreamReader exampleInsolvencyJsonPayload = new InputStreamReader(
-                ClassLoader.getSystemClassLoader().getResourceAsStream("insolvency-delta-example.json"));
+                ClassLoader.getSystemClassLoader().getResourceAsStream(payloadFilename));
         String insolvencyData = FileCopyUtils.copyToString(exampleInsolvencyJsonPayload);
 
         ChsDelta mockChsDelta = ChsDelta.newBuilder()
                 .setData(insolvencyData)
                 .setContextId("context_id")
                 .setAttempt(1)
+                .setIsDelete(isDelete)
                 .build();
 
         return MessageBuilder
@@ -151,15 +201,14 @@ public class InsolvencyDeltaProcessorTest {
                 .build();
     }
 
-    private Message<ChsDelta> invalidChsDeltaMessage() throws IOException {
-        InputStreamReader exampleInsolvencyJsonPayload = new InputStreamReader(
-                ClassLoader.getSystemClassLoader().getResourceAsStream("insolvency-delta-example.json"));
+    private Message<ChsDelta> invalidChsDeltaMessage(boolean isDelete) throws IOException {
         String insolvencyData = "Invalid Insolvency Data";
 
         ChsDelta mockChsDelta = ChsDelta.newBuilder()
                 .setData(insolvencyData)
                 .setContextId("context_id")
                 .setAttempt(1)
+                .setIsDelete(isDelete)
                 .build();
 
         return MessageBuilder

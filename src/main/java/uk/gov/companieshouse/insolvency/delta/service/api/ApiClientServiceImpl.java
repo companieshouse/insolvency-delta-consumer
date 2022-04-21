@@ -71,6 +71,21 @@ public class ApiClientServiceImpl extends BaseApiClientServiceImpl implements Ap
                         .upsert(uri, insolvency));
     }
 
+    @Override
+    public ApiResponse<Void> deleteInsolvency(
+            final String log,
+            final String companyNumber) {
+        final String uri =
+                String.format("/company/%s/insolvency", companyNumber);
+
+        Map<String,Object> logMap = createLogMap(companyNumber,"DELETE", uri);
+        logger.infoContext(log, String.format("DELETE %s", uri), logMap);
+
+        return executeOp(log, "deleteInsolvency", uri,
+                getApiClient(log).privateDeltaInsolvencyResourceHandler()
+                        .deleteInsolvency(uri));
+    }
+
     private Map<String,Object> createLogMap(String companyNumber, String method, String path) {
         final Map<String, Object> logMap = new HashMap<>();
         logMap.put("company_number", companyNumber);
