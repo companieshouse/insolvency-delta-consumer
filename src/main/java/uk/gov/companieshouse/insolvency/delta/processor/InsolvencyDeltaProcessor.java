@@ -2,15 +2,17 @@ package uk.gov.companieshouse.insolvency.delta.processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 import uk.gov.companieshouse.api.delta.Insolvency;
 import uk.gov.companieshouse.api.delta.InsolvencyDeleteDelta;
 import uk.gov.companieshouse.api.delta.InsolvencyDelta;
@@ -87,7 +89,7 @@ public class InsolvencyDeltaProcessor {
                         companyNumber,
                         internalCompanyInsolvency);
 
-        handleResponse(null, HttpStatus.valueOf(response.getStatusCode()), logContext,
+        handleResponse(HttpStatus.valueOf(response.getStatusCode()), logContext,
                 "Response from sending insolvency data", logMap);
 
     }
@@ -118,8 +120,8 @@ public class InsolvencyDeltaProcessor {
         final ApiResponse<Void> response =
                 apiClientService.deleteInsolvency(logContext, companyNumber);
 
-        handleResponse(null, HttpStatus.valueOf(response.getStatusCode()), logContext,
-                "Response from DELETE insolvency request", logMap);
+        handleDeleteResponse(HttpStatus.valueOf(response.getStatusCode()), logContext,
+                logMap);
     }
 
     private <T> T mapToInsolvencyDelta(ChsDelta payload, Class<T> deltaClass)
@@ -135,7 +137,6 @@ public class InsolvencyDeltaProcessor {
     }
 
     private void handleResponse(
-            final ResponseStatusException ex,
             final HttpStatus httpStatus,
             final String logContext,
             final String msg,
@@ -153,6 +154,30 @@ public class InsolvencyDeltaProcessor {
                     .format("Unsuccessful PUT API response, %s", msg));
         } else {
             logger.trace("Got success response from PUT insolvency");
+        }
+    }
+
+    private void handleDeleteResponse(
+            final HttpStatus httpStatus,
+            final String logContext,
+            final Map<String, Object> logMap)
+            throws NonRetryableErrorException, RetryableErrorException {
+        logMap.put("status", httpStatus.toString());
+        String msg = "Response from DELETE insolvency request";
+        Set<HttpStatus> nonRetryableStatuses =
+                Collections.unmodifiableSet(EnumSet.of(
+                        HttpStatus.BAD_REQUEST, HttpStatus.NOT_FOUND));
+
+        if (nonRetryableStatuses.contains(httpStatus)) {
+            throw new NonRetryableErrorException(
+                    String.format("Bad request DELETE Api Response %s", msg));
+        } else if (!httpStatus.is2xxSuccessful()) {
+            // any other client or server status is retryable
+            logger.errorContext(logContext, msg + ", retry", null, logMap);
+            throw new RetryableErrorException(
+                    String.format("Unsuccessful DELETE API response, %s", msg));
+        } else {
+            logger.trace("Got success response from DELETE insolvency request");
         }
     }
 
