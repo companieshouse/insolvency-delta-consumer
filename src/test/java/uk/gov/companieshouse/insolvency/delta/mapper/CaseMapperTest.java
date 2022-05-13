@@ -26,7 +26,7 @@ import uk.gov.companieshouse.api.insolvency.ModelCase;
 class CaseMapperTest {
 
     private static final String companyNumber = "1232466";
-    private static final String mortgageId = "1232466";
+    private static final String mortgageId = "1368018";
 
     @Autowired
     CaseMapper mapper;
@@ -54,7 +54,9 @@ class CaseMapperTest {
         assertThat(caseDates.get(1).getType()).isEqualTo(CaseDates.TypeEnum.ADMINISTRATION_DISCHARGED_ON);
         assertThat(caseDates.get(1).getDate()).isEqualTo(LocalDate.of(2021, 8, 23));
 
-        String expectedChargeLink = "/company/" + companyNumber + "/charges/" + mortgageId;
+        String expectedMortgageIdEncoded = "jq3ctuiIrFdFDxFI7QF0Ly8lKQw";
+        String expectedChargeLink = "/company/" + companyNumber
+                + "/charges/" + expectedMortgageIdEncoded;
         assertThat(targetCase.getLinks().getCharge()).isEqualTo(expectedChargeLink);
     }
 

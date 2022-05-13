@@ -112,8 +112,9 @@ class InsolvencyMapperTest {
         assertThat(caseDates.get(0).getDate()).isEqualTo(LocalDate.of(2002, 12, 17));
 
         assertThat(firstCase.getLinks()).isNotNull();
-        String mortgageId = insolvency.getCaseNumbers().get(0).getMortgageId().toString();
-        String expectedChargeLink = "/company/" + companyNumber + "/charges/" + mortgageId;
+        String expectedMortgageIdEncoded = "amEyrgR78bxdTQUWElBqIad86Ps";
+        String expectedChargeLink = "/company/" + companyNumber
+                + "/charges/" + expectedMortgageIdEncoded;
         assertThat(firstCase.getLinks().getCharge()).isEqualTo(expectedChargeLink);
 
         // SECOND CASE

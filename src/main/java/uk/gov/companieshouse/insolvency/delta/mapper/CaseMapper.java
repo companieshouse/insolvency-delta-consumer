@@ -1,5 +1,8 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +14,7 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ValueMapping;
 import org.mapstruct.ValueMappings;
+import org.springframework.util.Base64Utils;
 import uk.gov.companieshouse.api.delta.CaseNumber;
 import uk.gov.companieshouse.api.insolvency.CaseDates;
 import uk.gov.companieshouse.api.insolvency.Links;
@@ -64,11 +68,25 @@ public interface CaseMapper {
 
         Optional<Long> optionalMortgageId = Optional.ofNullable(sourceCase.getMortgageId());
         optionalMortgageId.ifPresent(mortgageId -> {
-            String link = String.format("/company/%s/charges/%s", companyNumber, mortgageId);
+            try {
+                // Concatenate mortgageId with salt, hash using SHA-1 and then encode using base64
+                MessageDigest digest = MessageDigest.getInstance("SHA-1");
+                var salt = "jkdhjdio";
+                String saltedMortgageId = mortgageId + salt;
+                byte[] hash = digest.digest(saltedMortgageId.getBytes(StandardCharsets.UTF_8));
+                // We remove the padding equals '=' appended at the end by the base64 encoding
+                // (could be at most 2 = based on the length of the mortgage id).
+                var encodedMortgageId = Base64Utils.encodeToUrlSafeString(hash).replace("=", "");
 
-            Links links = new Links();
-            links.setCharge(link);
-            modelCase.setLinks(links);
+                var chargeLink = String.format(
+                        "/company/%s/charges/%s", companyNumber, encodedMortgageId);
+
+                Links links = new Links();
+                links.setCharge(chargeLink);
+                modelCase.setLinks(links);
+            } catch (NoSuchAlgorithmException algorithmException) {
+                throw new RuntimeException("SHA-1 was not available to hash mortgageId");
+            }
         });
     }
 
