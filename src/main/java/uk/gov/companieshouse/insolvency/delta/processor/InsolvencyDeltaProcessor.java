@@ -57,10 +57,14 @@ public class InsolvencyDeltaProcessor {
         final Map<String, Object> logMap = new HashMap<>();
         final String companyNumber;
 
-        InsolvencyDelta insolvencyDelta = mapToInsolvencyDelta(payload, InsolvencyDelta.class);
+        InsolvencyDelta insolvencyDelta =
+                mapToInsolvencyDelta(payload, logContext, InsolvencyDelta.class);
 
-        logger.trace(String.format("DSND-362: InsolvencyDelta extracted "
-                + "from a Kafka message: %s", insolvencyDelta));
+        logger.trace(String.format("InsolvencyDelta extracted for context ID %s "
+                + "a Kafka message: %s",
+                logContext,
+                insolvencyDelta));
+
 
         /** We always receive only one insolvency/charge per delta in a list,
          * so we only take the first element
@@ -71,18 +75,15 @@ public class InsolvencyDeltaProcessor {
 
         InternalCompanyInsolvency internalCompanyInsolvency = transformer.transform(insolvency);
 
+        logger.trace(String.format("Message with contextId: %s successfully "
+                        + "transformed into InsolvencyAPI object",
+                logContext));
+
         final String updatedBy = String.format("%s-%s-%s", topic, partition, offset);
 
         internalCompanyInsolvency.getInternalData().setUpdatedBy(updatedBy);
 
         companyNumber = insolvency.getCompanyNumber();
-        logger.trace(String.format("DSND-362: InsolvencyDelta transformed into "
-                + "InternalCompanyInsolvency: %s", internalCompanyInsolvency));
-        logMap.put("company_number", companyNumber);
-        logger.infoContext(
-                logContext,
-                String.format("Process insolvency for company number [%s]", companyNumber),
-                logMap);
 
         final ApiResponse<Void> response =
                 apiClientService.putInsolvency(logContext,
@@ -104,18 +105,10 @@ public class InsolvencyDeltaProcessor {
         final String companyNumber;
 
         var insolvencyDeleteDelta =
-                mapToInsolvencyDelta(payload, InsolvencyDeleteDelta.class);
-        logger.trace(String.format("InsolvencyDeleteDelta extracted from Kafka message: %s",
-                insolvencyDeleteDelta));
+                mapToInsolvencyDelta(payload, logContext, InsolvencyDeleteDelta.class);
 
         companyNumber = insolvencyDeleteDelta.getCompanyNumber();
         logMap.put("company_number", companyNumber);
-
-        logger.infoContext(
-                logContext,
-                String.format(
-                        "Process DELETE insolvency for company number %s", companyNumber),
-                logMap);
 
         final ApiResponse<Void> response =
                 apiClientService.deleteInsolvency(logContext, companyNumber);
@@ -124,12 +117,15 @@ public class InsolvencyDeltaProcessor {
                 logMap);
     }
 
-    private <T> T mapToInsolvencyDelta(ChsDelta payload, Class<T> deltaClass)
+    private <T> T mapToInsolvencyDelta(ChsDelta payload, String contextId, Class<T> deltaClass)
             throws NonRetryableErrorException {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readValue(payload.getData(), deltaClass);
         } catch (Exception exception) {
+            logger.error(String.format("Failed to map to insolvency delta"
+                            + " class for context ID %s",
+                    contextId));
             throw new NonRetryableErrorException(
                     "Error when mapping to insolvency delta class" + deltaClass.getName(),
                     exception);
@@ -149,11 +145,17 @@ public class InsolvencyDeltaProcessor {
                     .format("Bad request PUT Api Response %s", msg));
         } else if (!httpStatus.is2xxSuccessful()) {
             // any other client or server status is retryable
-            logger.errorContext(logContext, msg + ", retry", null, logMap);
+            logger.trace(String.format("Failed to invoke insolvency-data-api "
+                            + "PUT endpoint for message with contextId: %s "
+                            + "with error %s",
+                    logContext,
+                    msg));
             throw new RetryableErrorException(String
                     .format("Unsuccessful PUT API response, %s", msg));
         } else {
-            logger.trace("Got success response from PUT insolvency");
+            logger.trace(String.format("Successfully invoked insolvency-data-api "
+                    + "PUT endpoint for message with contextId: %s",
+                    logContext));
         }
     }
 
@@ -173,11 +175,17 @@ public class InsolvencyDeltaProcessor {
                     String.format("Bad request DELETE Api Response %s", msg));
         } else if (!httpStatus.is2xxSuccessful()) {
             // any other client or server status is retryable
-            logger.errorContext(logContext, msg + ", retry", null, logMap);
+            logger.trace(String.format("Failed to invoke insolvency-data-api "
+                            + "DELETE endpoint for message with contextId: %s "
+                            + "with error %s",
+                    logContext,
+                    msg));
             throw new RetryableErrorException(
                     String.format("Unsuccessful DELETE API response, %s", msg));
         } else {
-            logger.trace("Got success response from DELETE insolvency request");
+            logger.trace(String.format("Successfully invoked insolvency-data-api "
+                            + "DELETE endpoint for message with contextId: %s",
+                    logContext));
         }
     }
 
