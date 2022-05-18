@@ -17,19 +17,24 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.companieshouse.api.delta.CaseNumber;
 import uk.gov.companieshouse.api.insolvency.CaseDates;
 import uk.gov.companieshouse.api.insolvency.ModelCase;
+import uk.gov.companieshouse.insolvency.delta.config.TestConfig;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
         CaseMapperImpl.class,
         PractitionersMapperImpl.class,
-        PractitionerAddressMapperImpl.class})
+        PractitionerAddressMapperImpl.class,
+        TestConfig.class}) // contains EncoderUtil bean
 class CaseMapperTest {
 
     private static final String companyNumber = "1232466";
-    private static final String mortgageId = "1232466";
+    private static final String mortgageId = "1368018";
 
     @Autowired
     CaseMapper mapper;
+
+    @Autowired
+    EncoderUtil encoderUtil;
 
     @Test
     void shouldMapFullCaseWithDatesAndMortgageId() {
@@ -54,7 +59,9 @@ class CaseMapperTest {
         assertThat(caseDates.get(1).getType()).isEqualTo(CaseDates.TypeEnum.ADMINISTRATION_DISCHARGED_ON);
         assertThat(caseDates.get(1).getDate()).isEqualTo(LocalDate.of(2021, 8, 23));
 
-        String expectedChargeLink = "/company/" + companyNumber + "/charges/" + mortgageId;
+        String expectedMortgageIdEncoded = "9JOzHElueI0XkJEhWd0lLqCkKRw";
+        String expectedChargeLink = "/company/" + companyNumber
+                + "/charges/" + expectedMortgageIdEncoded;
         assertThat(targetCase.getLinks().getCharge()).isEqualTo(expectedChargeLink);
     }
 

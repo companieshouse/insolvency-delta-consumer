@@ -24,6 +24,7 @@ import uk.gov.companieshouse.api.insolvency.InternalData;
 import uk.gov.companieshouse.api.insolvency.ModelCase;
 import uk.gov.companieshouse.api.insolvency.PractitionerAddress;
 import uk.gov.companieshouse.api.insolvency.Practitioners;
+import uk.gov.companieshouse.insolvency.delta.config.TestConfig;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -32,7 +33,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
         InsolvencyMapperImpl.class,
         CaseMapperImpl.class,
         PractitionersMapperImpl.class,
-        PractitionerAddressMapperImpl.class})
+        PractitionerAddressMapperImpl.class,
+        TestConfig.class}) // contains EncoderUtil bean
 class InsolvencyMapperTest {
 
     private ObjectMapper mapper;
@@ -40,6 +42,9 @@ class InsolvencyMapperTest {
 
     @Autowired
     InsolvencyMapper insolvencyMapper;
+
+    @Autowired
+    EncoderUtil encoderUtil;
 
     @BeforeEach
     public void setUp() throws IOException {
@@ -112,8 +117,9 @@ class InsolvencyMapperTest {
         assertThat(caseDates.get(0).getDate()).isEqualTo(LocalDate.of(2002, 12, 17));
 
         assertThat(firstCase.getLinks()).isNotNull();
-        String mortgageId = insolvency.getCaseNumbers().get(0).getMortgageId().toString();
-        String expectedChargeLink = "/company/" + companyNumber + "/charges/" + mortgageId;
+        String expectedMortgageIdEncoded = "cQjCn3ZZwOYqiJoMSc5Tm1OhFsE";
+        String expectedChargeLink = "/company/" + companyNumber
+                + "/charges/" + expectedMortgageIdEncoded;
         assertThat(firstCase.getLinks().getCharge()).isEqualTo(expectedChargeLink);
 
         // SECOND CASE

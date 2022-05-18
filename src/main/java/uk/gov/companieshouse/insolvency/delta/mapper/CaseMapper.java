@@ -1,8 +1,8 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
-
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
@@ -11,13 +11,17 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ValueMapping;
 import org.mapstruct.ValueMappings;
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.companieshouse.api.delta.CaseNumber;
 import uk.gov.companieshouse.api.insolvency.CaseDates;
 import uk.gov.companieshouse.api.insolvency.Links;
 import uk.gov.companieshouse.api.insolvency.ModelCase;
 
 @Mapper(componentModel = "spring", uses = {PractitionersMapper.class})
-public interface CaseMapper {
+public abstract class CaseMapper {
+
+    @Autowired
+    protected EncoderUtil encoderUtil;
 
     @Mapping(target = "dates", ignore = true) // mapped in AfterMapping
     @Mapping(target = "links", ignore = true) // mapped in AfterMapping
@@ -43,7 +47,7 @@ public interface CaseMapper {
                     "CVA_MORATORIA"),
             @ValueMapping(target = "FOREIGN_INSOLVENCY", source = "FOREIGN_INSOLVENCY"),
             @ValueMapping(target = "MORATORIUM", source = "MORATORIUM")})
-    ModelCase map(CaseNumber sourceCase, @Context String companyNumber);
+    public abstract ModelCase map(CaseNumber sourceCase, @Context String companyNumber);
 
     /**
      * Invoked at the end of the auto-generated mapping methods and maps/sets the following:
@@ -57,19 +61,26 @@ public interface CaseMapper {
      *                      source case
      */
     @AfterMapping
-    default void mapDatesAndLinks(@MappingTarget ModelCase modelCase,
+    public void mapDatesAndLinks(@MappingTarget ModelCase modelCase,
                                   CaseNumber sourceCase, @Context String companyNumber) {
         List<CaseDates> mappedCaseDates = MapperUtils.mapAndAggregateCaseDates(sourceCase);
         modelCase.setDates(mappedCaseDates);
 
         Optional<Long> optionalMortgageId = Optional.ofNullable(sourceCase.getMortgageId());
         optionalMortgageId.ifPresent(mortgageId -> {
-            String link = String.format("/company/%s/charges/%s", companyNumber, mortgageId);
+            try {
+                // Concatenate mortgageId with salt, hash using SHA-1 and then encode using base64
+                byte[] hash = encoderUtil.generateSha1Hash(String.valueOf(mortgageId));
+                var encodedMortgageId = encoderUtil.base64Encode(hash);
+                var chargeLink = String.format(
+                        "/company/%s/charges/%s", companyNumber, encodedMortgageId);
 
-            Links links = new Links();
-            links.setCharge(link);
-            modelCase.setLinks(links);
+                Links links = new Links();
+                links.setCharge(chargeLink);
+                modelCase.setLinks(links);
+            } catch (NoSuchAlgorithmException algorithmException) {
+                throw new RuntimeException("SHA-1 was not available to hash mortgageId");
+            }
         });
     }
-
 }
