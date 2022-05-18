@@ -1,11 +1,8 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
-
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
@@ -14,14 +11,17 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ValueMapping;
 import org.mapstruct.ValueMappings;
-import org.springframework.util.Base64Utils;
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.companieshouse.api.delta.CaseNumber;
 import uk.gov.companieshouse.api.insolvency.CaseDates;
 import uk.gov.companieshouse.api.insolvency.Links;
 import uk.gov.companieshouse.api.insolvency.ModelCase;
 
 @Mapper(componentModel = "spring", uses = {PractitionersMapper.class})
-public interface CaseMapper {
+public abstract class CaseMapper {
+
+    @Autowired
+    protected EncoderUtil encoderUtil;
 
     @Mapping(target = "dates", ignore = true) // mapped in AfterMapping
     @Mapping(target = "links", ignore = true) // mapped in AfterMapping
@@ -47,7 +47,7 @@ public interface CaseMapper {
                     "CVA_MORATORIA"),
             @ValueMapping(target = "FOREIGN_INSOLVENCY", source = "FOREIGN_INSOLVENCY"),
             @ValueMapping(target = "MORATORIUM", source = "MORATORIUM")})
-    ModelCase map(CaseNumber sourceCase, @Context String companyNumber);
+    public abstract ModelCase map(CaseNumber sourceCase, @Context String companyNumber);
 
     /**
      * Invoked at the end of the auto-generated mapping methods and maps/sets the following:
@@ -61,7 +61,7 @@ public interface CaseMapper {
      *                      source case
      */
     @AfterMapping
-    default void mapDatesAndLinks(@MappingTarget ModelCase modelCase,
+    public void mapDatesAndLinks(@MappingTarget ModelCase modelCase,
                                   CaseNumber sourceCase, @Context String companyNumber) {
         List<CaseDates> mappedCaseDates = MapperUtils.mapAndAggregateCaseDates(sourceCase);
         modelCase.setDates(mappedCaseDates);
@@ -70,14 +70,8 @@ public interface CaseMapper {
         optionalMortgageId.ifPresent(mortgageId -> {
             try {
                 // Concatenate mortgageId with salt, hash using SHA-1 and then encode using base64
-                MessageDigest digest = MessageDigest.getInstance("SHA-1");
-                var salt = "jkdhjdio";
-                String saltedMortgageId = mortgageId + salt;
-                byte[] hash = digest.digest(saltedMortgageId.getBytes(StandardCharsets.UTF_8));
-                // We remove the padding equals '=' appended at the end by the base64 encoding
-                // (could be at most 2 = based on the length of the mortgage id).
-                var encodedMortgageId = Base64Utils.encodeToUrlSafeString(hash).replace("=", "");
-
+                byte[] hash = encoderUtil.generateSha1Hash(String.valueOf(mortgageId));
+                var encodedMortgageId = encoderUtil.base64Encode(hash);
                 var chargeLink = String.format(
                         "/company/%s/charges/%s", companyNumber, encodedMortgageId);
 
@@ -89,5 +83,4 @@ public interface CaseMapper {
             }
         });
     }
-
 }
