@@ -42,8 +42,7 @@ public interface CaseMapper {
             @ValueMapping(target = "CORPORATE_VOLUNTARY_ARRANGEMENT_MORATORIUM", source =
                     "CVA_MORATORIA"),
             @ValueMapping(target = "FOREIGN_INSOLVENCY", source = "FOREIGN_INSOLVENCY"),
-            // TODO: Currently missing a target enum for Moratorium - see mapping spreadsheet
-            @ValueMapping(target = MappingConstants.NULL, source = "MORATORIUM")})
+            @ValueMapping(target = "MORATORIUM", source = "MORATORIUM")})
     ModelCase map(CaseNumber sourceCase, @Context String companyNumber);
 
     /**
