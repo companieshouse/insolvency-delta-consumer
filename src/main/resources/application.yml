@@ -25,3 +25,15 @@ api:
   api-url: ${API_URL:localhost}
   internal-api-url: ${INTERNAL_API_URL:localhost}
   mortgage-id-salt: ${MORTGAGE_ID_SALT:testsalt}
+
+management:
+  endpoints:
+    enabled-by-default: false
+    web:
+      base-path: /insolvency-delta-consumer
+      path-mapping:
+        health: healthcheck
+  endpoint:
+    health:
+      show-details: never
+      enabled: true
