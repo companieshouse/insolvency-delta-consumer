@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
+import org.apache.commons.lang.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import uk.gov.companieshouse.api.delta.PractitionerAddress;
@@ -25,6 +26,6 @@ public interface PractitionerAddressMapper {
      * @return the property itself if not an empty string, null otherwise
      */
     default String emptyStringToNull(String property) {
-        return property == null || property.isEmpty() ? null : property;
+        return StringUtils.isBlank(property) ? null : property;
     }
 }
