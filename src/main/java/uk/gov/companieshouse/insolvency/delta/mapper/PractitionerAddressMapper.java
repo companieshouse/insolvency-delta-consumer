@@ -25,6 +25,6 @@ public interface PractitionerAddressMapper {
      * @return the property itself if not an empty string, null otherwise
      */
     default String emptyStringToNull(String property) {
-        return property.isEmpty() ? null : property;
+        return property == null || property.isEmpty() ? null : property;
     }
 }
