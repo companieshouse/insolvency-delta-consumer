@@ -61,9 +61,9 @@ public class InsolvencyDataSteps {
 
     @Given("Insolvency delta consumer service is running")
     public void insolvency_delta_consumer_service_is_running() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/healthcheck", String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity("/insolvency-delta-consumer/healthcheck", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.valueOf(200));
-        assertThat(response.getBody()).isEqualTo("I am healthy");
+        assertThat(response.getBody()).isEqualTo("{\"status\":\"UP\"}");
     }
 
     @When("a {string} with {string} is published to the topic {string} and consumed")
