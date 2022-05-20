@@ -1,13 +1,13 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ValueMapping;
 import org.mapstruct.ValueMappings;
@@ -16,6 +16,7 @@ import uk.gov.companieshouse.api.delta.CaseNumber;
 import uk.gov.companieshouse.api.insolvency.CaseDates;
 import uk.gov.companieshouse.api.insolvency.Links;
 import uk.gov.companieshouse.api.insolvency.ModelCase;
+import uk.gov.companieshouse.api.insolvency.Practitioners;
 
 @Mapper(componentModel = "spring", uses = {PractitionersMapper.class})
 public abstract class CaseMapper {
@@ -82,5 +83,19 @@ public abstract class CaseMapper {
                 throw new RuntimeException("SHA-1 was not available to hash mortgageId");
             }
         });
+    }
+
+
+    /**
+     * Invoked at the end of the auto-generated mapping methods and
+     * if the practitioners is null, then initialize it with ArrayList of Practitioners.
+     *
+     * @param modelCase     the target ModelCase object
+     */
+    @AfterMapping
+    public void initializePractitionersIfNull(@MappingTarget ModelCase modelCase) {
+        if (modelCase.getPractitioners() == null) {
+            modelCase.setPractitioners(new ArrayList<Practitioners>());
+        }
     }
 }
