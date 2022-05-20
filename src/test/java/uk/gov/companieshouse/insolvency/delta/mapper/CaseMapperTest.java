@@ -7,6 +7,7 @@ import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.ADMINISTRA
 import static uk.gov.companieshouse.api.insolvency.ModelCase.TypeEnum.ADMINISTRATION_ORDER;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.companieshouse.api.delta.CaseNumber;
 import uk.gov.companieshouse.api.insolvency.CaseDates;
 import uk.gov.companieshouse.api.insolvency.ModelCase;
+import uk.gov.companieshouse.api.insolvency.Practitioners;
 import uk.gov.companieshouse.insolvency.delta.config.TestConfig;
 
 @ExtendWith(SpringExtension.class)
@@ -77,7 +79,7 @@ class CaseMapperTest {
         assertThat(targetCase.getType()).isEqualTo(ModelCase.TypeEnum.RECEIVER_MANAGER);
         assertThat(targetCase.getNumber()).isEqualTo("1");
         assertThat(targetCase.getDates().size()).isZero();
-        assertThat(targetCase.getPractitioners()).isNull();
+        assertThat(targetCase.getPractitioners()).isEqualTo(new ArrayList<Practitioners>());
         assertThat(targetCase.getLinks()).isNull();
     }
 }
