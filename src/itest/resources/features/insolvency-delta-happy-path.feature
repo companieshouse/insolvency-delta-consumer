@@ -12,7 +12,7 @@ Feature: Process insolvency delta happy path scenario
       | case_type_2 | 02877512      | case_type_2_output |
       | case_type_3 | 02877513      | case_type_3_output |
 
-  Scenario Outline: Consume the message and invoke the insolvency data endpoint successfully
+  Scenario Outline: Consume the message and invoke the insolvency data endpoint successfully for the delete event
 
     Given Insolvency delta consumer service is running
     When a "<message>" with "<companyNumber>" is published to the topic "insolvency-delta" and consumed
