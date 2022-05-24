@@ -1,4 +1,4 @@
-Feature: Process insolvency delta error path scenario
+Feature: Process insolvency delta error retry scenarios
 
   Scenario Outline: Processing invalid message
 
