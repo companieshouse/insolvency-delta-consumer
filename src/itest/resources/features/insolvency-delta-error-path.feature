@@ -1,22 +1,14 @@
-Feature: Process insolvency delta information
+Feature: Process insolvency delta error path scenario
 
-  Scenario Outline: Processing insolvency delta information successfully
+  Scenario Outline: Processing invalid message
 
     Given Insolvency delta consumer service is running
-    When a "<message>" with "<companyNumber>" is published to the topic "insolvency-delta" and consumed
-    Then verify PUT method is called on insolvency-data-api service with body "<output>"
+    When a non-avro "<input>" is published and failed to process
+    Then the message should be moved to topic "insolvency-delta-insolvency-delta-consumer-invalid"
 
     Examples:
-      | message     | companyNumber | output             |
-      | case_type_1 | 02877511      | case_type_1_output |
-      | case_type_2 | 02877512      | case_type_2_output |
-      | case_type_3 | 02877513      | case_type_3_output |
-
-  Scenario: Processing invalid message
-
-    Given Insolvency delta consumer service is running
-    When a non-avro message is published and failed to process
-    Then the message should be moved to topic "insolvency-delta-insolvency-delta-consumer-invalid"
+      | input             |
+      | case_type_invalid |
 
   Scenario: Processing valid avro message with invalid json
 
