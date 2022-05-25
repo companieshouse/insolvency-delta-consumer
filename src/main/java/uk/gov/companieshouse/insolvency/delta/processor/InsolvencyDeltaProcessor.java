@@ -85,6 +85,8 @@ public class InsolvencyDeltaProcessor {
 
         companyNumber = insolvency.getCompanyNumber();
 
+        logger.trace(String.format("Performing a PUT with "
+                + "company number %s for contextId %s", companyNumber, logContext));
         final ApiResponse<Void> response =
                 apiClientService.putInsolvency(logContext,
                         companyNumber,
@@ -107,9 +109,16 @@ public class InsolvencyDeltaProcessor {
         var insolvencyDeleteDelta =
                 mapToInsolvencyDelta(payload, logContext, InsolvencyDeleteDelta.class);
 
+        logger.trace(String.format("InsolvencyDeleteDelta extracted for context ID %s "
+                        + "a Kafka message: %s",
+                logContext,
+                insolvencyDeleteDelta));
+
         companyNumber = insolvencyDeleteDelta.getCompanyNumber();
         logMap.put("company_number", companyNumber);
 
+        logger.trace(String.format("Performing a DELETE with "
+                + "company number %s for contextId %s", companyNumber, logContext));
         final ApiResponse<Void> response =
                 apiClientService.deleteInsolvency(logContext, companyNumber);
 
@@ -145,7 +154,7 @@ public class InsolvencyDeltaProcessor {
                     .format("Bad request PUT Api Response %s", msg));
         } else if (!httpStatus.is2xxSuccessful()) {
             // any other client or server status is retryable
-            logger.trace(String.format("Failed to invoke insolvency-data-api "
+            logger.error(String.format("Failed to invoke insolvency-data-api "
                             + "PUT endpoint for message with contextId: %s "
                             + "with error %s",
                     logContext,
@@ -153,7 +162,7 @@ public class InsolvencyDeltaProcessor {
             throw new RetryableErrorException(String
                     .format("Unsuccessful PUT API response, %s", msg));
         } else {
-            logger.trace(String.format("Successfully invoked insolvency-data-api "
+            logger.info(String.format("Successfully invoked insolvency-data-api "
                     + "PUT endpoint for message with contextId: %s",
                     logContext));
         }
@@ -175,7 +184,7 @@ public class InsolvencyDeltaProcessor {
                     String.format("Bad request DELETE Api Response %s", msg));
         } else if (!httpStatus.is2xxSuccessful()) {
             // any other client or server status is retryable
-            logger.trace(String.format("Failed to invoke insolvency-data-api "
+            logger.error(String.format("Failed to invoke insolvency-data-api "
                             + "DELETE endpoint for message with contextId: %s "
                             + "with error %s",
                     logContext,
@@ -183,7 +192,7 @@ public class InsolvencyDeltaProcessor {
             throw new RetryableErrorException(
                     String.format("Unsuccessful DELETE API response, %s", msg));
         } else {
-            logger.trace(String.format("Successfully invoked insolvency-data-api "
+            logger.info(String.format("Successfully invoked insolvency-data-api "
                             + "DELETE endpoint for message with contextId: %s",
                     logContext));
         }
