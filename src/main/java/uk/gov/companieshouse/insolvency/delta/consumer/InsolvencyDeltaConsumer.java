@@ -54,7 +54,7 @@ public class InsolvencyDeltaConsumer {
                                     @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) String partition,
                                     @Header(KafkaHeaders.OFFSET) String offset) {
-        logger.trace(String.format("A new message successfully picked up "
+        logger.info(String.format("A new message successfully picked up "
                         + "from %s topic with contextId: %s",
                 topic,
                 message.getPayload().getContextId()));
