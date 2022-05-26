@@ -73,10 +73,12 @@ class InsolvencyMapperTest {
         assertThat(insolvency).isNotNull();
         assertThat(insolvencyTarget).isNotNull();
         assertThat(internalInsolvencyTarget.getDeltaAt()).isEqualTo(expectedDeltaAt);
-        assertThat(externalInsolvencyTarget.getCases().size()).isEqualTo(2);
+        assertThat(externalInsolvencyTarget.getCases().size()).isEqualTo(4);
 
         // FIRST CASE
         ModelCase firstCase = externalInsolvencyTarget.getCases().get(0);
+        assertThat(firstCase.getNotes().size()).isEqualTo(1);
+        assertThat(firstCase.getNotes().get(0)).isEqualTo("scottish-insolvency-info");
         assertThat(firstCase.getNumber()).isEqualTo("1");
         assertThat(firstCase.getType()).isEqualTo(ModelCase.TypeEnum.ADMINISTRATIVE_RECEIVER);
         assertThat(firstCase.getPractitioners().size()).isEqualTo(2);
@@ -124,6 +126,8 @@ class InsolvencyMapperTest {
 
         // SECOND CASE
         ModelCase secondCase = externalInsolvencyTarget.getCases().get(1);
+        assertThat(secondCase.getNotes().size()).isEqualTo(1);
+        assertThat(secondCase.getNotes().get(0)).isEqualTo("scottish-insolvency-info");
         assertThat(secondCase.getNumber()).isEqualTo("2");
         assertThat(secondCase.getType()).isEqualTo(ModelCase.TypeEnum.CREDITORS_VOLUNTARY_LIQUIDATION);
         assertThat(secondCase.getPractitioners().size()).isEqualTo(1);
@@ -149,5 +153,15 @@ class InsolvencyMapperTest {
         assertThat(secondCaseDates.get(1).getDate()).isEqualTo(LocalDate.of(2021, 10, 01));
 
         assertThat(secondCase.getLinks()).isNull();
+
+        // THIRD CASE
+        ModelCase thirdCase = externalInsolvencyTarget.getCases().get(2);
+        assertThat(thirdCase.getNotes()).isNull();
+
+        // FOURTH CASE
+        ModelCase fourthCase = externalInsolvencyTarget.getCases().get(3);
+        assertThat(fourthCase.getNotes()).isNull();
+
     }
+
 }
