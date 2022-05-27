@@ -177,7 +177,7 @@ public class InsolvencyDeltaProcessor {
         String msg = "Response from DELETE insolvency request";
         Set<HttpStatus> nonRetryableStatuses =
                 Collections.unmodifiableSet(EnumSet.of(
-                        HttpStatus.BAD_REQUEST, HttpStatus.NOT_FOUND));
+                        HttpStatus.BAD_REQUEST, HttpStatus.GONE));
 
         if (nonRetryableStatuses.contains(httpStatus)) {
             throw new NonRetryableErrorException(
