@@ -35,7 +35,6 @@
 		<io-cucumber.version>7.2.3</io-cucumber.version>
 		<springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
 
-
 		<!-- Tests -->
 		<io-cucumber.version>7.2.3</io-cucumber.version>
 		<skip.integration.tests>false</skip.integration.tests>
