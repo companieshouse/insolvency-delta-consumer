@@ -54,20 +54,20 @@ public class InsolvencyDeltaConsumer {
                                     @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) String partition,
                                     @Header(KafkaHeaders.OFFSET) String offset) {
-        logger.info(String.format("A new message successfully picked up "
-                        + "from %s topic with contextId: %s",
-                topic,
-                message.getPayload().getContextId()));
+        ChsDelta chsDelta = message.getPayload();
+        logger.info(String.format("A new message successfully picked up from topic: %s, "
+                        + "partition: %s and offset: %s with contextId: %s",
+                topic, partition, offset, chsDelta.getContextId()));
+
         try {
-            if (Boolean.TRUE.equals(message.getPayload().getIsDelete())) {
+            if (Boolean.TRUE.equals(chsDelta.getIsDelete())) {
                 deltaProcessor.processDelete(message);
             } else {
                 deltaProcessor.processDelta(message, topic, partition, offset);
             }
         } catch (Exception exception) {
-            logger.error(String.format("Exception occurred while processing the topic %s "
-                    + "with context id %s, exception thrown is %s",
-                    topic, message.getPayload().getContextId(), exception));
+            logger.error(String.format("Exception occurred while processing the topic: %s "
+                    + "with contextId: %s", topic, chsDelta.getContextId()), exception);
             throw exception;
         }
     }
