@@ -93,8 +93,9 @@ public abstract class CaseMapper {
      * @param modelCase     the target ModelCase object
      */
     @AfterMapping
-    public void initializePractitionersIfNull(@MappingTarget ModelCase modelCase) {
-        if (modelCase.getPractitioners() == null) {
+    public void initializePractitionersIfNull(CaseNumber sourceCase,
+                                              @MappingTarget ModelCase modelCase) {
+        if (sourceCase.getAppointments() == null) {
             modelCase.setPractitioners(new ArrayList<Practitioners>());
         }
     }
