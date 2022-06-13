@@ -68,12 +68,12 @@ public class InsolvencyDeltaConsumer {
         try {
             if (Boolean.TRUE.equals(chsDelta.getIsDelete())) {
                 deltaProcessor.processDelete(message);
-                logger.info(format("Insolvency Delete with contextId: %s is successfully "
+                logger.info(format("Insolvency Delete message with contextId: %s is successfully "
                                 + "processed in %d milliseconds", contextId,
                         Duration.between(startTime, Instant.now()).toMillis()));
             } else {
                 deltaProcessor.processDelta(message, topic, partition, offset);
-                logger.info(format("Insolvency Delta with contextId: %s is successfully "
+                logger.info(format("Insolvency Delta message with contextId: %s is successfully "
                                 + "processed in %d milliseconds", contextId,
                         Duration.between(startTime, Instant.now()).toMillis()));
             }
