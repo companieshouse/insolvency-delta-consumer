@@ -31,7 +31,7 @@ public class EncoderUtil {
      * @return the resulting byte array
      */
     public byte[] generateSha1Hash(String input) throws NoSuchAlgorithmException {
-        var digest = MessageDigest.getInstance(SHA_1);
+        var digest = MessageDigest.getInstance(SHA_1); //NOSONAR
         String saltedMortgageId = input + MORTGAGE_ID_SALT;
         return digest.digest(saltedMortgageId.getBytes(StandardCharsets.UTF_8));
     }
