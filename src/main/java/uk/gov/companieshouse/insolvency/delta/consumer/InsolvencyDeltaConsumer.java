@@ -1,5 +1,10 @@
 package uk.gov.companieshouse.insolvency.delta.consumer;
 
+import static java.lang.String.format;
+
+import java.time.Duration;
+import java.time.Instant;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
@@ -33,7 +38,6 @@ public class InsolvencyDeltaConsumer {
         this.deltaProcessor = deltaProcessor;
         this.logger = logger;
         this.kafkaTemplate = kafkaTemplate;
-
     }
 
     /**
@@ -54,20 +58,28 @@ public class InsolvencyDeltaConsumer {
                                     @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) String partition,
                                     @Header(KafkaHeaders.OFFSET) String offset) {
+        Instant startTime = Instant.now();
         ChsDelta chsDelta = message.getPayload();
-        logger.info(String.format("A new message successfully picked up from topic: %s, "
+        String contextId = chsDelta.getContextId();
+        logger.info(format("A new message successfully picked up from topic: %s, "
                         + "partition: %s and offset: %s with contextId: %s",
-                topic, partition, offset, chsDelta.getContextId()));
+                topic, partition, offset, contextId));
 
         try {
             if (Boolean.TRUE.equals(chsDelta.getIsDelete())) {
                 deltaProcessor.processDelete(message);
+                logger.info(format("Insolvency Delete with contextId: %s is successfully "
+                                + "processed in %d milliseconds", contextId,
+                        Duration.between(startTime, Instant.now()).toMillis()));
             } else {
                 deltaProcessor.processDelta(message, topic, partition, offset);
+                logger.info(format("Insolvency Delta with contextId: %s is successfully "
+                                + "processed in %d milliseconds", contextId,
+                        Duration.between(startTime, Instant.now()).toMillis()));
             }
         } catch (Exception exception) {
-            logger.error(String.format("Exception occurred while processing the topic: %s "
-                    + "with contextId: %s", topic, chsDelta.getContextId()), exception);
+            logger.error(format("Exception occurred while processing the topic: %s "
+                    + "with contextId: %s", topic, contextId), exception);
             throw exception;
         }
     }
