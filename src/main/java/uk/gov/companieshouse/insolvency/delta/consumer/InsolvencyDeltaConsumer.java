@@ -4,6 +4,7 @@ import static java.lang.String.format;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -78,9 +79,8 @@ public class InsolvencyDeltaConsumer {
                         Duration.between(startTime, Instant.now()).toMillis()));
             }
         } catch (Exception exception) {
-            logger.error(format("Exception occurred while processing the topic: %s "
-                            + "with contextId: %s, exception thrown: %s",
-                    topic, contextId, exception), exception);
+            logger.errorContext(contextId, format("Exception occurred while processing "
+                    + "message on the topic: %s", topic), exception, Collections.emptyMap());
             throw exception;
         }
     }
