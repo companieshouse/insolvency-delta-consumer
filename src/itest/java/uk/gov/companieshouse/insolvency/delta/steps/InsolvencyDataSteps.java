@@ -81,7 +81,7 @@ public class InsolvencyDataSteps {
         stubInsolvencyDataApiServiceCalls(companyNumber, 200);
         kafkaTemplate.send(topicName, createMessage(message));
 
-        assertFalse(countDownLatch.await(1, TimeUnit.SECONDS));
+        assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
     }
 
     @When("a {string} delete event is published to the topic {string} with insolvency data endpoint returning {string}")
@@ -90,7 +90,7 @@ public class InsolvencyDataSteps {
         stubInsolvencyDeleteDataApiServiceCalls(this.companyNumber, Integer.parseInt(statusCode));
         kafkaTemplate.send(topic, createDeleteMessage(message));
 
-        assertFalse(countDownLatch.await(1, TimeUnit.SECONDS));
+        assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
     }
 
     @When("a delete event message {string} is published to the topic {string}")
@@ -98,14 +98,14 @@ public class InsolvencyDataSteps {
         stubInsolvencyDeleteDataApiServiceCalls(this.companyNumber, 200);
         kafkaTemplate.send(topic, createDeleteMessage(message));
 
-        assertFalse(countDownLatch.await(1, TimeUnit.SECONDS));
+        assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
     }
 
     @When("a non-avro {string} is published and failed to process")
     public void a_non_avro_is_published_and_failed_to_process(String message) throws InterruptedException {
         kafkaTemplate.send(topic, message);
 
-        assertFalse(countDownLatch.await(1, TimeUnit.SECONDS));
+        assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
     }
 
     @When("a valid message is published with invalid json")
@@ -118,7 +118,7 @@ public class InsolvencyDataSteps {
                 .build();
         kafkaTemplate.send(topic, chsDelta);
 
-        assertFalse(countDownLatch.await(1, TimeUnit.SECONDS));
+        assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
     }
 
     @When("a message {string} is published for {string} and stubbed insolvency-data-api returns {string}")
@@ -129,7 +129,7 @@ public class InsolvencyDataSteps {
         stubInsolvencyDataApiServiceCalls(companyNumber, Integer.parseInt(statusCode));
         kafkaTemplate.send(topic, createMessage(message));
 
-        assertFalse(countDownLatch.await(1, TimeUnit.SECONDS));
+        assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
     }
 
     @When("a message {string} is published for {string} with unexpected data")
@@ -137,7 +137,7 @@ public class InsolvencyDataSteps {
         this.companyNumber = companyNumber;
         kafkaTemplate.send(topic, createMessage(message));
 
-        assertFalse(countDownLatch.await(1, TimeUnit.SECONDS));
+        assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
     }
 
     @Then("verify the insolvency data endpoint is invoked successfully")
