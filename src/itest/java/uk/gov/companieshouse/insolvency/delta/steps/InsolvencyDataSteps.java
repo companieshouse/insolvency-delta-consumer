@@ -41,9 +41,6 @@ import static uk.gov.companieshouse.insolvency.delta.config.WiremockTestConfig.s
 
 public class InsolvencyDataSteps {
 
-    private static WireMockServer wireMockServer;
-    private final CountDownLatch countDownLatch = new CountDownLatch(1);
-
     private String companyNumber;
 
     @Value("${insolvency.delta.topic}")
@@ -86,7 +83,7 @@ public class InsolvencyDataSteps {
         stubInsolvencyDataApiServiceCalls(companyNumber, 200);
         sendMessage(topicName, createMessage(message));
 
-        assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
+        TimeUnit.SECONDS.sleep(1);
     }
 
     @When("a {string} delete event is published to the topic {string} with insolvency data endpoint returning {string}")
@@ -95,7 +92,7 @@ public class InsolvencyDataSteps {
         stubInsolvencyDeleteDataApiServiceCalls(this.companyNumber, Integer.parseInt(statusCode));
         sendMessage(topic, createDeleteMessage(message));
 
-        assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
+        TimeUnit.SECONDS.sleep(1);
     }
 
     @When("a delete event message {string} is published to the topic {string}")
@@ -103,14 +100,14 @@ public class InsolvencyDataSteps {
         stubInsolvencyDeleteDataApiServiceCalls(this.companyNumber, 200);
         sendMessage(topic, createDeleteMessage(message));
 
-        assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
+        TimeUnit.SECONDS.sleep(1);
     }
 
     @When("a non-avro {string} is published and failed to process")
     public void a_non_avro_is_published_and_failed_to_process(String message) throws InterruptedException {
         kafkaTemplate.send(topic, message);
 
-        assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
+        TimeUnit.SECONDS.sleep(1);
     }
 
     @When("a valid message is published with invalid json")
@@ -123,7 +120,7 @@ public class InsolvencyDataSteps {
                 .build();
         sendMessage(topic, chsDelta);
 
-        assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
+        TimeUnit.SECONDS.sleep(1);
     }
 
     @When("a message {string} is published for {string} and stubbed insolvency-data-api returns {string}")
@@ -134,7 +131,7 @@ public class InsolvencyDataSteps {
         stubInsolvencyDataApiServiceCalls(companyNumber, Integer.parseInt(statusCode));
         sendMessage(topic, createMessage(message));
 
-        assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
+        TimeUnit.SECONDS.sleep(1);
     }
 
     @When("a message {string} is published for {string} with unexpected data")
@@ -142,7 +139,7 @@ public class InsolvencyDataSteps {
         this.companyNumber = companyNumber;
         sendMessage(topic, createMessage(message));
 
-        assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
+        TimeUnit.SECONDS.sleep(1);
     }
 
     @Then("verify the insolvency data endpoint is invoked successfully")
@@ -153,7 +150,7 @@ public class InsolvencyDataSteps {
     @Then("the message should be moved to topic {string}")
     public void the_message_should_be_moved_to_topic(String topic) {
         ConsumerRecord<String, Object> singleRecord =
-                KafkaTestUtils.getSingleRecord(kafkaConsumer, topic, 2000L);
+                KafkaTestUtils.getSingleRecord(kafkaConsumer, topic, 1000L);
 
         assertThat(singleRecord.value()).isNotNull();
     }
