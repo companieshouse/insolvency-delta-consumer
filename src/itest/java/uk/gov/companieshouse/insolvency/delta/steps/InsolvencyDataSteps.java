@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import io.cucumber.java.After;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
+import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
 import uk.gov.companieshouse.delta.ChsDelta;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
@@ -55,6 +57,9 @@ public class InsolvencyDataSteps {
 
     @Autowired
     public KafkaConsumer<String, Object> kafkaConsumer;
+
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     @Before
     public static void before_each() {
@@ -154,16 +159,18 @@ public class InsolvencyDataSteps {
     }
 
     @Then("verify PUT method is called on insolvency-data-api service with body {string}")
-    public void verify_put_method_is_called_on_insolvency_data_api_service_with_body(String output) {
+    public void verify_put_method_is_called_on_insolvency_data_api_service_with_body(String output) throws Exception {
         String expectedBody = loadFile("classpath:output/"+output+".json");
         verify(1, putRequestedFor(urlMatching("/company/"+this.companyNumber+"/insolvency")));
 
         List<ServeEvent> allServeEvents = getAllServeEvents();
         ServeEvent serveEvent = allServeEvents.get(0);
         String actualBody = serveEvent.getRequest().getBodyAsString();
+        InternalCompanyInsolvency companyInsolvency = objectMapper.readValue(actualBody, InternalCompanyInsolvency.class);
+        companyInsolvency.getInternalData().setUpdatedBy(null);
 
         assertThat(serveEvent.getResponse().getStatus()).isEqualTo(200);
-        assertThat(actualBody).isEqualTo(expectedBody);
+        assertThat(objectMapper.writeValueAsString(companyInsolvency)).isEqualTo(expectedBody);
     }
 
     private void sendMessage(String topic, ChsDelta message) {
