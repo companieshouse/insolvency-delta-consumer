@@ -4,7 +4,6 @@ import static java.lang.String.format;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -80,7 +79,7 @@ public class InsolvencyDeltaConsumer {
             }
         } catch (Exception exception) {
             logger.errorContext(contextId, format("Exception occurred while processing "
-                    + "message on the topic: %s", topic), exception, Collections.emptyMap());
+                    + "message on the topic: %s", topic), exception, null);
             throw exception;
         }
     }

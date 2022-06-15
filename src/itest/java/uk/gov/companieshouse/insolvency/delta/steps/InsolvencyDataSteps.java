@@ -79,7 +79,7 @@ public class InsolvencyDataSteps {
         this.companyNumber = companyNumber;
 
         stubInsolvencyDataApiServiceCalls(companyNumber, 200);
-        kafkaTemplate.send(topicName, createMessage(message));
+        sendMessage(topicName, createMessage(message));
 
         assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
     }
@@ -88,7 +88,7 @@ public class InsolvencyDataSteps {
     public void a_delete_event_is_published_to_the_topic_with_insolvency_data_endpoint_returning(
             String message, String topic, String statusCode) throws InterruptedException {
         stubInsolvencyDeleteDataApiServiceCalls(this.companyNumber, Integer.parseInt(statusCode));
-        kafkaTemplate.send(topic, createDeleteMessage(message));
+        sendMessage(topic, createDeleteMessage(message));
 
         assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
     }
@@ -96,7 +96,7 @@ public class InsolvencyDataSteps {
     @When("a delete event message {string} is published to the topic {string}")
     public void a_delete_event_message_is_published_to_the_topic(String message, String topic) throws InterruptedException {
         stubInsolvencyDeleteDataApiServiceCalls(this.companyNumber, 200);
-        kafkaTemplate.send(topic, createDeleteMessage(message));
+        sendMessage(topic, createDeleteMessage(message));
 
         assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
     }
@@ -116,7 +116,7 @@ public class InsolvencyDataSteps {
                 .setContextId("context_id")
                 .setAttempt(1)
                 .build();
-        kafkaTemplate.send(topic, chsDelta);
+        sendMessage(topic, chsDelta);
 
         assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
     }
@@ -127,7 +127,7 @@ public class InsolvencyDataSteps {
         this.companyNumber = companyNumber;
 
         stubInsolvencyDataApiServiceCalls(companyNumber, Integer.parseInt(statusCode));
-        kafkaTemplate.send(topic, createMessage(message));
+        sendMessage(topic, createMessage(message));
 
         assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
     }
@@ -135,7 +135,7 @@ public class InsolvencyDataSteps {
     @When("a message {string} is published for {string} with unexpected data")
     public void a_message_is_published_for_with_unexpected_data(String message, String companyNumber) throws InterruptedException {
         this.companyNumber = companyNumber;
-        kafkaTemplate.send(topic, createMessage(message));
+        sendMessage(topic, createMessage(message));
 
         assertFalse(countDownLatch.await(2, TimeUnit.SECONDS));
     }
@@ -147,7 +147,8 @@ public class InsolvencyDataSteps {
 
     @Then("the message should be moved to topic {string}")
     public void the_message_should_be_moved_to_topic(String topic) {
-        ConsumerRecord<String, Object> singleRecord = KafkaTestUtils.getSingleRecord(kafkaConsumer, topic);
+        ConsumerRecord<String, Object> singleRecord =
+                KafkaTestUtils.getSingleRecord(kafkaConsumer, topic, 2000L);
 
         assertThat(singleRecord.value()).isNotNull();
     }
@@ -165,4 +166,8 @@ public class InsolvencyDataSteps {
         assertThat(actualBody).isEqualTo(expectedBody);
     }
 
+    private void sendMessage(String topic, ChsDelta message) {
+        kafkaTemplate.send(topic, message);
+        kafkaTemplate.flush();
+    }
 }
