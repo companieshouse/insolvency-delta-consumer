@@ -52,6 +52,8 @@ public class KafkaTestContainerConfig {
         ConcurrentKafkaListenerContainerFactory<String, ChsDelta> factory
                 = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(kafkaConsumerFactory());
+        factory.getContainerProperties().setIdleBetweenPolls(0);
+        factory.getContainerProperties().setPollTimeout(10L);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
 
         return factory;
