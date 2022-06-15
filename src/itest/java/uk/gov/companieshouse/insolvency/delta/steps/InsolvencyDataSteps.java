@@ -1,11 +1,9 @@
 package uk.gov.companieshouse.insolvency.delta.steps;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
@@ -30,7 +28,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
 import static uk.gov.companieshouse.insolvency.delta.config.WiremockTestConfig.createDeleteMessage;
 import static uk.gov.companieshouse.insolvency.delta.config.WiremockTestConfig.createMessage;
 import static uk.gov.companieshouse.insolvency.delta.config.WiremockTestConfig.loadFile;
@@ -150,7 +147,7 @@ public class InsolvencyDataSteps {
     @Then("the message should be moved to topic {string}")
     public void the_message_should_be_moved_to_topic(String topic) {
         ConsumerRecord<String, Object> singleRecord =
-                KafkaTestUtils.getSingleRecord(kafkaConsumer, topic, 1000L);
+                KafkaTestUtils.getSingleRecord(kafkaConsumer, topic, 5000L);
 
         assertThat(singleRecord.value()).isNotNull();
     }

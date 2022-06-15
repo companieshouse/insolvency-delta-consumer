@@ -4,6 +4,8 @@ server:
 spring:
   kafka:
     bootstrap-servers: localhost:9092
+    listener:
+      concurrency: 1
 
 logger:
   namespace: company-delta-consumer
@@ -12,8 +14,8 @@ insolvency:
   delta:
     group-id: insolvency-delta-consumer
     topic: insolvency-delta
-    attempts: 1
-    backoff-delay: 100
+    attempts: 4
+    backoff-delay: 10
 
 api:
   endpoint: ${INSOLVENCY_DATA_API_URL:http://localhost:8888}
