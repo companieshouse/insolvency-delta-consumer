@@ -21,6 +21,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
 import uk.gov.companieshouse.delta.ChsDelta;
+import uk.gov.companieshouse.insolvency.delta.consumer.ResettableCountDownLatch;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.getAllServeEvents;
@@ -55,13 +56,17 @@ public class InsolvencyDataSteps {
     @Autowired
     protected ObjectMapper objectMapper;
 
+    @Autowired
+    private ResettableCountDownLatch resettableCountDownLatch;
+
     @Before
-    public static void before_each() {
+    public void beforeEach() {
+        resettableCountDownLatch.resetLatch(4);
         setupWiremock();
     }
 
     @After
-    public static void after_each() {
+    public void afterEach() {
         stop();
     }
 
@@ -78,33 +83,33 @@ public class InsolvencyDataSteps {
         this.companyNumber = companyNumber;
 
         stubInsolvencyDataApiServiceCalls(companyNumber, 200);
-        sendMessage(topicName, createMessage(message));
 
-        TimeUnit.SECONDS.sleep(1);
+        kafkaTemplate.send(topic, createMessage(message));
+        assertThat(resettableCountDownLatch.getCountDownLatch().await(5, TimeUnit.SECONDS)).isTrue();
     }
 
     @When("a {string} delete event is published to the topic {string} with insolvency data endpoint returning {string}")
     public void a_delete_event_is_published_to_the_topic_with_insolvency_data_endpoint_returning(
             String message, String topic, String statusCode) throws InterruptedException {
         stubInsolvencyDeleteDataApiServiceCalls(this.companyNumber, Integer.parseInt(statusCode));
-        sendMessage(topic, createDeleteMessage(message));
 
-        TimeUnit.SECONDS.sleep(1);
+        kafkaTemplate.send(topic, createDeleteMessage(message));
+        assertThat(resettableCountDownLatch.getCountDownLatch().await(5, TimeUnit.SECONDS)).isTrue();
     }
 
     @When("a delete event message {string} is published to the topic {string}")
     public void a_delete_event_message_is_published_to_the_topic(String message, String topic) throws InterruptedException {
         stubInsolvencyDeleteDataApiServiceCalls(this.companyNumber, 200);
-        sendMessage(topic, createDeleteMessage(message));
+        kafkaTemplate.send(topic, createDeleteMessage(message));
+        kafkaTemplate.flush();
 
-        TimeUnit.SECONDS.sleep(1);
+        assertThat(resettableCountDownLatch.getCountDownLatch().await(5, TimeUnit.SECONDS)).isTrue();
     }
 
     @When("a non-avro {string} is published and failed to process")
     public void a_non_avro_is_published_and_failed_to_process(String message) throws InterruptedException {
         kafkaTemplate.send(topic, message);
-
-        TimeUnit.SECONDS.sleep(1);
+        assertThat(resettableCountDownLatch.getCountDownLatch().await(5, TimeUnit.SECONDS)).isTrue();
     }
 
     @When("a valid message is published with invalid json")
@@ -115,9 +120,9 @@ public class InsolvencyDataSteps {
                 .setContextId("context_id")
                 .setAttempt(1)
                 .build();
-        sendMessage(topic, chsDelta);
 
-        TimeUnit.SECONDS.sleep(1);
+        kafkaTemplate.send(topic, chsDelta);
+        assertThat(resettableCountDownLatch.getCountDownLatch().await(5, TimeUnit.SECONDS)).isTrue();
     }
 
     @When("a message {string} is published for {string} and stubbed insolvency-data-api returns {string}")
@@ -126,17 +131,17 @@ public class InsolvencyDataSteps {
         this.companyNumber = companyNumber;
 
         stubInsolvencyDataApiServiceCalls(companyNumber, Integer.parseInt(statusCode));
-        sendMessage(topic, createMessage(message));
 
-        TimeUnit.SECONDS.sleep(1);
+        kafkaTemplate.send(topic, createMessage(message));
+        assertThat(resettableCountDownLatch.getCountDownLatch().await(5, TimeUnit.SECONDS)).isTrue();
     }
 
     @When("a message {string} is published for {string} with unexpected data")
     public void a_message_is_published_for_with_unexpected_data(String message, String companyNumber) throws InterruptedException {
         this.companyNumber = companyNumber;
-        sendMessage(topic, createMessage(message));
 
-        TimeUnit.SECONDS.sleep(1);
+        kafkaTemplate.send(topic, createMessage(message));
+        assertThat(resettableCountDownLatch.getCountDownLatch().await(5, TimeUnit.SECONDS)).isTrue();
     }
 
     @Then("verify the insolvency data endpoint is invoked successfully")
@@ -167,8 +172,4 @@ public class InsolvencyDataSteps {
         assertThat(objectMapper.writeValueAsString(companyInsolvency)).isEqualTo(expectedBody);
     }
 
-    private void sendMessage(String topic, ChsDelta message) {
-        kafkaTemplate.send(topic, message);
-        kafkaTemplate.flush();
-    }
 }

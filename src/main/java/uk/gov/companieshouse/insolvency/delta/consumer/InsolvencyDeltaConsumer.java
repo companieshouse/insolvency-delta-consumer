@@ -8,7 +8,6 @@ import java.time.Instant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.retrytopic.DltStrategy;
 import org.springframework.kafka.retrytopic.FixedDelayStrategy;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -27,17 +26,14 @@ public class InsolvencyDeltaConsumer {
 
     private final InsolvencyDeltaProcessor deltaProcessor;
     private final Logger logger;
-    public final KafkaTemplate<String, Object> kafkaTemplate;
 
     /**
      * Default constructor.
      */
     @Autowired
-    public InsolvencyDeltaConsumer(InsolvencyDeltaProcessor deltaProcessor, Logger logger,
-                                   KafkaTemplate<String, Object> kafkaTemplate) {
+    public InsolvencyDeltaConsumer(InsolvencyDeltaProcessor deltaProcessor, Logger logger) {
         this.deltaProcessor = deltaProcessor;
         this.logger = logger;
-        this.kafkaTemplate = kafkaTemplate;
     }
 
     /**
