@@ -99,9 +99,9 @@ public class InsolvencyDataSteps {
 
     @When("a delete event message {string} is published to the topic {string}")
     public void a_delete_event_message_is_published_to_the_topic(String message, String topic) throws InterruptedException {
+        resettableCountDownLatch.resetLatch(4);
         stubInsolvencyDeleteDataApiServiceCalls(this.companyNumber, 200);
         kafkaTemplate.send(topic, createDeleteMessage(message));
-        kafkaTemplate.flush();
 
         assertThat(resettableCountDownLatch.getCountDownLatch().await(5, TimeUnit.SECONDS)).isTrue();
     }
