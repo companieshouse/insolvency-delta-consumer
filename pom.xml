@@ -20,7 +20,6 @@
 
 		<main.class>uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication</main.class>
 
-
 		<map-struct.version>1.4.2.Final</map-struct.version>
 		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
 		<maven-build-helper-plugin.version>3.2.0</maven-build-helper-plugin.version>
@@ -93,6 +92,10 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-logging</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.mapstruct</groupId>
