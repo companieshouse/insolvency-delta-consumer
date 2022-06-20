@@ -88,18 +88,22 @@ public class InsolvencyDataSteps {
         assertThat(resettableCountDownLatch.getCountDownLatch().await(5, TimeUnit.SECONDS)).isTrue();
     }
 
-    @When("a {string} delete event is published to the topic {string} with insolvency data endpoint returning {string}")
+    @When("a {string} delete event with {string} is published to the topic {string} with insolvency data endpoint returning {string}")
     public void a_delete_event_is_published_to_the_topic_with_insolvency_data_endpoint_returning(
-            String message, String topic, String statusCode) throws InterruptedException {
+            String message, String companyNumber, String topic, String statusCode) throws InterruptedException {
+        this.companyNumber = companyNumber;
+
         stubInsolvencyDeleteDataApiServiceCalls(this.companyNumber, Integer.parseInt(statusCode));
 
         kafkaTemplate.send(topic, createDeleteMessage(message));
         assertThat(resettableCountDownLatch.getCountDownLatch().await(5, TimeUnit.SECONDS)).isTrue();
     }
 
-    @When("a delete event message {string} is published to the topic {string}")
-    public void a_delete_event_message_is_published_to_the_topic(String message, String topic) throws InterruptedException {
-        resettableCountDownLatch.resetLatch(4);
+    @When("a delete event message {string} with {string} is published to the topic {string}")
+    public void a_delete_event_message_is_published_to_the_topic(String message,
+                                                                 String companyNumber,
+                                                                 String topic) throws InterruptedException {
+        this.companyNumber = companyNumber;
         stubInsolvencyDeleteDataApiServiceCalls(this.companyNumber, 200);
         kafkaTemplate.send(topic, createDeleteMessage(message));
 
