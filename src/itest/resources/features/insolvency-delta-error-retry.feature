@@ -36,3 +36,14 @@ Feature: Process insolvency delta error retry scenarios
     Examples:
       | input         | companyNumber | statusCode | topic                                            |
       | case_type_NPE | 02877511      | 400        | insolvency-delta-insolvency-delta-consumer-error |
+
+  Scenario Outline: Processing insolvency delta information with validation errors
+
+    Given Insolvency delta consumer service is running
+    When a "<message>" with "<companyNumber>" is published to the topic "insolvency-delta" and consumed
+    Then the message should be moved to topic "insolvency-delta-insolvency-delta-consumer-invalid"
+
+    Examples:
+      | message                       | companyNumber |
+      | case_type_1_with_extra_fields | 02877511      |
+      | case_type_3_with_extra_fields | 02877512      |
