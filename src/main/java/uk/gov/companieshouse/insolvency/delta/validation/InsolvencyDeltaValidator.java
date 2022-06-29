@@ -44,6 +44,9 @@ public class InsolvencyDeltaValidator {
     private boolean checkFieldAgainstSchema(Field[] fields, CaseNumber caseNumber,
                                             List<String> listOfFieldsToValidate) throws Exception {
         for (Field field: fields) {
+            if (field.isSynthetic()) {
+                continue;
+            }
             String formattedFieldName = field.getName().substring(0, 1).toUpperCase()
                     + field.getName().substring(1);
             Method getter = CaseNumber.class.getMethod("get" + formattedFieldName);
