@@ -23,6 +23,7 @@ import uk.gov.companieshouse.insolvency.delta.exception.NonRetryableErrorExcepti
 import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
 import uk.gov.companieshouse.insolvency.delta.service.api.ApiClientService;
 import uk.gov.companieshouse.insolvency.delta.transformer.InsolvencyApiTransformer;
+import uk.gov.companieshouse.insolvency.delta.validation.InsolvencyDeltaValidator;
 import uk.gov.companieshouse.logging.Logger;
 
 @Component
@@ -31,6 +32,7 @@ public class InsolvencyDeltaProcessor {
     private final InsolvencyApiTransformer transformer;
     private final ApiClientService apiClientService;
     private final Logger logger;
+    private final InsolvencyDeltaValidator validator;
 
     /**
      * The constructor.
@@ -38,10 +40,12 @@ public class InsolvencyDeltaProcessor {
     @Autowired
     public InsolvencyDeltaProcessor(ApiClientService apiClientService,
                                     InsolvencyApiTransformer transformer,
-                                    Logger logger) {
+                                    Logger logger,
+                                    InsolvencyDeltaValidator validator) {
         this.transformer = transformer;
         this.apiClientService = apiClientService;
         this.logger = logger;
+        this.validator = validator;
     }
 
     /**
@@ -72,6 +76,13 @@ public class InsolvencyDeltaProcessor {
          **/
 
         Insolvency insolvency = insolvencyDelta.getInsolvency().get(0);
+
+        try {
+            validator.validateCaseDates(insolvency);
+        } catch (Exception error) {
+            throw new NonRetryableErrorException("Error when validating case dates: "
+                    + error.getMessage());
+        }
 
         InternalCompanyInsolvency internalCompanyInsolvency = transformer.transform(insolvency);
 

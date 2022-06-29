@@ -33,6 +33,7 @@ import uk.gov.companieshouse.insolvency.delta.exception.NonRetryableErrorExcepti
 import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
 import uk.gov.companieshouse.insolvency.delta.service.api.ApiClientService;
 import uk.gov.companieshouse.insolvency.delta.transformer.InsolvencyApiTransformer;
+import uk.gov.companieshouse.insolvency.delta.validation.InsolvencyDeltaValidator;
 import uk.gov.companieshouse.logging.Logger;
 
 import java.io.IOException;
@@ -45,6 +46,9 @@ class InsolvencyDeltaProcessorTest {
     private InsolvencyDeltaProcessor deltaProcessor;
 
     @Mock
+    InsolvencyDeltaValidator validator;
+
+    @Mock
     private InsolvencyApiTransformer transformer;
 
     @Mock
@@ -55,7 +59,7 @@ class InsolvencyDeltaProcessorTest {
 
     @BeforeEach
     void setUp() {
-        deltaProcessor = new InsolvencyDeltaProcessor(apiClientService, transformer, logger);
+        deltaProcessor = new InsolvencyDeltaProcessor(apiClientService, transformer, logger, validator);
     }
 
     @Test
