@@ -35,6 +35,12 @@ public class InsolvencyDeltaValidator {
         }
     }
 
+    /**
+     * This method cycles through the fields array formatting each one
+     * to get the getter method for that field. The field name is then
+     * checked against our list of fields to validate and the value
+     * of the getter is checked against null
+     */
     private boolean checkFieldAgainstSchema(Field[] fields, CaseNumber caseNumber,
                                             List<String> listOfFieldsToValidate) throws Exception {
         for (Field field: fields) {
@@ -49,6 +55,12 @@ public class InsolvencyDeltaValidator {
         return false;
     }
 
+    /**
+     * This method retrieves the zeroth entry of the caseDates map
+     * which contains all date fields. It then retrieves the entry
+     * for our case number type Id and returns the all date fields
+     * entry with the dates from the case number entry removed
+     */
     private List<String> buildListOfFieldsToValidateForSchema(
             CaseNumber caseNumber, Map<Integer, List<String>> caseDates) {
         return caseDates.get(0).stream().filter(
