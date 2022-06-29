@@ -11,6 +11,7 @@ import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.DECLARATIO
 import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.DISSOLVED_ON;
 import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.DUE_TO_BE_DISSOLVED_ON;
 import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.INSTRUMENTED_ON;
+import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.MORATORIUM_ENDED_ON;
 import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.MORATORIUM_STARTED_ON;
 import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.PETITIONED_ON;
 import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.VOLUNTARY_ARRANGEMENT_ENDED_ON;
@@ -35,7 +36,7 @@ public final class MapperUtils {
 
     /**
      * NB: Source does not have a corresponding date to map to the following target enum members:
-     * MORATORIUM_ENDED_ON, CASE_END_ON, ORDERED_TO_WIND_UP_ON.
+     * CASE_END_ON, ORDERED_TO_WIND_UP_ON.
      *
      * @param sourceCase the source case containing all dates as non-nested properties
      * @return a map of target enum values and the corresponding source case dates
@@ -57,6 +58,7 @@ public final class MapperUtils {
         datesWithTargetEnums.put(MORATORIUM_STARTED_ON, sourceCase.getAppointmentDate());
         datesWithTargetEnums.put(DECLARATION_SOLVENT_ON, sourceCase.getSwornDate());
         datesWithTargetEnums.put(DISSOLVED_ON, sourceCase.getDissolvedDate());
+        datesWithTargetEnums.put(MORATORIUM_ENDED_ON, sourceCase.getEndDate());
 
         // Special mapping cases
         if (sourceCase.getCaseType() == FOREIGN_INSOLVENCY) {
