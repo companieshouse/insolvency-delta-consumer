@@ -12,7 +12,7 @@ public class CaseNumberDatesMap {
                     "adminStartDate", "appointmentDate", "completionDate",
                     "dischargeAdminOrderDate", "dissolvedDate", "dissolvedDueDate",
                     "instrumentDate", "petitionDate", "reportDate", "swornDate",
-                    "windUpConclusionDate", "windUpDate");
+                    "windUpConclusionDate", "windUpDate", "endDate");
             put(0, allDatesList);
             put(1, Arrays.asList("dissolvedDueDate","dissolvedDate","swornDate","windUpDate"));
             put(2, Arrays.asList("dissolvedDueDate","dissolvedDate","windUpDate"));
@@ -23,10 +23,8 @@ public class CaseNumberDatesMap {
             put(7, Arrays.asList("adminOrderDate","dischargeAdminOrderDate"));
             put(8, Arrays.asList("reportDate","completionDate"));
             put(13, Arrays.asList("adminStartDate","adminEndDate"));
-            //end_date is missing from CaseNumber class, this needs updating
-            put(14, Arrays.asList("appointmentDate","end_date"));
-            //end_date is missing from CaseNumber class, this needs updating
-            put(17, Arrays.asList("appointmentDate","end_date"));
+            put(14, Arrays.asList("appointmentDate","endDate"));
+            put(17, Arrays.asList("appointmentDate","endDate"));
         }
     };
 
