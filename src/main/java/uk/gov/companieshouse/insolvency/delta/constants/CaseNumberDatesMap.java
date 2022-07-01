@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.insolvency.delta.constants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ public class CaseNumberDatesMap {
             put(8, Arrays.asList("reportDate","completionDate"));
             put(13, Arrays.asList("adminStartDate","adminEndDate"));
             put(14, Arrays.asList("appointmentDate","endDate"));
+            put(15, new ArrayList<>());
             put(17, Arrays.asList("appointmentDate","endDate"));
         }
     };
