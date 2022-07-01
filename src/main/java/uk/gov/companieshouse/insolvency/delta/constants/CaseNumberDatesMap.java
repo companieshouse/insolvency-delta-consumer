@@ -28,7 +28,7 @@ public class CaseNumberDatesMap {
         }
     };
 
-    private static final Map<Integer, String> mandatoryCaseTypesField = new HashMap<>() {
+    private static final Map<Integer, String> mandatoryFieldsForCaseType = new HashMap<>() {
         {
             put(8, "reportDate");
             put(13, "adminStartDate");
@@ -41,7 +41,7 @@ public class CaseNumberDatesMap {
         return caseDates;
     }
 
-    public static Map<Integer, String> getMandatoryCaseTypesField() {
-        return mandatoryCaseTypesField;
+    public static Map<Integer, String> getMandatoryFieldsForCaseType() {
+        return mandatoryFieldsForCaseType;
     }
 }

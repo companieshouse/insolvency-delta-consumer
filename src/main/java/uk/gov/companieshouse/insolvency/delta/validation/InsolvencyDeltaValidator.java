@@ -25,7 +25,7 @@ public class InsolvencyDeltaValidator {
         Field[] fields = CaseNumber.class.getDeclaredFields();
         Map<Integer, List<String>> caseDates = CaseNumberDatesMap.getCaseDates();
         Map<Integer, String> mandatoryCaseTypesField = 
-                        CaseNumberDatesMap.getMandatoryCaseTypesField();
+                        CaseNumberDatesMap.getMandatoryFieldsForCaseType();
 
         for (CaseNumber caseNumber : caseNumbers) {
             List<String> listOfFieldsToValidate =
@@ -53,7 +53,7 @@ public class InsolvencyDeltaValidator {
             }
 
             if (listOfFieldsToValidate.contains(field.getName()) 
-                    && checkIfFieldExist(field.getName(), caseNumber)) {
+                    && checkIfFieldIsPresent(field.getName(), caseNumber)) {
 
                 return true;
             }
@@ -80,17 +80,16 @@ public class InsolvencyDeltaValidator {
         int caseTypeId = caseNumber.getCaseTypeId().getValue();
 
         if (mandatoryCaseTypesField.containsKey(caseTypeId)) {
-            if (!checkIfFieldExist(mandatoryCaseTypesField.get(caseTypeId), caseNumber)) {
+            if (!checkIfFieldIsPresent(mandatoryCaseTypesField.get(caseTypeId), caseNumber)) {
                 throw new NonRetryableErrorException(String.format("Missing field: %s "
                     + "for case type Id: " + caseTypeId, mandatoryCaseTypesField.get(caseTypeId)));
             }
         }
     }
 
-    private boolean checkIfFieldExist(String field, CaseNumber caseNumber) throws Exception {
+    private boolean checkIfFieldIsPresent(String field, CaseNumber caseNumber) throws Exception {
         String formattedFieldName = 
-                field.substring(0, 1).toUpperCase()
-                + field.substring(1);
+                field.substring(0, 1).toUpperCase() + field.substring(1);
         Method getter = CaseNumber.class.getMethod("get" + formattedFieldName);
 
         return getter.invoke(caseNumber) != null;
