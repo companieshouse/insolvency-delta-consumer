@@ -24,14 +24,18 @@ public class InsolvencyDeltaValidator {
         List<CaseNumber> caseNumbers = insolvency.getCaseNumbers();
         Field[] fields = CaseNumber.class.getDeclaredFields();
         Map<Integer, List<String>> caseDates = CaseNumberDatesMap.getCaseDates();
+        Map<Integer, String> mandatoryCaseTypesField = 
+                        CaseNumberDatesMap.getMandatoryCaseTypesField();
 
-        for (CaseNumber caseNumber:caseNumbers) {
+        for (CaseNumber caseNumber : caseNumbers) {
             List<String> listOfFieldsToValidate =
                     buildListOfFieldsToValidateForSchema(caseNumber, caseDates);
             if (checkFieldAgainstSchema(fields, caseNumber, listOfFieldsToValidate)) {
                 throw new NonRetryableErrorException("Unexpected fields present "
                         + "for case type Id " + caseNumber.getCaseTypeId());
             }
+
+            checkForMandatoryCaseDate(caseNumber, mandatoryCaseTypesField);
         }
     }
 
@@ -43,15 +47,14 @@ public class InsolvencyDeltaValidator {
      */
     private boolean checkFieldAgainstSchema(Field[] fields, CaseNumber caseNumber,
                                             List<String> listOfFieldsToValidate) throws Exception {
-        for (Field field: fields) {
+        for (Field field : fields) {
             if (field.isSynthetic()) {
                 continue;
             }
-            String formattedFieldName = field.getName().substring(0, 1).toUpperCase()
-                    + field.getName().substring(1);
-            Method getter = CaseNumber.class.getMethod("get" + formattedFieldName);
-            if (listOfFieldsToValidate.contains(field.getName())
-                    & getter.invoke(caseNumber) != null) {
+
+            if (listOfFieldsToValidate.contains(field.getName()) 
+                    && checkIfFieldExist(field.getName(), caseNumber)) {
+
                 return true;
             }
         }
@@ -69,5 +72,27 @@ public class InsolvencyDeltaValidator {
         return caseDates.get(0).stream().filter(
                 Predicate.not(caseDates.get(caseNumber.getCaseTypeId().getValue())::contains))
                 .collect(Collectors.toList());
+    }
+
+    private void checkForMandatoryCaseDate(CaseNumber caseNumber,
+                                    Map<Integer, String> mandatoryCaseTypesField) throws Exception {
+
+        int caseTypeId = caseNumber.getCaseTypeId().getValue();
+
+        if (mandatoryCaseTypesField.containsKey(caseTypeId)) {
+            if (!checkIfFieldExist(mandatoryCaseTypesField.get(caseTypeId), caseNumber)) {
+                throw new NonRetryableErrorException(String.format("Missing field: %s "
+                    + "for case type Id: " + caseTypeId, mandatoryCaseTypesField.get(caseTypeId)));
+            }
+        }
+    }
+
+    private boolean checkIfFieldExist(String field, CaseNumber caseNumber) throws Exception {
+        String formattedFieldName = 
+                field.substring(0, 1).toUpperCase()
+                + field.substring(1);
+        Method getter = CaseNumber.class.getMethod("get" + formattedFieldName);
+
+        return getter.invoke(caseNumber) != null;
     }
 }
