@@ -39,4 +39,23 @@ public class InsolvencyDeltaValidatorTest {
         insolvency.addCaseNumbersItem(caseNumber);
         Assertions.assertDoesNotThrow(() -> validator.validateCaseDates(insolvency));
     }
+
+    @Test
+    void When_CaseTypeNo8_Missing_Mandatory_Field() throws IOException {
+        Insolvency insolvency = new Insolvency();
+        CaseNumber caseNumber = new CaseNumber();
+        caseNumber.setCaseTypeId(CaseNumber.CaseTypeIdEnum.NUMBER_8);
+        insolvency.addCaseNumbersItem(caseNumber);
+        Assertions.assertThrows(NonRetryableErrorException.class, () -> validator.validateCaseDates(insolvency));
+    }
+
+    @Test
+    void When_CaseTypeNo17_Contains_Mandatory_Field() throws IOException {
+        Insolvency insolvency = new Insolvency();
+        CaseNumber caseNumber = new CaseNumber();
+        caseNumber.setCaseTypeId(CaseNumber.CaseTypeIdEnum.NUMBER_17);
+        caseNumber.setAppointmentDate("202220512");
+        insolvency.addCaseNumbersItem(caseNumber);
+        Assertions.assertDoesNotThrow(() -> validator.validateCaseDates(insolvency));    
+    }
 }

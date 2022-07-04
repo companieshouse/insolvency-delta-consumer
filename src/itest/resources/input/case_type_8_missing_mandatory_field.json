@@ -1,0 +1,47 @@
+{
+    "insolvency": [
+        {
+            "delta_at": "{{timestamp}}",
+            "company_number": "10990530",
+            "case_numbers": [
+                {
+                    "case_number": "1",
+                    "case_type_id": "8",
+                    "case_type": "Corporate Voluntary Arrangement ",
+                    "completion_date": "20210504",
+                    "appointments": [
+                        {
+                            "forename": "Happy path 10",
+                            "middle_name": "Leslie",
+                            "surname": "Reeves",
+                            "appt_type": "1",
+                            "ceased_to_act_appt": "20191019",
+                            "practitioner_address": {
+                                "address_line_1": "Free From Debt",
+                                "address_line_2": "24 Wilton Drive",
+                                "locality": "Romford",
+                                "region": "",
+                                "country": "",
+                                "postal_code": "RM5 3TJ"
+                            }
+                        },
+                        {
+                            "forename": "Daniel",
+                            "middle_name": "",
+                            "surname": "Taylor",
+                            "appt_type": "1",
+                            "practitioner_address": {
+                                "address_line_1": "30 Finsbury Square",
+                                "address_line_2": "",
+                                "locality": "London",
+                                "region": "",
+                                "country": "",
+                                "postal_code": "EC2P 2YU"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
