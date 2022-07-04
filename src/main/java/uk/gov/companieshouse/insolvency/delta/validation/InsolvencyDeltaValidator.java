@@ -80,9 +80,9 @@ public class InsolvencyDeltaValidator {
         int caseTypeId = caseNumber.getCaseTypeId().getValue();
 
         if (mandatoryCaseTypesField.containsKey(caseTypeId)
-            && !checkIfFieldIsPresent(mandatoryCaseTypesField.get(caseTypeId), caseNumber)) {
-                throw new NonRetryableErrorException(String.format("Missing field: %s "
-                    + "for case type Id: " + caseTypeId, mandatoryCaseTypesField.get(caseTypeId)));
+                && ! checkIfFieldIsPresent(mandatoryCaseTypesField.get(caseTypeId), caseNumber)) {
+            throw new NonRetryableErrorException(String.format("Missing field: %s "
+                + "for case type Id: " + caseTypeId, mandatoryCaseTypesField.get(caseTypeId)));
         }
     }
 
