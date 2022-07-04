@@ -49,3 +49,4 @@ Feature: Process insolvency delta error retry scenarios
       | case_type_3_with_extra_fields       | 02877512      |
       | case_type_7_with_extra_fields       | 02877513      |
       | case_type_8_missing_mandatory_field | 02877514      |
+      | case_type_15_with_any_date          | 02877514      |
