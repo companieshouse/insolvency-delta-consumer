@@ -22,9 +22,8 @@ logger:
   namespace: insolvency-delta-consumer
 
 api:
-  endpoint: ${INSOLVENCY_DATA_API_URL:localhost}
   insolvency-data-api-key: ${INSOLVENCY_DATA_API_KEY:localhost}
-  api-url: ${API_URL:localhost}
+  api-url: ${INSOLVENCY_DATA_API_URL:localhost}
   internal-api-url: ${INTERNAL_API_URL:localhost}
   mortgage-id-salt: ${MORTGAGE_ID_SALT:testsalt}
 
