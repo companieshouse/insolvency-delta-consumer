@@ -35,7 +35,6 @@ class InsolvencyApiTransformerTest {
     @Test
     @DisplayName("Successfully invokes the mapstruct mapper")
     void When_TransformerIsCalled_ThenMapperIsSuccessfullyInvoked() {
-        Assertions.fail();
         Insolvency insolvency = new Insolvency();
         insolvency.setCompanyNumber(COMPANY_NUMBER);
         InternalCompanyInsolvency mockInternalInsolvency = mock(InternalCompanyInsolvency.class);
