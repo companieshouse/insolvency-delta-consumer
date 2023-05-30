@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,7 @@ class InsolvencyApiTransformerTest {
     @Test
     @DisplayName("Successfully invokes the mapstruct mapper")
     void When_TransformerIsCalled_ThenMapperIsSuccessfullyInvoked() {
+        Assertions.fail();
         Insolvency insolvency = new Insolvency();
         insolvency.setCompanyNumber(COMPANY_NUMBER);
         InternalCompanyInsolvency mockInternalInsolvency = mock(InternalCompanyInsolvency.class);

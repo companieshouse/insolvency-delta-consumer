@@ -10,7 +10,7 @@ import uk.gov.companieshouse.insolvency.delta.mapper.InsolvencyMapper;
 @Component
 public class InsolvencyApiTransformer {
 
-    //private final InsolvencyMapper mapper;
+    private final InsolvencyMapper mapper;
 
     @Autowired
     public InsolvencyApiTransformer(InsolvencyMapper mapper) {
