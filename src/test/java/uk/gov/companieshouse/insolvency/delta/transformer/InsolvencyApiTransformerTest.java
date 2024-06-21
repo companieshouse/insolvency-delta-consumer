@@ -2,6 +2,7 @@ package uk.gov.companieshouse.insolvency.delta.transformer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -12,9 +13,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.api.delta.Insolvency;
+import uk.gov.companieshouse.api.insolvency.CompanyInsolvency;
 import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
 import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
 import uk.gov.companieshouse.insolvency.delta.mapper.InsolvencyMapper;
+import uk.gov.companieshouse.insolvency.delta.mapper.InsolvencyStatusMapper;
 
 @ExtendWith(MockitoExtension.class)
 class InsolvencyApiTransformerTest {
@@ -23,12 +26,14 @@ class InsolvencyApiTransformerTest {
 
     @Mock
     private InsolvencyMapper mapper;
+    @Mock
+    private InsolvencyStatusMapper insolvencyStatusMapper;
 
     private InsolvencyApiTransformer transformer;
 
     @BeforeEach
     public void setup() {
-        transformer = new InsolvencyApiTransformer(mapper);
+        transformer = new InsolvencyApiTransformer(mapper, insolvencyStatusMapper);
     }
 
     @Test
@@ -40,6 +45,8 @@ class InsolvencyApiTransformerTest {
 
         when(mapper.insolvencyDeltaToApi(insolvency, COMPANY_NUMBER))
                 .thenReturn(mockInternalInsolvency);
+        when(mockInternalInsolvency.getExternalData()).thenReturn(new CompanyInsolvency());
+        when(insolvencyStatusMapper.mapStatus(any())).thenReturn(null);
 
         InternalCompanyInsolvency actual = transformer.transform(insolvency);
         assertThat(actual).isEqualTo(mockInternalInsolvency);
