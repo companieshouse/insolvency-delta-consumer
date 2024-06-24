@@ -33,8 +33,8 @@ public class InsolvencyStatusMapper {
             Map.entry("K", List.of(VOLUNTARY_ARRANGEMENT, ADMINISTRATIVE_RECEIVER)),
             Map.entry("L",
                     List.of(VOLUNTARY_ARRANGEMENT,
-                    ADMINISTRATIVE_RECEIVER,
-                    RECEIVER_MANAGER)),
+                            ADMINISTRATIVE_RECEIVER,
+                            RECEIVER_MANAGER)),
             Map.entry("M", List.of(ADMINISTRATION_ORDER)),
             Map.entry("N", List.of(ADMINISTRATION_ORDER, RECEIVER_MANAGER)),
             Map.entry("O", List.of(ADMINISTRATION_ORDER, ADMINISTRATIVE_RECEIVER)),
@@ -51,6 +51,6 @@ public class InsolvencyStatusMapper {
      * @return list of insolvency statuses.
      */
     public List<StatusEnum> mapStatus(final String key) {
-        return StringUtils.isNotBlank(key) ? STATUS_MAP.getOrDefault(key, null) : null;
+        return StringUtils.isNotBlank(key) ? STATUS_MAP.get(key) : null;
     }
 }

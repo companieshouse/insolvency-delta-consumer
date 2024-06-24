@@ -18,7 +18,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.companieshouse.api.insolvency.CompanyInsolvency.StatusEnum;
 
-public class InsolvencyStatusMapperTest {
+class InsolvencyStatusMapperTest {
 
     private final InsolvencyStatusMapper insolvencyStatusMapper = new InsolvencyStatusMapper();
 
@@ -61,6 +61,7 @@ public class InsolvencyStatusMapperTest {
                 // Should return null
                 Arguments.of("1", null),
                 Arguments.of("Z", null),
+                Arguments.of("", null),
                 Arguments.of(null, null)
         );
     }
