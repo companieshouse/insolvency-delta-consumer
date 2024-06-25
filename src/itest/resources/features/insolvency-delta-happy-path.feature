@@ -11,3 +11,4 @@ Feature: Process insolvency delta happy path scenario
       | case_type_1 | 02877511      | case_type_1_output |
       | case_type_2 | 02877512      | case_type_2_output |
       | case_type_3 | 02877513      | case_type_3_output |
+      | case_type_4 | 02877514      | case_type_4_output |
