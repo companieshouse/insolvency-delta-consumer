@@ -29,6 +29,8 @@ Feature: Process insolvency delta happy path scenario
 
     Examples:
       | deleteMessage | companyNumber | statusCode | topic                                              |
+      | case_delete   | 02877511      | 401        | insolvency-delta-insolvency-delta-consumer-error   |
+      | case_delete   | 02877511      | 403        | insolvency-delta-insolvency-delta-consumer-error   |
       | case_delete   | 02877511      | 404        | insolvency-delta-insolvency-delta-consumer-error   |
       | case_delete   | 02877511      | 405        | insolvency-delta-insolvency-delta-consumer-error   |
       | case_delete   | 02877511      | 410        | insolvency-delta-insolvency-delta-consumer-error   |

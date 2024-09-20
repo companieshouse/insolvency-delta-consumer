@@ -23,9 +23,16 @@ Feature: Process insolvency delta error retry scenarios
     Then the message should be moved to topic "<topic>"
 
     Examples:
-      | input       | companyNumber | statusCode | topic                                              |
-      | case_type_1 | 02877511      | 400        | insolvency-delta-insolvency-delta-consumer-invalid |
-      | case_type_1 | 02877511      | 503        | insolvency-delta-insolvency-delta-consumer-error   |
+      | input       | companyNumber | statusCode | topic                                                |
+      | case_type_1 | 02877511      | 401        | insolvency-delta-insolvency-delta-consumer-error     |
+      | case_type_1 | 02877511      | 403        | insolvency-delta-insolvency-delta-consumer-error     |
+      | case_type_1 | 02877511      | 404        | insolvency-delta-insolvency-delta-consumer-error     |
+      | case_type_1 | 02877511      | 405        | insolvency-delta-insolvency-delta-consumer-error     |
+      | case_type_1 | 02877511      | 410        | insolvency-delta-insolvency-delta-consumer-error     |
+      | case_type_1 | 02877511      | 500        | insolvency-delta-insolvency-delta-consumer-error     |
+      | case_type_1 | 02877511      | 503        | insolvency-delta-insolvency-delta-consumer-error     |
+      | case_type_1 | 02877511      | 400        | insolvency-delta-insolvency-delta-consumer-invalid   |
+      | case_type_1 | 02877511      | 409        | insolvency-delta-insolvency-delta-consumer-invalid   |
 
   Scenario Outline: Handle NPE while processing insolvency delta information
 
