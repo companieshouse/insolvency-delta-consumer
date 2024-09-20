@@ -1,13 +1,11 @@
 package uk.gov.companieshouse.insolvency.delta.processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
@@ -39,9 +37,9 @@ public class InsolvencyDeltaProcessor {
      */
     @Autowired
     public InsolvencyDeltaProcessor(ApiClientService apiClientService,
-                                    InsolvencyApiTransformer transformer,
-                                    Logger logger,
-                                    InsolvencyDeltaValidator validator) {
+            InsolvencyApiTransformer transformer,
+            Logger logger,
+            InsolvencyDeltaValidator validator) {
         this.transformer = transformer;
         this.apiClientService = apiClientService;
         this.logger = logger;
@@ -52,9 +50,9 @@ public class InsolvencyDeltaProcessor {
      * Process CHS Delta message.
      */
     public void processDelta(Message<ChsDelta> chsDelta,
-                             String topic,
-                             String partition,
-                             String offset) {
+            String topic,
+            String partition,
+            String offset) {
         MessageHeaders headers = chsDelta.getHeaders();
         final ChsDelta payload = chsDelta.getPayload();
         final String logContext = payload.getContextId();
@@ -65,10 +63,9 @@ public class InsolvencyDeltaProcessor {
                 mapToInsolvencyDelta(payload, logContext, InsolvencyDelta.class);
 
         logger.trace(String.format("InsolvencyDelta extracted for context ID %s "
-                + "a Kafka message: %s",
+                        + "a Kafka message: %s",
                 logContext,
                 insolvencyDelta));
-
 
         /** We always receive only one insolvency/charge per delta in a list,
          * so we only take the first element
@@ -103,9 +100,7 @@ public class InsolvencyDeltaProcessor {
                         companyNumber,
                         internalCompanyInsolvency);
 
-        handleResponse(HttpStatus.valueOf(response.getStatusCode()), logContext,
-                "Response from sending insolvency data", logMap);
-
+        handleResponse(HttpStatus.valueOf(response.getStatusCode()), logContext, logMap);
     }
 
     /**
@@ -155,27 +150,28 @@ public class InsolvencyDeltaProcessor {
     private void handleResponse(
             final HttpStatus httpStatus,
             final String logContext,
-            final String msg,
             final Map<String, Object> logMap)
             throws NonRetryableErrorException, RetryableErrorException {
         logMap.put("status", httpStatus.toString());
-        if (HttpStatus.BAD_REQUEST == httpStatus) {
-            // 400 BAD REQUEST status is not retryable
+        if (HttpStatus.BAD_REQUEST == httpStatus || HttpStatus.CONFLICT == httpStatus) {
+            logger.error(String
+                    .format("PUT request to API returned non-retryable: %d. Context ID: %s",
+                            httpStatus.value(), logContext));
             throw new NonRetryableErrorException(String
-                    .format("Bad request PUT Api Response %s", msg));
+                    .format("PUT request to API returned non-retryable: %d. Context ID: %s",
+                            httpStatus.value(), logContext));
         } else if (!httpStatus.is2xxSuccessful()) {
             // any other client or server status is retryable
-            logger.error(String.format("Failed to invoke insolvency-data-api "
-                            + "PUT endpoint for message with contextId: %s "
-                            + "with error %s",
-                    logContext,
-                    msg));
+            logger.info(String
+                    .format("PUT request to API returned retryable: %d. Context ID: %s",
+                            httpStatus.value(), logContext));
             throw new RetryableErrorException(String
-                    .format("Unsuccessful PUT API response, %s", msg));
+                    .format("PUT request to API returned retryable: %d. Context ID: %s",
+                            httpStatus.value(), logContext));
         } else {
-            logger.info(String.format("Successfully invoked insolvency-data-api "
-                    + "PUT endpoint for message with contextId: %s",
-                    logContext));
+            logger.info(String
+                    .format("Successful PUT request to insolvency-data-api with Context ID: %s",
+                            logContext));
         }
     }
 
@@ -185,27 +181,29 @@ public class InsolvencyDeltaProcessor {
             final Map<String, Object> logMap)
             throws NonRetryableErrorException, RetryableErrorException {
         logMap.put("status", httpStatus.toString());
-        String msg = "Response from DELETE insolvency request";
         Set<HttpStatus> nonRetryableStatuses =
                 Collections.unmodifiableSet(EnumSet.of(
-                        HttpStatus.BAD_REQUEST, HttpStatus.NOT_FOUND));
+                        HttpStatus.BAD_REQUEST, HttpStatus.CONFLICT));
 
         if (nonRetryableStatuses.contains(httpStatus)) {
-            throw new NonRetryableErrorException(
-                    String.format("Bad request DELETE Api Response %s", msg));
+            logger.error(String
+                    .format("DELETE request to API returned non-retryable: %d. Context ID: %s",
+                            httpStatus.value(), logContext));
+            throw new NonRetryableErrorException(String
+                    .format("DELETE request to API returned non-retryable: %d. Context ID: %s",
+                            httpStatus.value(), logContext));
         } else if (!httpStatus.is2xxSuccessful()) {
             // any other client or server status is retryable
-            logger.error(String.format("Failed to invoke insolvency-data-api "
-                            + "DELETE endpoint for message with contextId: %s "
-                            + "with error %s",
-                    logContext,
-                    msg));
-            throw new RetryableErrorException(
-                    String.format("Unsuccessful DELETE API response, %s", msg));
+            logger.info(String
+                    .format("DELETE request to API returned retryable: %d. Context ID: %s",
+                            httpStatus.value(), logContext));
+            throw new RetryableErrorException(String
+                    .format("DELETE request to API returned retryable: %d. Context ID: %s",
+                                    httpStatus.value(), logContext));
         } else {
-            logger.info(String.format("Successfully invoked insolvency-data-api "
-                            + "DELETE endpoint for message with contextId: %s",
-                    logContext));
+            logger.info(String
+                    .format("Successful DELETE request to insolvency-data-api with Context ID: %s",
+                            logContext));
         }
     }
 
