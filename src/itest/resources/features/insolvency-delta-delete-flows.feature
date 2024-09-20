@@ -7,8 +7,8 @@ Feature: Process insolvency delta happy path scenario
     Then verify the insolvency data endpoint is invoked successfully
 
     Examples:
-      | message     | deleteMessage | companyNumber |
-      | case_type_1 | case_delete   | 02877511      |
+      | deleteMessage | companyNumber |
+      | case_delete   | 02877511      |
 
 
   Scenario Outline: Processing invalid message for delete event
@@ -28,7 +28,13 @@ Feature: Process insolvency delta happy path scenario
     Then the message should be moved to topic "<topic>"
 
     Examples:
-      | input       | deleteMessage | companyNumber | statusCode | topic                                              |
-      | case_type_1 | case_delete   | 02877511      | 404        | insolvency-delta-insolvency-delta-consumer-invalid   |
-      | case_type_1 | case_delete   | 02877511      | 400        | insolvency-delta-insolvency-delta-consumer-invalid |
-      | case_type_1 | case_delete   | 02877511      | 503        | insolvency-delta-insolvency-delta-consumer-error   |
+      | deleteMessage | companyNumber | statusCode | topic                                              |
+      | case_delete   | 02877511      | 401        | insolvency-delta-insolvency-delta-consumer-error   |
+      | case_delete   | 02877511      | 403        | insolvency-delta-insolvency-delta-consumer-error   |
+      | case_delete   | 02877511      | 404        | insolvency-delta-insolvency-delta-consumer-error   |
+      | case_delete   | 02877511      | 405        | insolvency-delta-insolvency-delta-consumer-error   |
+      | case_delete   | 02877511      | 410        | insolvency-delta-insolvency-delta-consumer-error   |
+      | case_delete   | 02877511      | 500        | insolvency-delta-insolvency-delta-consumer-error   |
+      | case_delete   | 02877511      | 503        | insolvency-delta-insolvency-delta-consumer-error   |
+      | case_delete   | 02877511      | 400        | insolvency-delta-insolvency-delta-consumer-invalid |
+      | case_delete   | 02877511      | 409        | insolvency-delta-insolvency-delta-consumer-invalid |
