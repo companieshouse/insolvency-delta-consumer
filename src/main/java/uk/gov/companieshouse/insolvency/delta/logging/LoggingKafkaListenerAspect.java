@@ -22,7 +22,7 @@ class LoggingKafkaListenerAspect {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
     private static final String LOG_MESSAGE_RECEIVED = "Processing delta";
-    private static final String LOG_MESSAGE_PROCESSED = "Processed delta";
+    private static final String LOG_MESSAGE_PROCESSED = "Successfully processed delta";
     private static final String EXCEPTION_MESSAGE = "%s exception thrown";
 
     private final int maxAttempts;

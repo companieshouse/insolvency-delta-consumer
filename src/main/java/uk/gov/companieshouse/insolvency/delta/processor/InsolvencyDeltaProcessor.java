@@ -77,16 +77,14 @@ public class InsolvencyDeltaProcessor {
         }
 
         InternalCompanyInsolvency internalCompanyInsolvency = transformer.transform(insolvency);
-
         LOGGER.info("Message successfully transformed", DataMapHolder.getLogMap());
 
-        final String updatedBy = String.format("%s-%s-%s", topic, partition, offset);
+        companyNumber = insolvency.getCompanyNumber();
+        DataMapHolder.get().companyNumber(companyNumber);
 
+        final String updatedBy = String.format("%s-%s-%s", topic, partition, offset);
         internalCompanyInsolvency.getInternalData().setUpdatedBy(updatedBy);
 
-        companyNumber = insolvency.getCompanyNumber();
-
-        DataMapHolder.get().companyNumber(companyNumber);
         LOGGER.info("Sending PUT request to Insolvency Data API", DataMapHolder.getLogMap());
         final ApiResponse<Void> response =
                 apiClientService.putInsolvency(contextId,

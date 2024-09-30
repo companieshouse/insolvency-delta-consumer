@@ -1,15 +1,22 @@
 package uk.gov.companieshouse.insolvency.delta.transformer;
 
+import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.NAMESPACE;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.delta.Insolvency;
 import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
 import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
+import uk.gov.companieshouse.insolvency.delta.logging.DataMapHolder;
 import uk.gov.companieshouse.insolvency.delta.mapper.InsolvencyMapper;
 import uk.gov.companieshouse.insolvency.delta.mapper.InsolvencyStatusMapper;
+import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.logging.LoggerFactory;
 
 @Component
 public class InsolvencyApiTransformer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
 
     private final InsolvencyMapper mapper;
     private final InsolvencyStatusMapper insolvencyStatusMapper;
@@ -43,8 +50,8 @@ public class InsolvencyApiTransformer {
 
             return internalCompanyInsolvency;
         } catch (Exception exception) {
-            throw new RetryableErrorException("Unable to map to Insolvency API object",
-                    exception);
+            LOGGER.info("Unable to map to Insolvency API object", DataMapHolder.getLogMap());
+            throw new RetryableErrorException("Unable to map to Insolvency API object", exception);
         }
     }
 }
