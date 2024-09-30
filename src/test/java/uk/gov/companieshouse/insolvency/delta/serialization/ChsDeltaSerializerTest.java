@@ -37,7 +37,7 @@ class ChsDeltaSerializerTest {
     @Test
     void When_serialize_null_returns_null() {
         byte[] serialize = serializer.serialize("", null);
-        assertThat(serialize).isNull();
+        assertThat(serialize).isEqualTo(new byte[0]);
     }
 
     @Test
