@@ -10,11 +10,11 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
+import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
-import uk.gov.companieshouse.stream.ResourceChangedData;
 
 @Component
 @Aspect
@@ -45,8 +45,8 @@ class LoggingKafkaListenerAspect {
             DataMapHolder.get()
                     .retryCount(retryCount)
                     .topic((String) joinPoint.getArgs()[2])
-                    .partition((Integer) joinPoint.getArgs()[3])
-                    .offset((Long) joinPoint.getArgs()[4]);
+                    .partition(Integer.valueOf((String) joinPoint.getArgs()[3]))
+                    .offset(Long.valueOf((String) joinPoint.getArgs()[4]));
 
             LOGGER.info(LOG_MESSAGE_RECEIVED, DataMapHolder.getLogMap());
 
@@ -71,9 +71,9 @@ class LoggingKafkaListenerAspect {
         }
     }
 
-    private ResourceChangedData extractData(Object payload) {
-        if (payload instanceof ResourceChangedData) {
-            return (ResourceChangedData) payload;
+    private ChsDelta extractData(Object payload) {
+        if (payload instanceof ChsDelta) {
+            return (ChsDelta) payload;
         }
         throw new NonRetryableErrorException(String.format("Invalid payload type. Payload: %s", payload.toString()));
     }
