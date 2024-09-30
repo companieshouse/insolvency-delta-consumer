@@ -8,26 +8,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.exception.NonRetryableErrorException;
-import uk.gov.companieshouse.logging.Logger;
 
 @ExtendWith(MockitoExtension.class)
 class ChsDeltaDeserializerTest {
 
-    @Mock
-    private Logger logger;
     private ChsDeltaDeserializer deserializer;
 
     @BeforeEach
     public void init() {
-        deserializer = new ChsDeltaDeserializer(logger);
+        deserializer = new ChsDeltaDeserializer();
     }
 
     @ParameterizedTest
-    @ValueSource(booleans =  {true, false})
+    @ValueSource(booleans = {true, false})
     void When_deserialize_Expect_ValidChsDeltaObject(boolean isDelete) {
         ChsDelta chsDelta = new ChsDelta("{\"key\": \"value\"}", 1, "context_id", isDelete);
         byte[] data = encodedData(chsDelta);
@@ -44,7 +40,7 @@ class ChsDeltaDeserializerTest {
     }
 
     private byte[] encodedData(ChsDelta chsDelta) {
-        ChsDeltaSerializer serializer = new ChsDeltaSerializer(this.logger);
+        ChsDeltaSerializer serializer = new ChsDeltaSerializer();
         return serializer.serialize("", chsDelta);
     }
 }
