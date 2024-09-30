@@ -1,25 +1,29 @@
 package uk.gov.companieshouse.insolvency.delta.exception;
 
-import static java.lang.String.format;
 import static org.springframework.kafka.support.KafkaHeaders.EXCEPTION_CAUSE_FQCN;
 import static org.springframework.kafka.support.KafkaHeaders.EXCEPTION_STACKTRACE;
+import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.NAMESPACE;
 
 import java.util.Map;
-
 import org.apache.kafka.clients.producer.ProducerInterceptor;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.header.Header;
-import uk.gov.companieshouse.insolvency.delta.config.LoggingConfig;
+import uk.gov.companieshouse.insolvency.delta.logging.DataMapHolder;
+import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.logging.LoggerFactory;
 
 public class RetryableTopicErrorInterceptor implements ProducerInterceptor<String, Object> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
 
     @Override
     public ProducerRecord<String, Object> onSend(ProducerRecord<String, Object> record) {
         String nextTopic = record.topic().contains("-error") ? getNextErrorTopic(record)
                 : record.topic();
-        LoggingConfig.getLogger().info(format("Moving record into new topic: %s with value: %s",
-                nextTopic, record.value()));
+
+        LOGGER.info(String.format("Moving record into new topic: %s with value: %s", nextTopic, record.value()),
+                DataMapHolder.getLogMap());
         if (nextTopic.contains("-invalid")) {
             return new ProducerRecord<>(nextTopic, record.key(), record.value());
         }
@@ -46,7 +50,7 @@ public class RetryableTopicErrorInterceptor implements ProducerInterceptor<Strin
                 && new String(header1.value()).contains(NonRetryableErrorException.class.getName()))
                 || (header2 != null
                 && new String(header2.value()).contains(
-                        NonRetryableErrorException.class.getName())))
+                NonRetryableErrorException.class.getName())))
                 ? record.topic().replace("-error", "-invalid") : record.topic();
     }
 }

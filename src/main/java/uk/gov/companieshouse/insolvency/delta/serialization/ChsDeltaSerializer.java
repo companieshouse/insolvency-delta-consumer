@@ -8,7 +8,6 @@ import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.kafka.common.serialization.Serializer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.exception.NonRetryableErrorException;
@@ -26,7 +25,7 @@ public class ChsDeltaSerializer implements Serializer<Object> {
     public byte[] serialize(String topic, Object payload) {
         try {
             if (payload == null) {
-                return null;
+                return new byte[0];
             }
 
             if (payload instanceof byte[]) {
