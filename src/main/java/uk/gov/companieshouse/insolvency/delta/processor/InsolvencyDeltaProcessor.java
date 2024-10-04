@@ -1,15 +1,14 @@
 package uk.gov.companieshouse.insolvency.delta.processor;
 
+import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.NAMESPACE;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.delta.Insolvency;
 import uk.gov.companieshouse.api.delta.InsolvencyDeleteDelta;
@@ -19,17 +18,20 @@ import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.insolvency.delta.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
+import uk.gov.companieshouse.insolvency.delta.logging.DataMapHolder;
 import uk.gov.companieshouse.insolvency.delta.service.api.ApiClientService;
 import uk.gov.companieshouse.insolvency.delta.transformer.InsolvencyApiTransformer;
 import uk.gov.companieshouse.insolvency.delta.validation.InsolvencyDeltaValidator;
 import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.logging.LoggerFactory;
 
 @Component
 public class InsolvencyDeltaProcessor {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
+
     private final InsolvencyApiTransformer transformer;
     private final ApiClientService apiClientService;
-    private final Logger logger;
     private final InsolvencyDeltaValidator validator;
 
     /**
@@ -38,11 +40,9 @@ public class InsolvencyDeltaProcessor {
     @Autowired
     public InsolvencyDeltaProcessor(ApiClientService apiClientService,
             InsolvencyApiTransformer transformer,
-            Logger logger,
             InsolvencyDeltaValidator validator) {
         this.transformer = transformer;
         this.apiClientService = apiClientService;
-        this.logger = logger;
         this.validator = validator;
     }
 
@@ -53,19 +53,13 @@ public class InsolvencyDeltaProcessor {
             String topic,
             String partition,
             String offset) {
-        MessageHeaders headers = chsDelta.getHeaders();
         final ChsDelta payload = chsDelta.getPayload();
-        final String logContext = payload.getContextId();
-        final Map<String, Object> logMap = new HashMap<>();
+        final String contextId = payload.getContextId();
         final String companyNumber;
 
-        InsolvencyDelta insolvencyDelta =
-                mapToInsolvencyDelta(payload, logContext, InsolvencyDelta.class);
+        InsolvencyDelta insolvencyDelta = mapToInsolvencyDelta(payload, InsolvencyDelta.class);
 
-        logger.trace(String.format("InsolvencyDelta extracted for context ID %s "
-                        + "a Kafka message: %s",
-                logContext,
-                insolvencyDelta));
+        LOGGER.info("Insolvency delta extracted from payload", DataMapHolder.getLogMap());
 
         /** We always receive only one insolvency/charge per delta in a list,
          * so we only take the first element
@@ -76,31 +70,28 @@ public class InsolvencyDeltaProcessor {
 
         try {
             validator.validateCaseDates(insolvency);
-        } catch (Exception error) {
-            throw new NonRetryableErrorException("Error when validating case dates: "
-                    + error.getMessage());
+        } catch (Exception ex) {
+            final String msg = "Error when validating case dates";
+            LOGGER.error(msg, ex, DataMapHolder.getLogMap());
+            throw new NonRetryableErrorException(msg, ex);
         }
 
         InternalCompanyInsolvency internalCompanyInsolvency = transformer.transform(insolvency);
-
-        logger.trace(String.format("Message with contextId: %s successfully "
-                        + "transformed into InsolvencyAPI object",
-                logContext));
-
-        final String updatedBy = String.format("%s-%s-%s", topic, partition, offset);
-
-        internalCompanyInsolvency.getInternalData().setUpdatedBy(updatedBy);
+        LOGGER.info("Message successfully transformed", DataMapHolder.getLogMap());
 
         companyNumber = insolvency.getCompanyNumber();
+        DataMapHolder.get().companyNumber(companyNumber);
 
-        logger.trace(String.format("Performing a PUT with "
-                + "company number %s for contextId %s", companyNumber, logContext));
+        final String updatedBy = String.format("%s-%s-%s", topic, partition, offset);
+        internalCompanyInsolvency.getInternalData().setUpdatedBy(updatedBy);
+
+        LOGGER.info("Sending PUT request to Insolvency Data API", DataMapHolder.getLogMap());
         final ApiResponse<Void> response =
-                apiClientService.putInsolvency(logContext,
+                apiClientService.putInsolvency(contextId,
                         companyNumber,
                         internalCompanyInsolvency);
 
-        handleResponse(HttpStatus.valueOf(response.getStatusCode()), logContext, logMap);
+        handleResponse(HttpStatus.valueOf(response.getStatusCode()));
     }
 
     /**
@@ -108,102 +99,72 @@ public class InsolvencyDeltaProcessor {
      */
     public void processDelete(Message<ChsDelta> chsDelta) {
         final var payload = chsDelta.getPayload();
-        final String logContext = payload.getContextId();
-        final Map<String, Object> logMap = new HashMap<>();
+        final String contextId = payload.getContextId();
         final String companyNumber;
 
-        var insolvencyDeleteDelta =
-                mapToInsolvencyDelta(payload, logContext, InsolvencyDeleteDelta.class);
+        var insolvencyDeleteDelta = mapToInsolvencyDelta(payload, InsolvencyDeleteDelta.class);
 
-        logger.trace(String.format("InsolvencyDeleteDelta extracted for context ID %s "
-                        + "a Kafka message: %s",
-                logContext,
-                insolvencyDeleteDelta));
+        LOGGER.info("Insolvency delta extracted from payload", DataMapHolder.getLogMap());
 
         companyNumber = insolvencyDeleteDelta.getCompanyNumber();
-        logMap.put("company_number", companyNumber);
 
-        logger.trace(String.format("Performing a DELETE with "
-                + "company number %s for contextId %s", companyNumber, logContext));
+        DataMapHolder.get().companyNumber(companyNumber);
+        LOGGER.info("Sending DELETE request to Insolvency Data API", DataMapHolder.getLogMap());
+
         final ApiResponse<Void> response =
-                apiClientService.deleteInsolvency(logContext, companyNumber);
+                apiClientService.deleteInsolvency(contextId, companyNumber);
 
-        handleDeleteResponse(HttpStatus.valueOf(response.getStatusCode()), logContext,
-                logMap);
+        handleDeleteResponse(HttpStatus.valueOf(response.getStatusCode()));
     }
 
-    private <T> T mapToInsolvencyDelta(ChsDelta payload, String contextId, Class<T> deltaClass)
+    private <T> T mapToInsolvencyDelta(ChsDelta payload, Class<T> deltaClass)
             throws NonRetryableErrorException {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readValue(payload.getData(), deltaClass);
-        } catch (Exception exception) {
-            logger.error(String.format("Failed to map to insolvency delta"
-                            + " class for context ID %s",
-                    contextId));
-            throw new NonRetryableErrorException(
-                    "Error when mapping to insolvency delta class" + deltaClass.getName(),
-                    exception);
+        } catch (Exception ex) {
+            LOGGER.error("Failed to map to insolvency delta", ex, DataMapHolder.getLogMap());
+            throw new NonRetryableErrorException("Failed to map to insolvency delta", ex);
         }
     }
 
-    private void handleResponse(
-            final HttpStatus httpStatus,
-            final String logContext,
-            final Map<String, Object> logMap)
+    private void handleResponse(final HttpStatus httpStatus)
             throws NonRetryableErrorException, RetryableErrorException {
-        logMap.put("status", httpStatus.toString());
         if (HttpStatus.BAD_REQUEST == httpStatus || HttpStatus.CONFLICT == httpStatus) {
-            logger.error(String
-                    .format("PUT request to API returned non-retryable: %d. Context ID: %s",
-                            httpStatus.value(), logContext));
-            throw new NonRetryableErrorException(String
-                    .format("PUT request to API returned non-retryable: %d. Context ID: %s",
-                            httpStatus.value(), logContext));
+            LOGGER.error(String.format("PUT request to API returned non-retryable: %d", httpStatus.value()),
+                    DataMapHolder.getLogMap());
+            throw new NonRetryableErrorException(
+                    String.format("PUT request to API returned non-retryable: %d", httpStatus.value()));
         } else if (!httpStatus.is2xxSuccessful()) {
             // any other client or server status is retryable
-            logger.info(String
-                    .format("PUT request to API returned retryable: %d. Context ID: %s",
-                            httpStatus.value(), logContext));
-            throw new RetryableErrorException(String
-                    .format("PUT request to API returned retryable: %d. Context ID: %s",
-                            httpStatus.value(), logContext));
+            LOGGER.info(String.format("PUT request to API returned retryable: %d", httpStatus.value()),
+                    DataMapHolder.getLogMap());
+            throw new RetryableErrorException(
+                    String.format("PUT request to API returned retryable: %d", httpStatus.value()));
         } else {
-            logger.info(String
-                    .format("Successful PUT request to insolvency-data-api with Context ID: %s",
-                            logContext));
+            LOGGER.info("Successful PUT request to insolvency-data-api", DataMapHolder.getLogMap());
         }
     }
 
-    private void handleDeleteResponse(
-            final HttpStatus httpStatus,
-            final String logContext,
-            final Map<String, Object> logMap)
+    private void handleDeleteResponse(final HttpStatus httpStatus)
             throws NonRetryableErrorException, RetryableErrorException {
-        logMap.put("status", httpStatus.toString());
         Set<HttpStatus> nonRetryableStatuses =
                 Collections.unmodifiableSet(EnumSet.of(
                         HttpStatus.BAD_REQUEST, HttpStatus.CONFLICT));
 
         if (nonRetryableStatuses.contains(httpStatus)) {
-            logger.error(String
-                    .format("DELETE request to API returned non-retryable: %d. Context ID: %s",
-                            httpStatus.value(), logContext));
-            throw new NonRetryableErrorException(String
-                    .format("DELETE request to API returned non-retryable: %d. Context ID: %s",
-                            httpStatus.value(), logContext));
+            LOGGER.error(String.format("DELETE request to API returned non-retryable: %d", httpStatus.value()),
+                    DataMapHolder.getLogMap());
+            throw new NonRetryableErrorException(
+                    String.format("DELETE request to API returned non-retryable: %d", httpStatus.value()));
         } else if (!httpStatus.is2xxSuccessful()) {
             // any other client or server status is retryable
-            logger.info(String
-                    .format("DELETE request to API returned retryable: %d. Context ID: %s",
-                            httpStatus.value(), logContext));
-            throw new RetryableErrorException(String
-                    .format("DELETE request to API returned retryable: %d. Context ID: %s",
-                                    httpStatus.value(), logContext));
+            LOGGER.info(String.format("DELETE request to API returned retryable: %d", httpStatus.value()),
+                    DataMapHolder.getLogMap());
+            throw new RetryableErrorException(
+                    String.format("DELETE request to API returned retryable: %d", httpStatus.value()));
         } else {
-            logger.info(String
-                    .format("Successful DELETE request to insolvency-data-api with Context ID: %s",
-                            logContext));
+            LOGGER.info("Successful DELETE request to Insolvency Data API", DataMapHolder.getLogMap());
         }
     }
 

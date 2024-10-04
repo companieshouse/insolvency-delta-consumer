@@ -1,8 +1,5 @@
 package uk.gov.companieshouse.insolvency.delta.service.api;
 
-import java.util.HashMap;
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -11,7 +8,6 @@ import uk.gov.companieshouse.api.http.ApiKeyHttpClient;
 import uk.gov.companieshouse.api.http.HttpClient;
 import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
 import uk.gov.companieshouse.api.model.ApiResponse;
-import uk.gov.companieshouse.logging.Logger;
 
 /**
  * Service that sends REST requests via private SDK.
@@ -20,27 +16,21 @@ import uk.gov.companieshouse.logging.Logger;
 @Service
 public class ApiClientServiceImpl extends BaseApiClientServiceImpl implements ApiClientService {
 
-    @Value("${api.insolvency-data-api-key}")
-    private String chsApiKey;
+    private final String chsApiKey;
+    private final String apiUrl;
+    private final String internalApiUrl;
 
-    @Value("${api.api-url}")
-    private String apiUrl;
-
-    @Value("${api.internal-api-url}")
-    private String internalApiUrl;
-
-    /**
-     * Construct an {@link ApiClientServiceImpl}.
-     *
-     * @param logger the CH logger
-     */
-    @Autowired
-    public ApiClientServiceImpl(final Logger logger) {
-        super(logger);
+    public ApiClientServiceImpl(
+            @Value("${api.insolvency-data-api-key}") String chsApiKey,
+            @Value("${api.api-url}") String apiUrl,
+            @Value("${api.internal-api-url}") String internalApiUrl) {
+        this.chsApiKey = chsApiKey;
+        this.apiUrl = apiUrl;
+        this.internalApiUrl = internalApiUrl;
     }
 
     @Override
-    public InternalApiClient getApiClient(String contextId) {
+    public InternalApiClient getApiClient(final String contextId) {
         InternalApiClient internalApiClient = new InternalApiClient(getHttpClient(contextId));
         internalApiClient.setBasePath(apiUrl);
         internalApiClient.setInternalBasePath(internalApiUrl);
@@ -56,41 +46,22 @@ public class ApiClientServiceImpl extends BaseApiClientServiceImpl implements Ap
 
     @Override
     public ApiResponse<Void> putInsolvency(
-            final String log,
+            final String contextId,
             String companyNumber,
             InternalCompanyInsolvency insolvency) {
-        final String uri =
-                String.format("/company/%s/insolvency", companyNumber);
+        final String uri = String.format("/company/%s/insolvency", companyNumber);
 
-        Map<String,Object> logMap = createLogMap(companyNumber,"PUT", uri);
-        logger.infoContext(log, String.format("PUT %s", uri), logMap);
-
-        return executeOp(log, "putInsolvency", uri,
-                getApiClient(log).privateDeltaInsolvencyResourceHandler()
-                        .putInsolvency()
-                        .upsert(uri, insolvency));
+        return executeOp(getApiClient(contextId).privateDeltaInsolvencyResourceHandler()
+                .putInsolvency()
+                .upsert(uri, insolvency));
     }
 
     @Override
     public ApiResponse<Void> deleteInsolvency(
-            final String log,
+            final String contextId,
             final String companyNumber) {
-        final String uri =
-                String.format("/company/%s/insolvency", companyNumber);
+        final String uri = String.format("/company/%s/insolvency", companyNumber);
 
-        Map<String,Object> logMap = createLogMap(companyNumber,"DELETE", uri);
-        logger.infoContext(log, String.format("DELETE %s", uri), logMap);
-
-        return executeOp(log, "deleteInsolvency", uri,
-                getApiClient(log).privateDeltaInsolvencyResourceHandler()
-                        .deleteInsolvency(uri));
-    }
-
-    private Map<String,Object> createLogMap(String companyNumber, String method, String path) {
-        final Map<String, Object> logMap = new HashMap<>();
-        logMap.put("company_number", companyNumber);
-        logMap.put("method",method);
-        logMap.put("path", path);
-        return logMap;
+        return executeOp(getApiClient(contextId).privateDeltaInsolvencyResourceHandler().deleteInsolvency(uri));
     }
 }

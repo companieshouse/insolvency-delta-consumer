@@ -21,7 +21,7 @@ class ChsDeltaSerializerTest {
 
     @BeforeEach
     public void init() {
-        serializer = new ChsDeltaSerializer(logger);
+        serializer = new ChsDeltaSerializer();
     }
 
     @ParameterizedTest
@@ -37,7 +37,7 @@ class ChsDeltaSerializerTest {
     @Test
     void When_serialize_null_returns_null() {
         byte[] serialize = serializer.serialize("", null);
-        assertThat(serialize).isNull();
+        assertThat(serialize).isEqualTo(new byte[0]);
     }
 
     @Test
@@ -48,7 +48,7 @@ class ChsDeltaSerializerTest {
     }
 
     private ChsDelta decodedData(byte[] chsDelta) {
-        ChsDeltaDeserializer serializer = new ChsDeltaDeserializer(this.logger);
-        return serializer.deserialize("", chsDelta);
+        ChsDeltaDeserializer deserializer = new ChsDeltaDeserializer();
+        return deserializer.deserialize("", chsDelta);
     }
 }
