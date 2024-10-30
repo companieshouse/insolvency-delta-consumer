@@ -79,7 +79,7 @@ class InsolvencyDeltaProcessorTest {
 
         deltaProcessor.processDelete(mockChsDeltaMessage);
 
-        verify(insolvencyApiClient).deleteInsolvency("12345678");
+        verify(insolvencyApiClient).deleteInsolvency("12345678", "20230724093435661593");
     }
 
     @Test
