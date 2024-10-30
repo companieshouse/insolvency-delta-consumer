@@ -1,17 +1,14 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.security.NoSuchAlgorithmException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @TestPropertySource(
         properties = {

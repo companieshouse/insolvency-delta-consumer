@@ -3,23 +3,16 @@ package uk.gov.companieshouse.insolvency.delta.processor;
 import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.NAMESPACE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.delta.Insolvency;
 import uk.gov.companieshouse.api.delta.InsolvencyDeleteDelta;
 import uk.gov.companieshouse.api.delta.InsolvencyDelta;
 import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
-import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.delta.ChsDelta;
+import uk.gov.companieshouse.insolvency.delta.apiclient.InsolvencyApiClient;
 import uk.gov.companieshouse.insolvency.delta.exception.NonRetryableErrorException;
-import uk.gov.companieshouse.insolvency.delta.exception.RetryableErrorException;
 import uk.gov.companieshouse.insolvency.delta.logging.DataMapHolder;
-import uk.gov.companieshouse.insolvency.delta.service.api.ApiClientService;
 import uk.gov.companieshouse.insolvency.delta.transformer.InsolvencyApiTransformer;
 import uk.gov.companieshouse.insolvency.delta.validation.InsolvencyDeltaValidator;
 import uk.gov.companieshouse.logging.Logger;
@@ -31,42 +24,27 @@ public class InsolvencyDeltaProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
 
     private final InsolvencyApiTransformer transformer;
-    private final ApiClientService apiClientService;
     private final InsolvencyDeltaValidator validator;
+    private final InsolvencyApiClient insolvencyApiClient;
 
-    /**
-     * The constructor.
-     */
-    @Autowired
-    public InsolvencyDeltaProcessor(ApiClientService apiClientService,
-            InsolvencyApiTransformer transformer,
-            InsolvencyDeltaValidator validator) {
+    public InsolvencyDeltaProcessor(InsolvencyApiTransformer transformer, InsolvencyDeltaValidator validator,
+            InsolvencyApiClient insolvencyApiClient) {
         this.transformer = transformer;
-        this.apiClientService = apiClientService;
         this.validator = validator;
+        this.insolvencyApiClient = insolvencyApiClient;
     }
 
     /**
      * Process CHS Delta message.
      */
-    public void processDelta(Message<ChsDelta> chsDelta,
-            String topic,
-            String partition,
-            String offset) {
-        final ChsDelta payload = chsDelta.getPayload();
-        final String contextId = payload.getContextId();
-        final String companyNumber;
-
+    public void processDelta(Message<ChsDelta> chsDelta, String topic, String partition, String offset) {
+        LOGGER.info("Extracting insolvency delta from payload", DataMapHolder.getLogMap());
+        ChsDelta payload = chsDelta.getPayload();
         InsolvencyDelta insolvencyDelta = mapToInsolvencyDelta(payload, InsolvencyDelta.class);
-
-        LOGGER.info("Insolvency delta extracted from payload", DataMapHolder.getLogMap());
-
-        /** We always receive only one insolvency/charge per delta in a list,
-         * so we only take the first element
-         * CHIPS is not able to send more than one insolvency per delta.
-         **/
-
         Insolvency insolvency = insolvencyDelta.getInsolvency().get(0);
+
+        final String companyNumber = insolvency.getCompanyNumber();
+        DataMapHolder.get().companyNumber(companyNumber);
 
         try {
             validator.validateCaseDates(insolvency);
@@ -76,45 +54,29 @@ public class InsolvencyDeltaProcessor {
             throw new NonRetryableErrorException(msg, ex);
         }
 
+        LOGGER.info("Transforming delta", DataMapHolder.getLogMap());
         InternalCompanyInsolvency internalCompanyInsolvency = transformer.transform(insolvency);
-        LOGGER.info("Message successfully transformed", DataMapHolder.getLogMap());
-
-        companyNumber = insolvency.getCompanyNumber();
-        DataMapHolder.get().companyNumber(companyNumber);
 
         final String updatedBy = String.format("%s-%s-%s", topic, partition, offset);
         internalCompanyInsolvency.getInternalData().setUpdatedBy(updatedBy);
 
         LOGGER.info("Sending PUT request to Insolvency Data API", DataMapHolder.getLogMap());
-        final ApiResponse<Void> response =
-                apiClientService.putInsolvency(contextId,
-                        companyNumber,
-                        internalCompanyInsolvency);
-
-        handleResponse(HttpStatus.valueOf(response.getStatusCode()));
+        insolvencyApiClient.putInsolvency(companyNumber, internalCompanyInsolvency);
     }
 
     /**
      * Process Insolvency Delete messages.
      */
     public void processDelete(Message<ChsDelta> chsDelta) {
-        final var payload = chsDelta.getPayload();
-        final String contextId = payload.getContextId();
-        final String companyNumber;
+        LOGGER.info("Extracting insolvency delta from payload", DataMapHolder.getLogMap());
+        ChsDelta payload = chsDelta.getPayload();
+        InsolvencyDeleteDelta insolvencyDeleteDelta = mapToInsolvencyDelta(payload, InsolvencyDeleteDelta.class);
 
-        var insolvencyDeleteDelta = mapToInsolvencyDelta(payload, InsolvencyDeleteDelta.class);
-
-        LOGGER.info("Insolvency delta extracted from payload", DataMapHolder.getLogMap());
-
-        companyNumber = insolvencyDeleteDelta.getCompanyNumber();
-
+        final String companyNumber = insolvencyDeleteDelta.getCompanyNumber();
         DataMapHolder.get().companyNumber(companyNumber);
+
         LOGGER.info("Sending DELETE request to Insolvency Data API", DataMapHolder.getLogMap());
-
-        final ApiResponse<Void> response =
-                apiClientService.deleteInsolvency(contextId, companyNumber);
-
-        handleDeleteResponse(HttpStatus.valueOf(response.getStatusCode()));
+        insolvencyApiClient.deleteInsolvency(companyNumber);
     }
 
     private <T> T mapToInsolvencyDelta(ChsDelta payload, Class<T> deltaClass)
@@ -127,45 +89,4 @@ public class InsolvencyDeltaProcessor {
             throw new NonRetryableErrorException("Failed to map to insolvency delta", ex);
         }
     }
-
-    private void handleResponse(final HttpStatus httpStatus)
-            throws NonRetryableErrorException, RetryableErrorException {
-        if (HttpStatus.BAD_REQUEST == httpStatus || HttpStatus.CONFLICT == httpStatus) {
-            LOGGER.error(String.format("PUT request to API returned non-retryable: %d", httpStatus.value()),
-                    DataMapHolder.getLogMap());
-            throw new NonRetryableErrorException(
-                    String.format("PUT request to API returned non-retryable: %d", httpStatus.value()));
-        } else if (!httpStatus.is2xxSuccessful()) {
-            // any other client or server status is retryable
-            LOGGER.info(String.format("PUT request to API returned retryable: %d", httpStatus.value()),
-                    DataMapHolder.getLogMap());
-            throw new RetryableErrorException(
-                    String.format("PUT request to API returned retryable: %d", httpStatus.value()));
-        } else {
-            LOGGER.info("Successful PUT request to insolvency-data-api", DataMapHolder.getLogMap());
-        }
-    }
-
-    private void handleDeleteResponse(final HttpStatus httpStatus)
-            throws NonRetryableErrorException, RetryableErrorException {
-        Set<HttpStatus> nonRetryableStatuses =
-                Collections.unmodifiableSet(EnumSet.of(
-                        HttpStatus.BAD_REQUEST, HttpStatus.CONFLICT));
-
-        if (nonRetryableStatuses.contains(httpStatus)) {
-            LOGGER.error(String.format("DELETE request to API returned non-retryable: %d", httpStatus.value()),
-                    DataMapHolder.getLogMap());
-            throw new NonRetryableErrorException(
-                    String.format("DELETE request to API returned non-retryable: %d", httpStatus.value()));
-        } else if (!httpStatus.is2xxSuccessful()) {
-            // any other client or server status is retryable
-            LOGGER.info(String.format("DELETE request to API returned retryable: %d", httpStatus.value()),
-                    DataMapHolder.getLogMap());
-            throw new RetryableErrorException(
-                    String.format("DELETE request to API returned retryable: %d", httpStatus.value()));
-        } else {
-            LOGGER.info("Successful DELETE request to Insolvency Data API", DataMapHolder.getLogMap());
-        }
-    }
-
 }

@@ -1,17 +1,15 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
-import java.time.LocalDate;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.companieshouse.api.delta.Appointment;
-
 import uk.gov.companieshouse.api.insolvency.Practitioners;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {

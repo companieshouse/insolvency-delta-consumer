@@ -1,10 +1,11 @@
 package uk.gov.companieshouse.insolvency.delta.config;
 
+import static java.time.temporal.ChronoUnit.SECONDS;
+
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -30,8 +31,6 @@ import uk.gov.companieshouse.insolvency.delta.consumer.ResettableCountDownLatch;
 import uk.gov.companieshouse.insolvency.delta.exception.RetryableTopicErrorInterceptor;
 import uk.gov.companieshouse.insolvency.delta.serialization.ChsDeltaDeserializer;
 import uk.gov.companieshouse.insolvency.delta.serialization.ChsDeltaSerializer;
-
-import static java.time.temporal.ChronoUnit.SECONDS;
 
 @TestConfiguration
 public class KafkaTestContainerConfig {

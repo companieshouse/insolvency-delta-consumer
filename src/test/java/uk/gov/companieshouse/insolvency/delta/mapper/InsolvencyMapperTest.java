@@ -1,13 +1,14 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,8 +26,6 @@ import uk.gov.companieshouse.api.insolvency.ModelCase;
 import uk.gov.companieshouse.api.insolvency.PractitionerAddress;
 import uk.gov.companieshouse.api.insolvency.Practitioners;
 import uk.gov.companieshouse.insolvency.delta.config.TestConfig;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {

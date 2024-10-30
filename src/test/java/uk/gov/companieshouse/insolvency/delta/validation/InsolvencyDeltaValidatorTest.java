@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.insolvency.delta.validation;
 
+import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,8 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.api.delta.CaseNumber;
 import uk.gov.companieshouse.api.delta.Insolvency;
 import uk.gov.companieshouse.insolvency.delta.exception.NonRetryableErrorException;
-
-import java.io.IOException;
 
 @ExtendWith(MockitoExtension.class)
 public class InsolvencyDeltaValidatorTest {
