@@ -39,14 +39,14 @@ public class InsolvencyApiClient implements ApiClient {
     }
 
     @Override
-    public void deleteInsolvency(String companyNumber) {
+    public void deleteInsolvency(String companyNumber, String deltaAt) {
         InternalApiClient client = internalApiClientFactory.get();
         client.getHttpClient().setRequestId(DataMapHolder.getRequestId());
 
         final String formattedUri = String.format(REQUEST_URI, companyNumber);
         try {
             client.privateDeltaResourceHandler()
-                    .deleteInsolvency(formattedUri)
+                    .deleteInsolvency(formattedUri, deltaAt)
                     .execute();
         } catch (ApiErrorResponseException ex) {
             responseHandler.handle(ex);

@@ -76,7 +76,7 @@ public class InsolvencyDeltaProcessor {
         DataMapHolder.get().companyNumber(companyNumber);
 
         LOGGER.info("Sending DELETE request to Insolvency Data API", DataMapHolder.getLogMap());
-        insolvencyApiClient.deleteInsolvency(companyNumber);
+        insolvencyApiClient.deleteInsolvency(companyNumber, insolvencyDeleteDelta.getDeltaAt());
     }
 
     private <T> T mapToInsolvencyDelta(ChsDelta payload, Class<T> deltaClass)

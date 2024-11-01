@@ -29,6 +29,7 @@ class InsolvencyApiClientTest {
     private static final String COMPANY_NUMBER = "12345678";
     private static final String REQUEST_URI = String.format("/company/%s/insolvency", COMPANY_NUMBER);
     private static final String CONTEXT_ID = "context_id";
+    private static final String DELTA_AT = "20241010175532456123";
 
     @InjectMocks
     private InsolvencyApiClient insolvencyApiClient;
@@ -131,13 +132,14 @@ class InsolvencyApiClientTest {
         // given
         DataMapHolder.get().requestId(CONTEXT_ID);
 
-        when(privateDeltaResourceHandler.deleteInsolvency(any())).thenReturn(privateInsolvencyDelete);
+        when(privateDeltaResourceHandler.deleteInsolvency(any(), any())).thenReturn(privateInsolvencyDelete);
 
         // when
-        insolvencyApiClient.deleteInsolvency(COMPANY_NUMBER);
+        insolvencyApiClient.deleteInsolvency(COMPANY_NUMBER, DELTA_AT);
 
         // then
         verifyNoInteractions(responseHandler);
+        verify(privateDeltaResourceHandler).deleteInsolvency(REQUEST_URI, DELTA_AT);
     }
 
     @Test
@@ -145,16 +147,17 @@ class InsolvencyApiClientTest {
         // given
         Class<ApiErrorResponseException> exceptionClass = ApiErrorResponseException.class;
 
-        when(privateDeltaResourceHandler.deleteInsolvency(any())).thenReturn(privateInsolvencyDelete);
+        when(privateDeltaResourceHandler.deleteInsolvency(any(), any())).thenReturn(privateInsolvencyDelete);
         when(privateInsolvencyDelete.execute()).thenThrow(exceptionClass);
 
         DataMapHolder.get().requestId(CONTEXT_ID);
 
         // when
-        insolvencyApiClient.deleteInsolvency(COMPANY_NUMBER);
+        insolvencyApiClient.deleteInsolvency(COMPANY_NUMBER, DELTA_AT);
 
         // then
         verify(responseHandler).handle(any(exceptionClass));
+        verify(privateDeltaResourceHandler).deleteInsolvency(REQUEST_URI, DELTA_AT);
     }
 
     @Test
@@ -162,15 +165,16 @@ class InsolvencyApiClientTest {
         // given
         Class<URIValidationException> exceptionClass = URIValidationException.class;
 
-        when(privateDeltaResourceHandler.deleteInsolvency(any())).thenReturn(privateInsolvencyDelete);
+        when(privateDeltaResourceHandler.deleteInsolvency(any(), any())).thenReturn(privateInsolvencyDelete);
         when(privateInsolvencyDelete.execute()).thenThrow(exceptionClass);
 
         DataMapHolder.get().requestId(CONTEXT_ID);
 
         // when
-        insolvencyApiClient.deleteInsolvency(COMPANY_NUMBER);
+        insolvencyApiClient.deleteInsolvency(COMPANY_NUMBER, DELTA_AT);
 
         // then
         verify(responseHandler).handle(any(exceptionClass));
+        verify(privateDeltaResourceHandler).deleteInsolvency(REQUEST_URI, DELTA_AT);
     }
 }
