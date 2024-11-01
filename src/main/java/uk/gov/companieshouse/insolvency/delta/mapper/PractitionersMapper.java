@@ -2,7 +2,6 @@ package uk.gov.companieshouse.insolvency.delta.mapper;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

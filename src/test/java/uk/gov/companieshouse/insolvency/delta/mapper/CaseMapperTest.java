@@ -9,7 +9,6 @@ import static uk.gov.companieshouse.api.insolvency.ModelCase.TypeEnum.ADMINISTRA
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

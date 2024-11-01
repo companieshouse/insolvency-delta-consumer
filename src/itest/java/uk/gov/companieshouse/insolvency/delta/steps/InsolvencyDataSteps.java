@@ -1,28 +1,5 @@
 package uk.gov.companieshouse.insolvency.delta.steps;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
-import io.cucumber.java.After;
-import io.cucumber.java.Before;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.test.utils.KafkaTestUtils;
-import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
-import uk.gov.companieshouse.delta.ChsDelta;
-import uk.gov.companieshouse.insolvency.delta.consumer.ResettableCountDownLatch;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.getAllServeEvents;
 import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
@@ -36,6 +13,28 @@ import static uk.gov.companieshouse.insolvency.delta.config.WiremockTestConfig.s
 import static uk.gov.companieshouse.insolvency.delta.config.WiremockTestConfig.stop;
 import static uk.gov.companieshouse.insolvency.delta.config.WiremockTestConfig.stubInsolvencyDataApiServiceCalls;
 import static uk.gov.companieshouse.insolvency.delta.config.WiremockTestConfig.stubInsolvencyDeleteDataApiServiceCalls;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.test.utils.KafkaTestUtils;
+import uk.gov.companieshouse.api.insolvency.InternalCompanyInsolvency;
+import uk.gov.companieshouse.delta.ChsDelta;
+import uk.gov.companieshouse.insolvency.delta.consumer.ResettableCountDownLatch;
 
 public class InsolvencyDataSteps {
 

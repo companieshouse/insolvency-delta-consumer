@@ -3,7 +3,6 @@ package uk.gov.companieshouse.insolvency.delta.serialization;
 import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.NAMESPACE;
 
 import java.nio.charset.StandardCharsets;
-
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.specific.SpecificDatumWriter;
