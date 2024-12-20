@@ -1,6 +1,6 @@
 package uk.gov.companieshouse.insolvency.delta.transformer;
 
-import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.NAMESPACE;
+import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.APPLICATION_NAMESPACE;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ import uk.gov.companieshouse.logging.LoggerFactory;
 @Component
 public class InsolvencyApiTransformer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
+    private static final Logger LOGGER = LoggerFactory.getLogger(APPLICATION_NAMESPACE);
 
     private final InsolvencyMapper mapper;
     private final InsolvencyStatusMapper insolvencyStatusMapper;

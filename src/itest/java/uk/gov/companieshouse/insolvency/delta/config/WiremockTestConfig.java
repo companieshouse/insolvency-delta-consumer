@@ -1,19 +1,13 @@
 package uk.gov.companieshouse.insolvency.delta.config;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.containing;
-import static com.github.tomakehurst.wiremock.client.WireMock.delete;
-import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-
 import com.github.tomakehurst.wiremock.WireMockServer;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.FileUtils;
 import org.springframework.util.ResourceUtils;
 import uk.gov.companieshouse.delta.ChsDelta;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class WiremockTestConfig {
 
@@ -46,6 +40,7 @@ public class WiremockTestConfig {
     }
 
     public static void stubInsolvencyDataApiServiceCalls(String chNumber, int statusCode) {
+        configureFor(port);
         stubFor(
                 put(urlPathEqualTo("/company/"+chNumber+"/insolvency"))
                         .withRequestBody(containing(chNumber))
@@ -54,6 +49,7 @@ public class WiremockTestConfig {
     }
 
     public static void stubInsolvencyDeleteDataApiServiceCalls(String chNumber, int statusCode) {
+        configureFor(port);
         stubFor(
                 delete(urlPathEqualTo("/company/"+chNumber+"/insolvency"))
                         .willReturn(aResponse()

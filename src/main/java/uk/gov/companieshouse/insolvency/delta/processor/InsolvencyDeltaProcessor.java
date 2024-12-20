@@ -1,6 +1,6 @@
 package uk.gov.companieshouse.insolvency.delta.processor;
 
-import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.NAMESPACE;
+import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.APPLICATION_NAMESPACE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.messaging.Message;
@@ -21,7 +21,7 @@ import uk.gov.companieshouse.logging.LoggerFactory;
 @Component
 public class InsolvencyDeltaProcessor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
+    private static final Logger LOGGER = LoggerFactory.getLogger(APPLICATION_NAMESPACE);
 
     private final InsolvencyApiTransformer transformer;
     private final InsolvencyDeltaValidator validator;

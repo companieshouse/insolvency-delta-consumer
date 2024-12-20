@@ -1,6 +1,6 @@
 package uk.gov.companieshouse.insolvency.delta.validation;
 
-import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.NAMESPACE;
+import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.APPLICATION_NAMESPACE;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -21,7 +21,7 @@ import uk.gov.companieshouse.logging.LoggerFactory;
 @Component
 public class InsolvencyDeltaValidator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
+    private static final Logger LOGGER = LoggerFactory.getLogger(APPLICATION_NAMESPACE);
 
     /**
      * Validate case dates for an insolvency.
