@@ -117,7 +117,7 @@ class InsolvencyDeltaProcessorTest {
                 .withPayload(mockChsDelta)
                 .setHeader(KafkaHeaders.RECEIVED_TOPIC, "topic")
                 .setHeader("INSOLVENCY_DELTA_RETRY_COUNT", 1)
-                .setHeader(KafkaHeaders.RECEIVED_PARTITION_ID, "partition")
+                .setHeader(KafkaHeaders.RECEIVED_PARTITION, "partition")
                 .setHeader(KafkaHeaders.OFFSET, "offset")
                 .build();
     }
@@ -136,7 +136,7 @@ class InsolvencyDeltaProcessorTest {
                 .withPayload(mockChsDelta)
                 .setHeader(KafkaHeaders.RECEIVED_TOPIC, "topic")
                 .setHeader("INSOLVENCY_DELTA_RETRY_COUNT", 1)
-                .setHeader(KafkaHeaders.RECEIVED_PARTITION_ID, "partition")
+                .setHeader(KafkaHeaders.RECEIVED_PARTITION, "partition")
                 .setHeader(KafkaHeaders.OFFSET, "offset")
                 .build();
     }

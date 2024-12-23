@@ -1,6 +1,6 @@
 package uk.gov.companieshouse.insolvency.delta.logging;
 
-import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.NAMESPACE;
+import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.APPLICATION_NAME_SPACE;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -20,7 +20,7 @@ import uk.gov.companieshouse.logging.LoggerFactory;
 @Aspect
 class LoggingKafkaListenerAspect {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
+    private static final Logger LOGGER = LoggerFactory.getLogger(APPLICATION_NAME_SPACE);
     private static final String LOG_MESSAGE_RECEIVED = "Processing delta";
     private static final String LOG_MESSAGE_PROCESSED = "Successfully processed delta";
     private static final String EXCEPTION_MESSAGE = "%s exception thrown";

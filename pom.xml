@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>uk.gov.companieshouse</groupId>
 		<artifactId>companies-house-parent</artifactId>
-		<version>2.1.6</version>
+		<version>2.1.11</version>
 	</parent>
 
 	<artifactId>insolvency-delta-consumer</artifactId>
@@ -16,34 +16,40 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>11</java.version>
+		<java.version>21</java.version>
 
 		<main.class>uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication</main.class>
 
-		<map-struct.version>1.4.2.Final</map-struct.version>
+		<map-struct.version>1.6.3</map-struct.version>
 		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-		<maven-build-helper-plugin.version>3.2.0</maven-build-helper-plugin.version>
-		<maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
-		<docker-maven-plugin.version>1.0.0</docker-maven-plugin.version>
-		<ch-kafka.version>1.4.2</ch-kafka.version>
-		<structured-logging.version>1.9.37</structured-logging.version>
-		<kafka-models.version>1.0.28</kafka-models.version>
-		<private-api-sdk-java.version>2.0.454</private-api-sdk-java.version>
-		<api-sdk-manager-java-library.version>1.0.4</api-sdk-manager-java-library.version>
-		<jib-maven-plugin.version>3.1.1</jib-maven-plugin.version>
-		<io-cucumber.version>7.2.3</io-cucumber.version>
-		<springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
+		<maven-build-helper-plugin.version>3.5.2</maven-build-helper-plugin.version>
+		<maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
+		<docker-maven-plugin.version>1.6.0</docker-maven-plugin.version>
+		<ch-kafka.version>3.0.3</ch-kafka.version>
+		<structured-logging.version>3.0.20</structured-logging.version>
+		<kafka-models.version>3.0.8</kafka-models.version>
+		<private-api-sdk-java.version>4.0.250</private-api-sdk-java.version>
+		<api-sdk-manager-java-library.version>3.0.6</api-sdk-manager-java-library.version>
+		<jib-maven-plugin.version>3.4.4</jib-maven-plugin.version>
+		<io-cucumber.version>7.20.1</io-cucumber.version>
+		<springdoc-openapi-starter-webmvc-ui.version>2.7.0</springdoc-openapi-starter-webmvc-ui.version>
+		<maven-build-helper-plugin.version>3.6.0</maven-build-helper-plugin.version>
+		<avro.version>1.12.0</avro.version>
+		<classgraph.version>4.8.179</classgraph.version>
+		<jetty-server.version>12.0.15</jetty-server.version>
+		<jetty-ee10-webapp.version>12.0.16</jetty-ee10-webapp.version>
+		<logback-core.version>1.5.13</logback-core.version>
 
 		<!-- Tests -->
-		<io-cucumber.version>7.2.3</io-cucumber.version>
+		<io-cucumber.version>7.20.1</io-cucumber.version>
 		<skip.integration.tests>false</skip.integration.tests>
 		<skip.unit.tests>false</skip.unit.tests>
-		<assertj-core.version>3.22.0</assertj-core.version>
-		<wiremock.standalone.version>2.32.0</wiremock.standalone.version>
-		<test-containers.version>1.16.3</test-containers.version>
+		<assertj-core.version>3.26.3</assertj-core.version>
+		<test-containers.version>1.20.4</test-containers.version>
+		<wiremock.version>3.10.0</wiremock.version>
 
 		<!--sonar configuration-->
-		<sonar-maven-plugin.version>3.7.0.1746</sonar-maven-plugin.version>
+		<sonar-maven-plugin.version>5.0.0.4389</sonar-maven-plugin.version>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<sonar.projectKey>uk.gov.companieshouse:insolvency-delta-consumer</sonar.projectKey>
 		<sonar.sources>src/main</sonar.sources>
@@ -53,11 +59,11 @@
 			${project.basedir}/target/site/jacoco/jacoco.xml
 		</sonar.coverage.jacoco.xmlReportPaths>
 		<sonar.jacoco.reports>${project.basedir}/target/site</sonar.jacoco.reports>
-		<spring.boot.version>2.6.4</spring.boot.version>
+		<spring.boot.version>3.4.1</spring.boot.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
+		<maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+		<maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
 	</properties>
 
 	<dependencyManagement>
@@ -94,6 +100,17 @@
 			<artifactId>spring-boot-starter-logging</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>${logback-core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback-core.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-aop</artifactId>
 		</dependency>
@@ -106,6 +123,16 @@
 			<groupId>uk.gov.companieshouse</groupId>
 			<artifactId>kafka-models</artifactId>
 			<version>${kafka-models.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.eclipse.jetty.http2</groupId>
+					<artifactId>http2-server</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-webapp</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>uk.gov.companieshouse</groupId>
@@ -116,6 +143,12 @@
 			<groupId>uk.gov.companieshouse</groupId>
 			<artifactId>structured-logging</artifactId>
 			<version>${structured-logging.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>uk.gov.companieshouse</groupId>
@@ -132,10 +165,15 @@
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-boot-starter</artifactId>
-			<version>${springfox-boot-starter.version}</version>
-			<scope>provided</scope>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>${springdoc-openapi-starter-webmvc-ui.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.jspecify</groupId>
+					<artifactId>jspecify</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -152,6 +190,26 @@
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.scala-lang</groupId>
+					<artifactId>scala-library</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.pcollections</groupId>
+					<artifactId>pcollections</artifactId>
+				</exclusion>
+				<exclusion>
+					<!-- Exclude logback to prevent multiple SLF4J binding warning -->
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+				<exclusion>
+					<!-- Exclude logback to prevent multiple SLF4J binding warning -->
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-core</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
@@ -202,9 +260,30 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.github.tomakehurst</groupId>
-			<artifactId>wiremock-jre8</artifactId>
-			<version>${wiremock.standalone.version}</version>
+			<groupId>org.apache.avro</groupId>
+			<artifactId>avro</artifactId>
+			<version>${avro.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.classgraph</groupId>
+			<artifactId>classgraph</artifactId>
+			<version>${classgraph.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>${jetty-server.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.ee10</groupId>
+			<artifactId>jetty-ee10-webapp</artifactId>
+			<version>${jetty-ee10-webapp.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.wiremock</groupId>
+			<artifactId>wiremock-standalone</artifactId>
+			<version>${wiremock.version}</version>
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
@@ -222,6 +301,14 @@
 				<exclusion>
 					<groupId>com.github.jknack</groupId>
 					<artifactId>handlebars-helpers</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.ethlo.time</groupId>
+					<artifactId>itu</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-webapp</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -387,6 +474,12 @@
 					<container>
 						<expandClasspathDependencies>true</expandClasspathDependencies>
 					</container>
+					<from>
+						<image>416670754337.dkr.ecr.eu-west-2.amazonaws.com/ci-corretto-build-21:latest</image>
+					</from>
+					<to>
+						<image>416670754337.dkr.ecr.eu-west-2.amazonaws.com/insolvency-delta-consumer:latest</image>
+					</to>
 				</configuration>
 			</plugin>
 

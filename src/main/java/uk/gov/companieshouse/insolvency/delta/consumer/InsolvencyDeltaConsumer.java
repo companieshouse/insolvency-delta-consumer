@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.retrytopic.DltStrategy;
-import org.springframework.kafka.retrytopic.FixedDelayStrategy;
 import org.springframework.kafka.retrytopic.RetryTopicHeaders;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
@@ -34,7 +33,6 @@ public class InsolvencyDeltaConsumer {
      */
     @RetryableTopic(attempts = "${insolvency.delta.attempts}",
             backoff = @Backoff(delayExpression = "${insolvency.delta.backoff-delay}"),
-            fixedDelayTopicStrategy = FixedDelayStrategy.SINGLE_TOPIC,
             retryTopicSuffix = "-${insolvency.delta.group-id}-retry",
             dltTopicSuffix = "-${insolvency.delta.group-id}-error",
             dltStrategy = DltStrategy.FAIL_ON_ERROR,
@@ -46,7 +44,7 @@ public class InsolvencyDeltaConsumer {
     public void receiveMainMessages(Message<ChsDelta> message,
             @Header(name = RetryTopicHeaders.DEFAULT_HEADER_ATTEMPTS, required = false) Integer attempt,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) String partition,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) String partition,
             @Header(KafkaHeaders.OFFSET) String offset) {
         ChsDelta chsDelta = message.getPayload();
         if (Boolean.TRUE.equals(chsDelta.getIsDelete())) {
