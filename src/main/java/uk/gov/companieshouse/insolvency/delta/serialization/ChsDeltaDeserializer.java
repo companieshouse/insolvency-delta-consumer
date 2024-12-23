@@ -1,6 +1,6 @@
 package uk.gov.companieshouse.insolvency.delta.serialization;
 
-import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.APPLICATION_NAMESPACE;
+import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.APPLICATION_NAME_SPACE;
 
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.Decoder;
@@ -17,7 +17,7 @@ import uk.gov.companieshouse.logging.LoggerFactory;
 @Component
 public class ChsDeltaDeserializer implements Deserializer<ChsDelta> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(APPLICATION_NAMESPACE);
+    private static final Logger LOGGER = LoggerFactory.getLogger(APPLICATION_NAME_SPACE);
 
     @Override
     public ChsDelta deserialize(String topic, byte[] data) {

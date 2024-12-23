@@ -1,7 +1,7 @@
 package uk.gov.companieshouse.insolvency.delta.apiclient;
 
 
-import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.APPLICATION_NAMESPACE;
+import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.APPLICATION_NAME_SPACE;
 
 import java.util.Arrays;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,7 @@ import uk.gov.companieshouse.logging.LoggerFactory;
 @Component
 public class ResponseHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(APPLICATION_NAMESPACE);
+    private static final Logger LOGGER = LoggerFactory.getLogger(APPLICATION_NAME_SPACE);
     private static final String API_INFO_RESPONSE_MESSAGE = "Call to insolvency-data-api failed, status code: %d. %s";
     private static final String API_ERROR_RESPONSE_MESSAGE = "Call to insolvency-data-api failed, status code: %d";
     private static final String URI_VALIDATION_EXCEPTION_MESSAGE = "Invalid URI";

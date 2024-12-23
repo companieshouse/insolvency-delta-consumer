@@ -1,6 +1,6 @@
 package uk.gov.companieshouse.insolvency.delta.serialization;
 
-import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.APPLICATION_NAMESPACE;
+import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.APPLICATION_NAME_SPACE;
 
 import java.nio.charset.StandardCharsets;
 import org.apache.avro.io.DatumWriter;
@@ -18,7 +18,7 @@ import uk.gov.companieshouse.logging.LoggerFactory;
 @Component
 public class ChsDeltaSerializer implements Serializer<Object> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(APPLICATION_NAMESPACE);
+    private static final Logger LOGGER = LoggerFactory.getLogger(APPLICATION_NAME_SPACE);
 
     @Override
     public byte[] serialize(String topic, Object payload) {
