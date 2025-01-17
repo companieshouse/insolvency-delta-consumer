@@ -5,6 +5,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.retrytopic.DltStrategy;
 import org.springframework.kafka.retrytopic.RetryTopicHeaders;
+import org.springframework.kafka.retrytopic.SameIntervalTopicReuseStrategy;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.Header;
@@ -32,6 +33,7 @@ public class InsolvencyDeltaConsumer {
      * Receives Main topic messages.
      */
     @RetryableTopic(attempts = "${insolvency.delta.attempts}",
+            sameIntervalTopicReuseStrategy = SameIntervalTopicReuseStrategy.SINGLE_TOPIC,
             backoff = @Backoff(delayExpression = "${insolvency.delta.backoff-delay}"),
             retryTopicSuffix = "-${insolvency.delta.group-id}-retry",
             dltTopicSuffix = "-${insolvency.delta.group-id}-error",
