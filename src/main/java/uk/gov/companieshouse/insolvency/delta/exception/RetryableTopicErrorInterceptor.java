@@ -2,7 +2,7 @@ package uk.gov.companieshouse.insolvency.delta.exception;
 
 import static org.springframework.kafka.support.KafkaHeaders.EXCEPTION_CAUSE_FQCN;
 import static org.springframework.kafka.support.KafkaHeaders.EXCEPTION_STACKTRACE;
-import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.NAMESPACE;
+import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.APPLICATION_NAME_SPACE;
 
 import java.util.Map;
 import org.apache.kafka.clients.producer.ProducerInterceptor;
@@ -15,7 +15,7 @@ import uk.gov.companieshouse.logging.LoggerFactory;
 
 public class RetryableTopicErrorInterceptor implements ProducerInterceptor<String, Object> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
+    private static final Logger LOGGER = LoggerFactory.getLogger(APPLICATION_NAME_SPACE);
 
     @Override
     public ProducerRecord<String, Object> onSend(ProducerRecord<String, Object> record) {

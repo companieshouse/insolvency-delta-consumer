@@ -21,10 +21,13 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -155,7 +158,7 @@ public class InsolvencyDataSteps {
     @Then("the message should be moved to topic {string}")
     public void the_message_should_be_moved_to_topic(String topic) {
         ConsumerRecord<String, Object> singleRecord =
-                KafkaTestUtils.getSingleRecord(kafkaConsumer, topic, 5000L);
+                KafkaTestUtils.getSingleRecord(kafkaConsumer, topic, Duration.ofMillis(5000L));
 
         assertThat(singleRecord.value()).isNotNull();
     }
@@ -166,7 +169,7 @@ public class InsolvencyDataSteps {
         verify(1, putRequestedFor(urlMatching("/company/"+this.companyNumber+"/insolvency")));
 
         List<ServeEvent> allServeEvents = getAllServeEvents();
-        ServeEvent serveEvent = allServeEvents.get(0);
+        ServeEvent serveEvent = allServeEvents.getFirst();
         String actualBody = serveEvent.getRequest().getBodyAsString();
         InternalCompanyInsolvency companyInsolvency = objectMapper.readValue(actualBody, InternalCompanyInsolvency.class);
         companyInsolvency.getInternalData().setUpdatedBy(null);

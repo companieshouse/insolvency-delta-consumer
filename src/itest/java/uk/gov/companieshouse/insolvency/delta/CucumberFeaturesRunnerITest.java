@@ -12,5 +12,4 @@ import org.junit.runner.RunWith;
 )
 @CucumberContextConfiguration
 public class CucumberFeaturesRunnerITest extends AbstractIntegrationTest {
-
 }
