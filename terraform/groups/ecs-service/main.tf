@@ -103,7 +103,7 @@ module "ecs-service-kafka-error" {
 
   # Service configuration
   service_name                         = local.service_name_kafka_error
-  name_prefix_kafka_error              = local.name_prefix_kafka_error
+  name_prefix                          = local.name_prefix_kafka_error
   desired_task_count                   = var.desired_task_count_kafka_error
   max_task_count                       = var.max_task_count_kafka_error
   required_cpus                        = var.required_cpus
@@ -123,6 +123,6 @@ module "ecs-service-kafka-error" {
   # Service environment variable and secret configs
   task_environment                      = local.task_environment
   task_secrets                          = local.task_secrets
-  app_environment_filename_kafka_error  = local.app_environment_filename_kafka_error
+  app_environment_filename              = local.app_environment_filename_kafka_error
   use_set_environment_files             = local.use_set_environment_files
 }
