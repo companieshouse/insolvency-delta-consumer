@@ -33,6 +33,13 @@ variable "desired_task_count" {
   description = "The desired ECS task count for this service"
   default = 1 # defaulted low for dev environments, override for production
 }
+
+variable "desired_task_count_kafka_error" {
+  type = number
+  description = "The desired ECS task count for this service"
+  default = 1 # defaulted low for dev environments, override for production
+}
+
 variable "required_cpus" {
   type = number
   description = "The required cpu resource for this service. 1024 here is 1 vCPU"
@@ -45,6 +52,12 @@ variable "required_memory" {
 }
 
 variable "max_task_count" {
+  type        = number
+  description = "The maximum number of tasks for this service."
+  default     = 3
+}
+
+variable "max_task_count_kafka_error" {
   type        = number
   description = "The maximum number of tasks for this service."
   default     = 3
