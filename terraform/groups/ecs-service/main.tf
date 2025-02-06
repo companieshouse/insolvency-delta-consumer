@@ -103,7 +103,7 @@ module "ecs-service-kafka-error" {
 
   # Service configuration
   service_name                         = local.service_name_kafka_error
-  name_prefix                          = local.name_prefix_kafka_error
+  name_prefix                          = local.name_prefix
   desired_task_count                   = var.desired_task_count_kafka_error
   max_task_count                       = var.max_task_count_kafka_error
   required_cpus                        = var.required_cpus

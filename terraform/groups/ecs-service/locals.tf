@@ -2,7 +2,6 @@
 locals {
   stack_name                              = "data-sync" # this must match the stack name (cluster) the service deploys into
   name_prefix                             = "${local.stack_name}-${var.environment}"
-  name_prefix_kafka_error                 = "${local.stack_name}-${var.environment}-kafka-error"
   global_prefix                           = "global-${var.environment}"
   service_name                            = "insolvency-delta-consumer"
   service_name_kafka_error                = "insolvency-delta-kafka-error"
