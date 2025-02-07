@@ -8,6 +8,7 @@ locals {
   service_name_kafka_error                = "insolvency-delta-kafka-error"
   container_port                          = "8080"
   docker_repo                             = "insolvency-delta-consumer"
+  docker_repo_kafka_error                 = "kafka-error-consumer"
   kms_alias                               = "alias/${var.aws_profile}/environment-services-kms"
   healthcheck_path                        = "/insolvency-delta-consumer/healthcheck" # healthcheck path for insolvency-delta-consumer
   healthcheck_matcher                     = "200"

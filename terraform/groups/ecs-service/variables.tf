@@ -140,3 +140,8 @@ variable "insolvency_delta_consumer_version" {
   type        = string
   description = "The version of the insolvency_delta_consumer container to run."
 }
+
+variable "kafka_error_consumer_version" {
+  type        = string
+  description = "The version of the kafka_error_consumer container to run."
+}

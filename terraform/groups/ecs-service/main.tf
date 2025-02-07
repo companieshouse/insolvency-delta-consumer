@@ -97,13 +97,13 @@ module "ecs-service-kafka-error" {
 
   # Docker container details
   docker_registry   = var.docker_registry
-  docker_repo       = local.docker_repo
-  container_version = var.insolvency_delta_consumer_version
+  docker_repo       = local.docker_repo_kafka_error
+  container_version = var.kafka_error_consumer_version
   container_port    = local.container_port
 
   # Service configuration
   service_name                         = local.service_name_kafka_error
-  name_prefix                          = local.name_prefix_kafka_error
+  name_prefix                          = local.name_prefix
   desired_task_count                   = var.desired_task_count_kafka_error
   max_task_count                       = var.max_task_count_kafka_error
   required_cpus                        = var.required_cpus
