@@ -54,6 +54,7 @@ kafka-console-producer.sh --topic delta-topic --broker-list localhost:9092
 The code present in this repository is used to define and deploy a dockerised container in AWS ECS.
 This is done by calling a [module](https://github.com/companieshouse/terraform-modules/tree/main/aws/ecs) from terraform-modules. Application specific attributes are injected and the service is then deployed using Terraform via the CICD platform 'Concourse'.
 
+The __insolvency-delta-consumer__ service also includes (as a pipeline resource) a kafka-error-consumer image called here [kafka-error-release-tag](https://github.com/companieshouse/ci-pipelines/blob/7e0cfd7c9db47d0323e87f0956549796ef12d5a7/pipelines/ssplatform/team-development/insolvency-delta-consumer#L1274), which is used to deploy a corresponding kafka-error service alongside this delta-consumer service. This is done via terraform in an additional ecs-service-kafka-error module, within the insolvency-delta-consumer terraform code.
 
 Application specific attributes | Value                                | Description
 :---------|:-----------------------------------------------------------------------------|:-----------
