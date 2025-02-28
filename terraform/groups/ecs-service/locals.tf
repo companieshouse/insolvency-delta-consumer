@@ -10,6 +10,7 @@ locals {
   docker_repo_kafka_error                 = "kafka-error-consumer"
   kms_alias                               = "alias/${var.aws_profile}/environment-services-kms"
   healthcheck_path                        = "/insolvency-delta-consumer/healthcheck" # healthcheck path for insolvency-delta-consumer
+  healthcheck_path_kafka_error            = "/kafka-error-consumer/healthcheck" # healthcheck path for insolvency-delta-kafka-error
   healthcheck_matcher                     = "200"
   vpc_name                                = local.stack_secrets["vpc_name"]
   s3_config_bucket                        = data.vault_generic_secret.shared_s3.data["config_bucket_name"]

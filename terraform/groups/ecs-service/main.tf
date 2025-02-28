@@ -92,7 +92,7 @@ module "ecs-service-kafka-error" {
 
   # ECS Task container health check
   use_task_container_healthcheck = true
-  healthcheck_path               = local.healthcheck_path
+  healthcheck_path               = local.healthcheck_path_kafka_error
   healthcheck_matcher            = local.healthcheck_matcher
 
   # Docker container details
