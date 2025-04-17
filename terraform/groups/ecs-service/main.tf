@@ -66,8 +66,6 @@ module "ecs-service" {
   use_capacity_provider                = var.use_capacity_provider
   use_fargate                          = var.use_fargate
   fargate_subnets                      = local.application_subnet_ids
-  ecs_cluster_arn                 = data.aws_ecs_cluster.ecs_cluster.arn
-  eventbridge_scheduler_role_arn  = data.aws_iam_role.eventbridge_role.arn
  
 
 
