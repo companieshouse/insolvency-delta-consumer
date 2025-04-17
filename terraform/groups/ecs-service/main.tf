@@ -19,7 +19,7 @@ terraform {
 }
 
 module "secrets" {
-  source = "git@github.com:companieshouse/terraform-modules//aws/ecs/secrets?ref=1.0.296"
+  source = "git@github.com:companieshouse/terraform-modules//aws/ecs/secrets?ref=1.0.315"
 
   name_prefix = "${local.service_name}-${var.environment}"
   environment = var.environment
@@ -28,18 +28,17 @@ module "secrets" {
 }
 
 module "ecs-service" {
-  source = "git@github.com:companieshouse/terraform-modules//aws/ecs/ecs-service?ref=1.0.296"
+  source = "git@github.com:companieshouse/terraform-modules//aws/ecs/ecs-service?ref=1.0.315"
 
   # Environmental configuration
-  environment             = var.environment
-  aws_region              = var.aws_region
-  aws_profile             = var.aws_profile
-  vpc_id                  = data.aws_vpc.vpc.id
-  ecs_cluster_id          = data.aws_ecs_cluster.ecs_cluster.id
-  task_execution_role_arn = data.aws_iam_role.ecs_cluster_iam_role.arn
-  batch_service           = true
+  environment                         = var.environment
+  aws_region                          = var.aws_region
+  aws_profile                         = var.aws_profile
+  vpc_id                              = data.aws_vpc.vpc.id
+  ecs_cluster_id                      = data.aws_ecs_cluster.ecs_cluster.id
+  task_execution_role_arn             = data.aws_iam_role.ecs_cluster_iam_role.arn
+  batch_service                       = true  
   
-
   # ECS Task container health check
   use_task_container_healthcheck = true
   healthcheck_path               = local.healthcheck_path
@@ -67,6 +66,7 @@ module "ecs-service" {
   use_capacity_provider                = var.use_capacity_provider
   use_fargate                          = var.use_fargate
   fargate_subnets                      = local.application_subnet_ids
+ 
 
 
   # Service environment variable and secret configs
@@ -77,17 +77,25 @@ module "ecs-service" {
 }
 
 module "ecs-service-kafka-error" {
-  source = "git@github.com:companieshouse/terraform-modules//aws/ecs/ecs-service?ref=1.0.296"
+  source = "git@github.com:companieshouse/terraform-modules//aws/ecs/ecs-service?ref=1.0.315"
 
   # Environmental configuration
-  environment             = var.environment
-  aws_region              = var.aws_region
-  aws_profile             = var.aws_profile
-  vpc_id                  = data.aws_vpc.vpc.id
-  ecs_cluster_id          = data.aws_ecs_cluster.ecs_cluster.id
-  task_execution_role_arn = data.aws_iam_role.ecs_cluster_iam_role.arn
-  batch_service           = true
+  environment                           = var.environment
+  aws_region                            = var.aws_region
+  aws_profile                           = var.aws_profile
+  vpc_id                                = data.aws_vpc.vpc.id
+  ecs_cluster_id                        = data.aws_ecs_cluster.ecs_cluster.id
+  ecs_cluster_arn                       = data.aws_ecs_cluster.ecs_cluster.arn
+  task_execution_role_arn               = data.aws_iam_role.ecs_cluster_iam_role.arn
+  eventbridge_scheduler_role_arn        = data.aws_iam_role.eventbridge_role.arn  
+  batch_service                         = true
   
+  
+  # Scheduler configuration
+  enable_eventbridge_scheduler          = var.enable_eventbridge_scheduler
+  eventbridge_group_name                = local.name_prefix
+  startup_eventbridge_scheduler_cron    = var.startup_eventbridge_scheduler_cron
+  shutdown_eventbridge_scheduler_cron   = var.shutdown_eventbridge_scheduler_cron 
 
   # ECS Task container health check
   use_task_container_healthcheck = true

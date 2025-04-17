@@ -6,11 +6,13 @@ variable "environment" {
   type        = string
   description = "The environment name, defined in environments vars."
 }
+
 variable "aws_region" {
   default     = "eu-west-2"
   type        = string
   description = "The AWS region for deployment."
 }
+
 variable "aws_profile" {
   default     = "development-eu-west-2"
   type        = string
@@ -45,6 +47,7 @@ variable "required_cpus" {
   description = "The required cpu resource for this service. 1024 here is 1 vCPU"
   default = 256 # defaulted low for dev environments, override for production
 }
+
 variable "required_memory" {
   type = number
   description = "The required memory for this service"
@@ -68,16 +71,19 @@ variable "use_fargate" {
   description = "If true, sets the required capabilities for all containers in the task definition to use FARGATE, false uses EC2"
   default     = true
 }
+
 variable "use_capacity_provider" {
   type        = bool
   description = "Whether to use a capacity provider instead of setting a launch type for the service"
   default     = true
 }
+
 variable "service_autoscale_enabled" {
   type        = bool
   description = "Whether to enable service autoscaling, including scheduled autoscaling"
   default     = true
 }
+
 variable "service_autoscale_target_value_cpu" {
   type        = number
   description = "Target CPU percentage for the ECS Service to autoscale on"
@@ -89,6 +95,7 @@ variable "service_autoscale_scale_in_cooldown" {
   description = "Cooldown in seconds for ECS Service scale in (run fewer tasks)"
   default     = 600
 }
+
 variable "service_autoscale_scale_out_cooldown" {
   type        = number
   description = "Cooldown in seconds for ECS Service scale out (add more tasks)"
@@ -103,6 +110,7 @@ variable "service_scaledown_schedule" {
 
   default     = ""
 }
+
 variable "service_scaleup_schedule" {
   type        = string
   description = "The schedule to use when scaling up the number of tasks to their normal desired level."
@@ -110,6 +118,45 @@ variable "service_scaleup_schedule" {
   # E.g. a value of '5 6 * * ? *' would be Mon-Sun 6:05am.  An empty string indicates that no schedule should be created.
 
   default     = ""
+}
+
+variable "create_eventbridge_scheduler_group" {
+  default     = true
+  description = "Whether to create the ECS EventBridge scheduler group"
+  type        = bool
+}
+
+variable "create_eventbridge_scheduler_role" {
+  default     = true
+  description = "Whether to enable eventbridge scheduler iam role in ecs cluster."
+  type        = bool
+}
+
+# ------------------------------------------------------------------------------
+# Scheduler variables
+# ------------------------------------------------------------------------------
+variable "enable_eventbridge_scheduler" {
+  description = "Whether to enable the EventBridge scheduler for the ECS service"
+  type        = bool
+  default     = false
+}
+
+variable "eventbridge_group_name" {
+  default     = ""
+  description = "Group of the eventbridge schedulers"
+  type        = string
+}
+
+variable "startup_eventbridge_scheduler_cron" {
+  description = "Cron expression for the startup scheduler"
+  type        = string
+  default     = "" 
+}
+
+variable "shutdown_eventbridge_scheduler_cron" {
+  description = "Cron expression for shutdown scheduler"
+  type        = string
+  default     = "" 
 }
 
 # ----------------------------------------------------------------------
