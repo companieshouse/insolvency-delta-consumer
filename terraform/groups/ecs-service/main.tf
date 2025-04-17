@@ -66,8 +66,9 @@ module "ecs-service" {
   use_capacity_provider                = var.use_capacity_provider
   use_fargate                          = var.use_fargate
   fargate_subnets                      = local.application_subnet_ids
-  create_eventbridge_scheduler_group    = var.create_eventbridge_scheduler_group
-  create_eventbridge_scheduler_role     = var.create_eventbridge_scheduler_role
+  ecs_cluster_arn                 = data.aws_ecs_cluster.ecs_cluster.arn
+  eventbridge_scheduler_role_arn  = data.aws_iam_role.eventbridge_role.arn
+ 
 
 
   # Service environment variable and secret configs
@@ -90,8 +91,7 @@ module "ecs-service-kafka-error" {
   task_execution_role_arn               = data.aws_iam_role.ecs_cluster_iam_role.arn
   eventbridge_scheduler_role_arn        = data.aws_iam_role.eventbridge_role.arn  
   batch_service                         = true
-  # create_eventbridge_scheduler_group    = var.create_eventbridge_scheduler_group
-  # create_eventbridge_scheduler_role     = var.create_eventbridge_scheduler_role
+  
   
   # Scheduler configuration
   enable_eventbridge_scheduler          = var.enable_eventbridge_scheduler
