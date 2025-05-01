@@ -7,3 +7,8 @@ use_set_environment_files = true
 required_cpus = 512
 required_memory = 1024
 service_autoscale_scale_in_cooldown = 600
+
+# Scheduler configuration
+enable_eventbridge_scheduler              = true
+startup_eventbridge_scheduler_cron        = "cron(0 0 * * MON-FRI)"
+shutdown_eventbridge_scheduler_cron       = "cron(0 1 * * MON-FRI)"
