@@ -177,6 +177,7 @@ variable "cloudwatch_alarms_enabled" {
 # ------------------------------------------------------------------------------
 # Service environment variable configs
 # ------------------------------------------------------------------------------
+
 variable "ssm_version_prefix" {
   type        = string
   description = "String to use as a prefix to the names of the variables containing variables and secrets version."
