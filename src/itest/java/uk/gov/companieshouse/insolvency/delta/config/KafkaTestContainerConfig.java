@@ -46,8 +46,8 @@ public class KafkaTestContainerConfig {
     }
 
     @Bean
-    public ConfluentKafkaContainer kafkaContainer() {
-        ConfluentKafkaContainer kafkaContainer = new ConfluentKafkaContainer("confluentinc/cp-kafka");
+    public KafkaContainer kafkaContainer() {
+        KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.0.0"));
         kafkaContainer.setWaitStrategy(Wait.defaultWaitStrategy()
                 .withStartupTimeout(Duration.of(300, SECONDS)));
         kafkaContainer.start();
@@ -73,7 +73,7 @@ public class KafkaTestContainerConfig {
     }
 
     @Bean
-    public Map<String, Object> consumerConfigs(ConfluentKafkaContainer kafkaContainer) {
+    public Map<String, Object> consumerConfigs(KafkaContainer kafkaContainer) {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
@@ -87,7 +87,7 @@ public class KafkaTestContainerConfig {
     }
 
     @Bean
-    public ProducerFactory<String, Object> producerFactory(ConfluentKafkaContainer kafkaContainer) {
+    public ProducerFactory<String, Object> producerFactory(KafkaContainer kafkaContainer) {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "false");
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
