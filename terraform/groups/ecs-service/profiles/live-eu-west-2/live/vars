@@ -11,5 +11,5 @@ service_autoscale_scale_in_cooldown = 600
 # Scheduler configuration
 enable_scale_up_eventbridge_scheduler     = true
 enable_scale_down_eventbridge_scheduler   = true
-startup_eventbridge_scheduler_cron        = "cron(0 0 * * MON-FRI)"
-shutdown_eventbridge_scheduler_cron       = "cron(15 0 * * MON-FRI)"
+startup_eventbridge_scheduler_cron        = "cron(0 0 ? * MON-FRI)"
+shutdown_eventbridge_scheduler_cron       = "cron(15 0 ? * MON-FRI)"
