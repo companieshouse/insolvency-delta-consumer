@@ -63,7 +63,7 @@ variable "max_task_count" {
 variable "max_task_count_kafka_error" {
   type        = number
   description = "The maximum number of tasks for this service."
-  default     = 3
+  default     = 1
 }
 
 variable "use_fargate" {
