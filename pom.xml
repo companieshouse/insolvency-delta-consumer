@@ -49,8 +49,8 @@
 		<wiremock.version>3.10.0</wiremock.version>
 
 		<!--sonar configuration-->
-		<sonar-maven-plugin.version>3.11.0.3922</sonar-maven-plugin.version>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+		<sonar.projectName>insolvency-delta-consumer</sonar.projectName>
 		<sonar.projectKey>uk.gov.companieshouse:insolvency-delta-consumer</sonar.projectKey>
 		<sonar.sources>src/main</sonar.sources>
 		<sonar.tests>src/test,src/itest</sonar.tests>
@@ -59,6 +59,10 @@
 			${project.basedir}/target/site/jacoco/jacoco.xml
 		</sonar.coverage.jacoco.xmlReportPaths>
 		<sonar.jacoco.reports>${project.basedir}/target/site</sonar.jacoco.reports>
+		<sonar.token>${CODE_ANALYSIS_TOKEN}</sonar.token>
+		<sonar.login></sonar.login>
+		<sonar.password></sonar.password>
+
 		<spring.boot.version>3.4.1</spring.boot.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
