@@ -39,6 +39,7 @@ public class InsolvencyDeltaProcessor {
      */
     public void processDelta(Message<ChsDelta> chsDelta, String topic, String partition, String offset) {
         LOGGER.info("Extracting insolvency delta from payload", DataMapHolder.getLogMap());
+        LOGGER.info("TEST");
         ChsDelta payload = chsDelta.getPayload();
         InsolvencyDelta insolvencyDelta = mapToInsolvencyDelta(payload, InsolvencyDelta.class);
         Insolvency insolvency = insolvencyDelta.getInsolvency().get(0);
