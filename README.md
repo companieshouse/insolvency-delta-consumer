@@ -60,9 +60,11 @@ The operation of this task has been scheduled to run for a period of 30 minutes 
 
 If you wish to change this cron established period, you must modify it in the environment variables file of the service: 
 
+__terraform/groups/ecs-service/profiles/staging-eu-west-2/staging/vars__
+
 __terraform/groups/ecs-service/profiles/live-eu-west-2/live/vars__
 
-__terraform/groups/ecs-service/profiles/staging-eu-west-2/staging/vars__
+
 
 ```
 
