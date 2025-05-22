@@ -56,6 +56,18 @@ This is done by calling a [module](https://github.com/companieshouse/terraform-m
 
 The __insolvency-delta-consumer__ service also includes (as a pipeline resource) a kafka-error-consumer image called here [kafka-error-release-tag](https://github.com/companieshouse/ci-pipelines/blob/7e0cfd7c9db47d0323e87f0956549796ef12d5a7/pipelines/ssplatform/team-development/insolvency-delta-consumer#L1274), which is used to deploy a corresponding kafka-error service alongside this delta-consumer service. This is done via terraform in an additional ecs-service-kafka-error module, within the insolvency-delta-consumer terraform code.
 
+The operation of this task has been set to run for a period of 30 minutes from 00:00 to 00:30, Monday through Friday. During this time, the kafka-error-consumer task will process existing errors in the queue, which will then appear in the AWS console application logs. Once processed, the task will disconnect until the next scheduled period. 
+
+If you wish to change this established period, you must modify it in the environment variables file of the service: 
+
+__terraform/groups/ecs-service/profiles/live-eu-west-2/live/vars__
+
+__terraform/groups/ecs-service/profiles/staging-eu-west-2/staging/vars__
+
+![kafka-error-consumer scheduler times](image-2.png)
+
+
+
 Application specific attributes | Value                                | Description
 :---------|:-----------------------------------------------------------------------------|:-----------
 **ECS Cluster**        |data-sync                                      | ECS cluster (stack) the service belongs to
