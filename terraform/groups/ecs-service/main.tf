@@ -19,7 +19,7 @@ terraform {
 }
 
 module "secrets" {
-  source = "git@github.com:companieshouse/terraform-modules//aws/ecs/secrets?ref=1.0.315"
+  source = "git@github.com:companieshouse/terraform-modules//aws/ecs/secrets?ref=1.0.324"
 
   name_prefix = "${local.service_name}-${var.environment}"
   environment = var.environment
@@ -28,7 +28,7 @@ module "secrets" {
 }
 
 module "ecs-service" {
-  source = "git@github.com:companieshouse/terraform-modules//aws/ecs/ecs-service?ref=1.0.321"
+  source = "git@github.com:companieshouse/terraform-modules//aws/ecs/ecs-service?ref=1.0.324"
 
   # Environmental configuration
   environment                         = var.environment
@@ -77,7 +77,7 @@ module "ecs-service" {
 }
 
 module "ecs-service-kafka-error" {
-  source = "git@github.com:companieshouse/terraform-modules//aws/ecs/ecs-service?ref=1.0.321"
+  source = "git@github.com:companieshouse/terraform-modules//aws/ecs/ecs-service?ref=1.0.324"
 
   # Environmental configuration
   environment                           = var.environment
@@ -89,7 +89,6 @@ module "ecs-service-kafka-error" {
   task_execution_role_arn               = data.aws_iam_role.ecs_cluster_iam_role.arn
   eventbridge_scheduler_role_arn        = data.aws_iam_role.eventbridge_role.arn  
   batch_service                         = true
-  
   
   # Scheduler configuration
   enable_scale_up_eventbridge_scheduler   = var.enable_scale_up_eventbridge_scheduler
