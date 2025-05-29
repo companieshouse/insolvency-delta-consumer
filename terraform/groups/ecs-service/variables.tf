@@ -39,7 +39,7 @@ variable "desired_task_count" {
 variable "desired_task_count_kafka_error" {
   type = number
   description = "The desired ECS task count for this service"
-  default = 1 # defaulted low for dev environments, override for production
+  default = 0 # defaulted low for dev environments, override for production
 }
 
 variable "required_cpus" {
