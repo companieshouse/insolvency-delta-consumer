@@ -60,6 +60,12 @@ variable "max_task_count" {
   default     = 3
 }
 
+variable "min_task_count_kafka_error" {
+  type        = number
+  description = "The minimum number of tasks for this service."
+  default     = 0
+}
+
 variable "max_task_count_kafka_error" {
   type        = number
   description = "The maximum number of tasks for this service."
