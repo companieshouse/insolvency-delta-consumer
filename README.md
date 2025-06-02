@@ -56,7 +56,7 @@ This is done by calling a [module](https://github.com/companieshouse/terraform-m
 
 The __insolvency-delta-consumer__ service also includes (as a pipeline resource) a kafka-error-consumer image called here [kafka-error-release-tag](https://github.com/companieshouse/ci-pipelines/blob/7e0cfd7c9db47d0323e87f0956549796ef12d5a7/pipelines/ssplatform/team-development/insolvency-delta-consumer#L1274), which is used to deploy a corresponding kafka-error service alongside this delta-consumer service. This is done via terraform in an additional ecs-service-kafka-error module, within the insolvency-delta-consumer terraform code.
 
-The operation of this task has been scheduled to run for a period of 30 minutes from 00:00 to 00:30, Monday through Friday. During this time, the __kafka-error-consumer task__ will process existing errors in the queue, which will then appear in the AWS console application logs. Once processed, the task will disconnect until the next scheduled period. 
+The operation of this task has been scheduled to run for a period of 30 minutes from 00:15 to 00:45, Monday through Friday. During this time, the __kafka-error-consumer task__ will process existing errors in the queue, which will then appear in the AWS console application logs. Once processed, the task will disconnect until the next scheduled period. 
 
 If you wish to change this cron established period, you must modify it in the environment variables file of the service: 
 
@@ -71,8 +71,8 @@ __terraform/groups/ecs-service/profiles/live-eu-west-2/live/vars__
 # Scheduler configuration (for kafka error consumer)
 enable_scale_up_eventbridge_scheduler     = true
 enable_scale_down_eventbridge_scheduler   = true
-startup_eventbridge_scheduler_cron        = "cron(0 0 ? * MON-FRI)"
-shutdown_eventbridge_scheduler_cron       = "cron(30 0 ? * MON-FRI)"
+startup_eventbridge_scheduler_cron        = "cron(15 0 ? * MON-FRI)"
+shutdown_eventbridge_scheduler_cron       = "cron(45 0 ? * MON-FRI)"
 
 ```
 #
