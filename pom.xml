@@ -25,7 +25,7 @@
 		<maven-build-helper-plugin.version>3.6.1</maven-build-helper-plugin.version>
 		<maven-failsafe-plugin.version>3.5.3</maven-failsafe-plugin.version>
 		<jib-maven-plugin.version>3.4.6</jib-maven-plugin.version>
-		<opemtelemtry.version>2.14.0</opemtelemtry.version>
+		<opentelemetry.version>2.14.0</opentelemetry.version>
 
 		<springdoc-openapi-starter-webmvc-ui.version>2.8.9</springdoc-openapi-starter-webmvc-ui.version>
 		<avro.version>1.12.0</avro.version>
@@ -76,7 +76,7 @@
 			<dependency>
 				<groupId>io.opentelemetry.instrumentation</groupId>
 				<artifactId>opentelemetry-instrumentation-bom</artifactId>
-				<version>${opemtelemtry.version}</version>
+				<version>${opentelemetry.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
