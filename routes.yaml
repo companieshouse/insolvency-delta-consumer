@@ -1,5 +1,0 @@
-app_name: insolvency-delta-consumer
-group: api
-weight: 900
-routes:
-   1: ^/insolvency-delta-consumer/healthcheck
