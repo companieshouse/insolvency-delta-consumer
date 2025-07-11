@@ -1,5 +1,4 @@
 #!/bin/bash
-#
 # Start script for insolvency-delta-consumer
 
 
