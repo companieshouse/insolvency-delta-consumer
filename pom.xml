@@ -6,6 +6,7 @@
 		<groupId>uk.gov.companieshouse</groupId>
 		<artifactId>companies-house-parent</artifactId>
 		<version>2.1.12</version>
+		<relativePath/>
 	</parent>
 
 	<artifactId>insolvency-delta-consumer</artifactId>
