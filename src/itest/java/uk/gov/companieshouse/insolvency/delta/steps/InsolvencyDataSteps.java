@@ -14,7 +14,9 @@ import static uk.gov.companieshouse.insolvency.delta.config.WiremockTestConfig.s
 import static uk.gov.companieshouse.insolvency.delta.config.WiremockTestConfig.stubInsolvencyDataApiServiceCalls;
 import static uk.gov.companieshouse.insolvency.delta.config.WiremockTestConfig.stubInsolvencyDeleteDataApiServiceCalls;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
+import tools.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
@@ -27,10 +29,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -76,7 +77,7 @@ public class InsolvencyDataSteps {
     public void insolvency_delta_consumer_service_is_running() {
         ResponseEntity<String> response = restTemplate.getForEntity("/insolvency-delta-consumer/healthcheck", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.valueOf(200));
-        assertThat(response.getBody()).isEqualTo("{\"status\":\"UP\"}");
+        assertThat(response.getBody()).contains("\"status\":\"UP\"");
     }
 
     @When("a {string} with {string} is published to the topic {string} and consumed")
@@ -175,7 +176,8 @@ public class InsolvencyDataSteps {
         companyInsolvency.getInternalData().setUpdatedBy(null);
 
         assertThat(serveEvent.getResponse().getStatus()).isEqualTo(200);
-        assertThat(objectMapper.writeValueAsString(companyInsolvency)).isEqualTo(expectedBody);
+        JSONAssert.assertEquals(expectedBody, objectMapper.writeValueAsString(companyInsolvency),
+                JSONCompareMode.STRICT);
     }
 
 }

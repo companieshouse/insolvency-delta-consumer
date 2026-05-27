@@ -17,6 +17,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.FileCopyUtils;
+import tools.jackson.databind.ObjectMapper;
 import uk.gov.companieshouse.api.delta.Appointment;
 import uk.gov.companieshouse.api.delta.CaseNumber;
 import uk.gov.companieshouse.api.delta.Insolvency;
@@ -45,9 +46,12 @@ class InsolvencyDeltaProcessorTest {
     @Mock
     private InsolvencyApiClient insolvencyApiClient;
 
+    private final ObjectMapper mapper = new ObjectMapper();
+
     @BeforeEach
     void setUp() {
-        deltaProcessor = new InsolvencyDeltaProcessor(transformer, validator, insolvencyApiClient);
+
+        deltaProcessor = new InsolvencyDeltaProcessor(transformer, validator, insolvencyApiClient, mapper);
     }
 
     @Test
