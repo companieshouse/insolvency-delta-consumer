@@ -36,7 +36,7 @@ public class CommonApiSteps {
 
     @And("the client receives response body as {string}")
     public void theClientReceivesRawResponse(String response) {
-        assertThat(lastResponse.getBody()).contains("\"status\":\"UP\"");
+        assertThat(lastResponse.getBody()).contains(response);
     }
 
 }

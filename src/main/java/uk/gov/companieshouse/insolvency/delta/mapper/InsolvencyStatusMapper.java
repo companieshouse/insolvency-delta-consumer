@@ -12,7 +12,7 @@ import static uk.gov.companieshouse.api.insolvency.CompanyInsolvency.StatusEnum.
 
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.insolvency.CompanyInsolvency.StatusEnum;
 

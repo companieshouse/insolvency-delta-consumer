@@ -4,4 +4,4 @@ Feature: Health check API endpoint
     Given the application running
     When the client invokes '/insolvency-delta-consumer/healthcheck' endpoint
     Then the client receives status code of 200
-    And the client receives response body as '{"status":"UP"}'
+    And the client receives response body as '{"groups":["liveness","readiness"],"status":"UP"}'
