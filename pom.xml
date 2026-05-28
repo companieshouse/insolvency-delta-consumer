@@ -35,7 +35,7 @@
 		<log4j2.version>2.25.3</log4j2.version>
 
 		<!-- internal dependencies -->
-		<structured-logging.version>3.0.53</structured-logging.version>
+		<structured-logging.version>3.0.52</structured-logging.version>
 		<private-api-sdk-java.version>4.0.494</private-api-sdk-java.version>
 		<api-sdk-manager-java-library.version>3.0.19</api-sdk-manager-java-library.version>
 		<ch-kafka.version>3.0.9</ch-kafka.version>
@@ -63,7 +63,7 @@
 		<sonar.login></sonar.login>
 		<sonar.password></sonar.password>
 
-		<spring.boot.version>4.1.0-M4</spring.boot.version>
+		<spring.boot.version>4.0.6</spring.boot.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
@@ -97,24 +97,6 @@
 	</dependencyManagement>
 
 	<dependencies>
-		<!-- OVERRIDE -->
-
-		<!-- override tomcat-embed-core to fix CVE-2026-34500, CVE-2026-34487, CVE-2026-34486, CVE-2026-34483 - transitive dependency from spring-boot-starter-web 4.1.0-M4 -->
-		<dependency>
-			<groupId>org.apache.tomcat.embed</groupId>
-			<artifactId>tomcat-embed-core</artifactId>
-			<version>11.0.21</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<!-- override tomcat-embed-websocket to fix CVE-2026-34500, CVE-2026-34487, CVE-2026-34486, CVE-2026-34483 - transitive dependency from spring-boot-starter-web 4.1.0-M4 -->
-		<dependency>
-			<groupId>org.apache.tomcat.embed</groupId>
-			<artifactId>tomcat-embed-websocket</artifactId>
-			<version>11.0.21</version>
-			<scope>compile</scope>
-		</dependency>
-
 		<!-- override jetty-ee10-webapp to fix CVE-2026-1605, CVE-2025-11143 - transitive dependency from kafka-models 3.0.30 -->
 		<dependency>
 			<groupId>org.eclipse.jetty.ee10</groupId>
@@ -122,8 +104,6 @@
 			<version>12.1.8</version>
 			<scope>compile</scope>
 		</dependency>
-
-		<!-- OVERRIDE -->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -147,8 +127,8 @@
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.kafka</groupId>
-			<artifactId>spring-kafka</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-kafka</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
@@ -253,6 +233,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.jupiter</groupId>
+					<artifactId>junit-jupiter-engine</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.kafka</groupId>
