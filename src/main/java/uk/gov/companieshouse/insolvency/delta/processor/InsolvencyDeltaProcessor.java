@@ -2,7 +2,7 @@ package uk.gov.companieshouse.insolvency.delta.processor;
 
 import static uk.gov.companieshouse.insolvency.delta.InsolvencyDeltaConsumerApplication.APPLICATION_NAME_SPACE;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.delta.Insolvency;
@@ -26,12 +26,14 @@ public class InsolvencyDeltaProcessor {
     private final InsolvencyApiTransformer transformer;
     private final InsolvencyDeltaValidator validator;
     private final InsolvencyApiClient insolvencyApiClient;
+    private final ObjectMapper mapper;
 
     public InsolvencyDeltaProcessor(InsolvencyApiTransformer transformer, InsolvencyDeltaValidator validator,
-            InsolvencyApiClient insolvencyApiClient) {
+            InsolvencyApiClient insolvencyApiClient, ObjectMapper mapper) {
         this.transformer = transformer;
         this.validator = validator;
         this.insolvencyApiClient = insolvencyApiClient;
+        this.mapper = mapper;
     }
 
     /**
@@ -81,7 +83,6 @@ public class InsolvencyDeltaProcessor {
 
     private <T> T mapToInsolvencyDelta(ChsDelta payload, Class<T> deltaClass)
             throws NonRetryableErrorException {
-        ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readValue(payload.getData(), deltaClass);
         } catch (Exception ex) {

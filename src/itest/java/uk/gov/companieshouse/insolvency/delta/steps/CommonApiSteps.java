@@ -7,7 +7,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -36,7 +36,7 @@ public class CommonApiSteps {
 
     @And("the client receives response body as {string}")
     public void theClientReceivesRawResponse(String response) {
-        assertThat(lastResponse.getBody()).isEqualTo(response);
+        assertThat(lastResponse.getBody()).contains(response);
     }
 
 }

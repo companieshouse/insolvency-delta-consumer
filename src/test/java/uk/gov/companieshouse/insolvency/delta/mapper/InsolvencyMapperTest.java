@@ -2,7 +2,7 @@ package uk.gov.companieshouse.insolvency.delta.mapper;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDate;

@@ -1,6 +1,6 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import uk.gov.companieshouse.api.delta.PractitionerAddress;
