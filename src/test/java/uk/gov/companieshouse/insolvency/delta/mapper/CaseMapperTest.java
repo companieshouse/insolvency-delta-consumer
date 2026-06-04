@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.Assert.assertTrue;
 import static uk.gov.companieshouse.api.delta.CaseNumber.CaseTypeEnum.ADMINISTRATION;
 import static uk.gov.companieshouse.api.delta.CaseNumber.CaseTypeEnum.RECEIVER_MANAGER;
 import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.ADMINISTRATION_STARTED_ON;
@@ -51,7 +52,7 @@ class CaseMapperTest {
 
         assertThat(targetCase.getType()).isEqualTo(ADMINISTRATION_ORDER);
         assertThat(targetCase.getNumber()).isEqualTo("1");
-        assertThat(targetCase.getNotes()).isNull();
+        assertTrue(targetCase.getNotes().isEmpty());
 
         List<CaseDates> caseDates = targetCase.getDates();
         assertThat(caseDates.size()).isEqualTo(2);

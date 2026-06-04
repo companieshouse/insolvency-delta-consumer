@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -155,11 +156,11 @@ class InsolvencyMapperTest {
 
         // THIRD CASE
         ModelCase thirdCase = externalInsolvencyTarget.getCases().get(2);
-        assertThat(thirdCase.getNotes()).isNull();
+        assertTrue(thirdCase.getNotes().isEmpty());
 
         // FOURTH CASE
         ModelCase fourthCase = externalInsolvencyTarget.getCases().get(3);
-        assertThat(fourthCase.getNotes()).isNull();
+        assertTrue(fourthCase.getNotes().isEmpty());
 
     }
 
