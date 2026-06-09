@@ -52,7 +52,7 @@ class CaseMapperTest {
 
         assertThat(targetCase.getType()).isEqualTo(ADMINISTRATION_ORDER);
         assertThat(targetCase.getNumber()).isEqualTo("1");
-        assertTrue(targetCase.getNotes().isEmpty());
+        assertThat(targetCase.getNotes()).isNull();
 
         List<CaseDates> caseDates = targetCase.getDates();
         assertThat(caseDates.size()).isEqualTo(2);
