@@ -1,7 +1,6 @@
 package uk.gov.companieshouse.insolvency.delta.mapper;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.Assert.assertTrue;
 import static uk.gov.companieshouse.api.delta.CaseNumber.CaseTypeEnum.ADMINISTRATION;
 import static uk.gov.companieshouse.api.delta.CaseNumber.CaseTypeEnum.RECEIVER_MANAGER;
 import static uk.gov.companieshouse.api.insolvency.CaseDates.TypeEnum.ADMINISTRATION_STARTED_ON;
