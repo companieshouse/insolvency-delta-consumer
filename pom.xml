@@ -34,13 +34,6 @@
 		<classgraph.version>4.8.179</classgraph.version>
 		<logback-core.version>1.5.25</logback-core.version>
 
-		<!-- internal dependencies -->
-		<structured-logging.version>4.0.4</structured-logging.version>
-		<private-api-sdk-java.version>6.0.24</private-api-sdk-java.version>
-		<api-sdk-manager-java-library.version>3.0.19</api-sdk-manager-java-library.version>
-		<ch-kafka.version>3.0.9</ch-kafka.version>
-		<kafka-models.version>3.0.30</kafka-models.version>
-
 		<!-- Tests -->
 		<io-cucumber.version>7.23.0</io-cucumber.version>
 		<skip.integration.tests>false</skip.integration.tests>
@@ -198,73 +191,42 @@
 			<artifactId>mapstruct</artifactId>
 			<version>${map-struct.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>uk.gov.companieshouse</groupId>
 			<artifactId>kafka-models</artifactId>
-			<version>${kafka-models.version}</version>
-<!--			<exclusions>-->
-<!--				<exclusion>-->
-<!--					<groupId>org.eclipse.jetty.http2</groupId>-->
-<!--					<artifactId>http2-server</artifactId>-->
-<!--				</exclusion>-->
-<!--				<exclusion>-->
-<!--					<groupId>org.eclipse.jetty</groupId>-->
-<!--					<artifactId>jetty-webapp</artifactId>-->
-<!--				</exclusion>-->
-<!--				<exclusion>-->
-<!--					<groupId>net.minidev</groupId>-->
-<!--					<artifactId>json-smart</artifactId>-->
-<!--				</exclusion>-->
-<!--			</exclusions>-->
+			<version>3.0.40</version>
 		</dependency>
 		<dependency>
 			<groupId>uk.gov.companieshouse</groupId>
 			<artifactId>ch-kafka</artifactId>
-			<version>${ch-kafka.version}</version>
+			<version>4.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>uk.gov.companieshouse</groupId>
 			<artifactId>structured-logging</artifactId>
-			<version>${structured-logging.version}</version>
+			<version>4.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>uk.gov.companieshouse</groupId>
 			<artifactId>private-api-sdk-java</artifactId>
-			<version>${private-api-sdk-java.version}</version>
+			<version>7.2.26</version>
 		</dependency>
 		<dependency>
 			<groupId>uk.gov.companieshouse</groupId>
 			<artifactId>api-sdk-manager-java-library</artifactId>
-			<version>${api-sdk-manager-java-library.version}</version>
-<!--			<exclusions>-->
-<!--				<exclusion>-->
-<!--					<groupId>commons-beanutils</groupId>-->
-<!--					<artifactId>commons-beanutils</artifactId>-->
-<!--				</exclusion>-->
-<!--			</exclusions>-->
+			<version>3.0.30</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>${springdoc-openapi-starter-webmvc-ui.version}</version>
-<!--			<exclusions>-->
-<!--				<exclusion>-->
-<!--					<groupId>org.jspecify</groupId>-->
-<!--					<artifactId>jspecify</artifactId>-->
-<!--				</exclusion>-->
-<!--			</exclusions>-->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-<!--			<exclusions>-->
-<!--				<exclusion>-->
-<!--					<groupId>org.junit.jupiter</groupId>-->
-<!--					<artifactId>junit-jupiter-engine</artifactId>-->
-<!--				</exclusion>-->
-<!--			</exclusions>-->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.kafka</groupId>
@@ -308,6 +270,12 @@
 			<version>${io-cucumber.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- required so the JUnit Platform can run the JUnit4 @RunWith(Cucumber.class) itest runner -->
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.avro</groupId>
 			<artifactId>avro</artifactId>
@@ -324,32 +292,6 @@
 			<artifactId>wiremock-standalone</artifactId>
 			<version>${wiremock.version}</version>
 			<scope>test</scope>
-<!--			<exclusions>-->
-<!--				<exclusion>-->
-<!--					<groupId>org.conscrypt</groupId>-->
-<!--					<artifactId>conscrypt-openjdk-uber</artifactId>-->
-<!--				</exclusion>-->
-<!--				<exclusion>-->
-<!--					<groupId>net.javacrumbs.json-unit</groupId>-->
-<!--					<artifactId>json-unit-core</artifactId>-->
-<!--				</exclusion>-->
-<!--				<exclusion>-->
-<!--					<groupId>com.github.jknack</groupId>-->
-<!--					<artifactId>handlebars</artifactId>-->
-<!--				</exclusion>-->
-<!--				<exclusion>-->
-<!--					<groupId>com.github.jknack</groupId>-->
-<!--					<artifactId>handlebars-helpers</artifactId>-->
-<!--				</exclusion>-->
-<!--				<exclusion>-->
-<!--					<groupId>com.ethlo.time</groupId>-->
-<!--					<artifactId>itu</artifactId>-->
-<!--				</exclusion>-->
-<!--				<exclusion>-->
-<!--					<groupId>org.eclipse.jetty</groupId>-->
-<!--					<artifactId>jetty-webapp</artifactId>-->
-<!--				</exclusion>-->
-<!--			</exclusions>-->
 		</dependency>
 	</dependencies>
 
