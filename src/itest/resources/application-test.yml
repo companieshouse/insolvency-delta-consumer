@@ -36,8 +36,8 @@ management:
         otlp:
           enabled: false
           endpoint: http://localhost:4318/v1/traces
+  otlp:
     metrics:
       export:
-        otlp:
-          enabled: false
-          endpoint: http://localhost:4318/v1/metrics
+        enabled: false
+        url: http://localhost:4318/v1/metrics
